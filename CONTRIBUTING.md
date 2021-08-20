@@ -8,6 +8,6 @@ guides and tutorials to help you through the _issue => fork => pull request_
 workflow, like [this one
 ](https://github.com/firstcontributions/first-contributions)
 
-# What are we doing here?
+# `./misc` (what are we doing here)
 
-Look in the `./design` folder for the plan.
+Look in the `./misc` folder for the plan.
