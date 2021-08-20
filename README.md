@@ -1,5 +1,7 @@
 # ⚡️ Grade Like Lightning 🌩
 
+[![Test Suites](https://github.com/jdevries3133/fast_grader/actions/workflows/tests.yml/badge.svg)](https://github.com/jdevries3133/fast_grader/actions/workflows/tests.yml)
+
 **Grading in Google Classroom _really_ stinks.**
 
 Let's say you are grading a google docs/slides assignment. The grading page
