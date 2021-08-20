@@ -3,7 +3,7 @@
 Additional tools and libraries:
 
 - typescript
-- wagtail
+- tailwind css
 - redux
 - payment (stripe?)
 - jest / react testing library

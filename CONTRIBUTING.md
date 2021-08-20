@@ -11,3 +11,15 @@ workflow, like [this one
 # `./misc` (what are we doing here)
 
 Look in the `./misc` folder for the plan.
+
+# Helper Scripts
+
+In `./scripts`, there are a few helpeful scripts:
+
+| Script            | Purpose                                         |
+| ----------------- | ----------------------------------------------- |
+| `install_deps.sh` | install npm and python dependencies             |
+| `run_all.sh`      | run django and next.js dev servers concurrently |
+| `test_all.sh`     | run django and next.js test suites              |
+
+**Note:** `run_all.sh` has a dependency on `rn`. [See src.](./scripts/run_all.sh)
