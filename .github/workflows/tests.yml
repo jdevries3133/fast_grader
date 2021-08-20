@@ -2,12 +2,13 @@ name: Test Suites
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main, workflow ]
     paths:
       - '**.py'
       - '**.tsx?'
       - '**.jsx?'
       - '**.json'
+      - '**.sh'
       - '**.yml'
   pull_request:
     branches: [ main ]
@@ -17,29 +18,26 @@ on:
       - '**.jsx?'
       - '**.json'
       - '**.yml'
+      - '**.sh'
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python-version: [3.9]
-        node-version: [14, 16]
-
     steps:
     - uses: actions/checkout@v2
-    - name: Set up Python ${{ matrix.python-version }}
+    - name: Set up Python
       uses: actions/setup-python@v2
       with:
-        python-version: ${{ matrix.python-version }}
-    - name: Setup Node ${{ matrix.node-version }}
-    - uses: actions/setup-node@v2
-    - with:
-        node-version: ${{ matrix.node-version }}
+        python-version: 3.9
+    - name: Setup Node
+      uses: actions/setup-node@v2
+      with:
+        node-version: 14
     - name: Install Dependencies
       run: |
         bash scripts/install_deps.sh
+      env:
+        CI_CD: true
     - name: Run Tests
       run: |
         bash scripts/test_all.sh

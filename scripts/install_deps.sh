@@ -17,9 +17,17 @@
 
 
 cd frontend
-npm install
+if [[ $CI_CD ]]; then
+    npm ci
+else
+    npm install
+fi
 
 cd ../backend
 python3 -m venv venv
 pip install --upgrade pip
-pip install -r requirements.txt
+if [[ $CI_CD ]]; then
+    pip install -U -r requirements.txt
+else
+    pip install -r requirements.txt
+fi

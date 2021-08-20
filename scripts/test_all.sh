@@ -18,10 +18,25 @@
 
 # run django and jest test suites
 
+FAILED=0
+
 # django
-source backend/venv/bin/activate
 python3 backend/manage.py test
+
+if [[ $? -ne 0 ]]; then
+    FAILED=1
+fi
 
 
 # next.js
 npm run test --prefix=$(pwd)/frontend
+if [[ $? -ne 0 ]]; then
+    FAILED=1
+fi
+
+if [[ $FAILED -ne 0 ]]; then
+    echo "Test failures occured"
+    exit 1
+else
+    exit 0
+fi

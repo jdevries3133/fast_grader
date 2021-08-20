@@ -18,4 +18,4 @@ from .base import *
 try:
     from .secrets import *  # type: ignore
 except ImportError:
-    raise Exception('Not properly configured: create a secrets.py file') from None
+    raise ImportError('Not properly configured: create a secrets.py file') from None

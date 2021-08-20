@@ -37,3 +37,4 @@ PASSWORD_HASHERS = [
 
 # provide defaults for secure settings that are not included
 SECRET_KEY = 'foo'
+print('foo')
