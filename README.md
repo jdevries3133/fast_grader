@@ -1,8 +1,5 @@
 # ⚡️ Grade Like Lightning 🌩
 
-> This project is currently in **alpha development.** Read our contributing
-> guide and get involved if you want it now!
-
 **Grading in Google Classroom _really_ stinks.**
 
 Let's say you are grading a google docs/slides assignment. The grading page
@@ -36,7 +33,7 @@ This application uses the official Google Classroom and Google Docs APIs. It
 is stable and built right, and as long as EdPuzzle or any of your other
 favorite google classroom integrations keep working this one will too.
 
-### Free and Open Source
+### Open Source
 
 If you know the web, come
 [contribute!](https://github.com/jdevries3133/fast_grader)
