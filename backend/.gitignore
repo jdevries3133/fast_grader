@@ -1,0 +1,25 @@
+# file types
+*.db
+*.sqlite3
+*.log
+*.csv
+*.xlsx
+*.pdf
+
+# editor
+Session.vim
+tags
+.vscode/
+.idea/
+
+# python
+dist/
+build/
+*.egg-info
+__pycache__
+*.pyc
+venv
+
+# django
+static_root
+media_root

@@ -25,20 +25,24 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 
+import os
 from pathlib import Path
+
+
+try:
+    from .secrets import *  # type: ignore
+except ImportError:
+    from .create_secrets_file import main as create_secrets
+    print("Your secrets file does not exist yet. Let's set it up now.")
+    create_secrets()
+    from .secrets import *  # type: ignore
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
-
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-ll5f5*i&u1se0zeg(g0s1pv=48o-2cxdv$9xw8m-ce6agv4ghi'
-
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = bool(os.getenv('DJANGO_DEBUG'))
 
 ALLOWED_HOSTS = []
 
@@ -52,6 +56,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sitemaps',
+
+    'rest_framework',
 ]
 
 MIDDLEWARE = [
@@ -133,6 +140,13 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
 STATIC_URL = '/static/'
+STATIC_ROOT = Path(BASE_DIR, 'static_root')
+
+
+# Where uploaded files go
+# https://docs.djangoproject.com/en/3.2/ref/settings/#media-root
+
+MEDIA_ROOT = Path(BASE_DIR, 'media_root')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
