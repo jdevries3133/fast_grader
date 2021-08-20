@@ -13,9 +13,27 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import os
+"""Speed up tests, provide defaults for secret values."""
 
-if os.getenv('DJANGO_DEBUG'):
-    from .development import *
-else:
-    from .production import *
+from .base import *
+
+import logging
+logging.disable()
+
+
+# --- OPTIMIZATIONS
+
+# debug adds overhead without changing test output
+DEBUG = False
+
+
+# fast but insecure hashing algorithm
+PASSWORD_HASHERS = [
+    'django.contrib.auth.hashers.MD5PasswordHasher',
+]
+
+
+# --- SECRET VALUES PLACEHOLDERS
+
+# provide defaults for secure settings that are not included
+SECRET_KEY = 'foo'

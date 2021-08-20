@@ -13,9 +13,6 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import os
+from django.db import models
 
-if os.getenv('DJANGO_DEBUG'):
-    from .development import *
-else:
-    from .production import *
+# Create your models here.

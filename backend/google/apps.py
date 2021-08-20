@@ -13,9 +13,9 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import os
+from django.apps import AppConfig
 
-if os.getenv('DJANGO_DEBUG'):
-    from .development import *
-else:
-    from .production import *
+
+class GoogleConfig(AppConfig):
+    default_auto_field = 'django.db.models.BigAutoField'
+    name = 'google'
