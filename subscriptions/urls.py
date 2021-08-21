@@ -13,26 +13,11 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-"""Run this script to create your secrets file"""
-from pathlib import Path
-from django.core.management.utils import get_random_secret_key
+from django.urls import path
+
+from .views import profile_home
 
 
-def create_secrets_file(values: dict):
-    with open(Path(Path(__file__).parent, 'secrets.py'), 'w') as f:
-        f.write(f"SECRET_KEY = '{get_random_secret_key()}'\n")
-        for field_name, field_value in values.items():
-            f.write(f"{field_name} = '{field_value}'\n")
-
-
-def main():
-    fields = (
-        'GOOGLE_CLIENT_ID',
-        'GOOGLE_CLIENT_SECRET' 
-    )
-    values = {f : input(f'{f}: ') for f in fields}
-    create_secrets_file(values)
-
-
-if __name__ == '__main__':
-    main()
+urlpatterns = [
+    path('', profile_home)
+]
