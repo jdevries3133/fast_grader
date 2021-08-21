@@ -2,7 +2,7 @@ name: Test Suites
 
 on:
   push:
-    branches: [ main, workflow ]
+    branches: [ main ]
     paths:
       - '**.py'
       - '**.tsx?'
@@ -29,15 +29,14 @@ jobs:
       uses: actions/setup-python@v2
       with:
         python-version: 3.9
-    - name: Setup Node
-      uses: actions/setup-node@v2
-      with:
-        node-version: 14
     - name: Install Dependencies
       run: |
-        bash scripts/install_deps.sh
+        python3 -m venv venv
+        source venv/bin/activate
+        pip install --upgrade pip
+        pip install -r requirements.txt
       env:
         CI_CD: true
     - name: Run Tests
       run: |
-        bash scripts/test_all.sh
+        python3 manage.py test
