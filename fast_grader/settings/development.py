@@ -16,3 +16,7 @@
 
 from .base import *
 from .consume_secrets_file import *
+
+
+# for django-tailwind
+INTERNAL_IPS = ['127.0.0.1']

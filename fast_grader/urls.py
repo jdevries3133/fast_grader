@@ -31,7 +31,13 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from django.shortcuts import render
+
+
+async def hello(request):
+    return render(request, 'base.html')
 
 urlpatterns = [
+    path('', hello),
     path('admin/', admin.site.urls),
 ]

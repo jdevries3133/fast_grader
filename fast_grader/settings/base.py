@@ -30,7 +30,7 @@ from pathlib import Path
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
+BASE_DIR = Path(__file__).resolve().parents[2]
 
 
 DEBUG = bool(os.getenv('DJANGO_DEBUG'))
@@ -49,7 +49,12 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.sitemaps',
 
+    'django_htmx',
     'rest_framework',
+    'tailwind',
+
+    'theme'
+
 ]
 
 MIDDLEWARE = [
@@ -60,7 +65,10 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
+    "django_htmx.middleware.HtmxMiddleware",
 ]
+
 
 ROOT_URLCONF = 'fast_grader.urls'
 
@@ -132,6 +140,9 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATIC_ROOT = Path(BASE_DIR, 'static_root')
+
+
+TAILWIND_APP_NAME = 'theme'
 
 
 # Where uploaded files go
