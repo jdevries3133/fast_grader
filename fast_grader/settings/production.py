@@ -14,8 +14,4 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 from .base import *
-
-try:
-    from .secrets import *  # type: ignore
-except ImportError:
-    raise ImportError('Not properly configured: create a secrets.py file') from None
+from .consume_secrets_file import *
