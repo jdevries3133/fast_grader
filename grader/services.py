@@ -5,7 +5,14 @@ from django.contrib.auth.models import User
 from googleapiclient.discovery import build
 from google.oauth2.credentials import Credentials
 
-from fast_grader.settings.secrets import GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET
+try:
+    from fast_grader.settings.secrets import (
+        GOOGLE_CLIENT_ID,
+        GOOGLE_CLIENT_SECRET
+    )
+except ImportError:
+    GOOGLE_CLIENT_ID = None
+    GOOGLE_CLIENT_SECRET = None
 
 
 def _get_google_api_service(*, user: User, service: str, version: str):

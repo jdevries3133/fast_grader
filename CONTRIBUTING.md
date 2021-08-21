@@ -12,14 +12,8 @@ workflow, like [this one
 
 Look in the `./misc` folder for the plan.
 
-# Helper Scripts
+# Set `$DJANGO_DEBUG`
 
-In `./scripts`, there are a few helpeful scripts:
-
-| Script            | Purpose                                         |
-| ----------------- | ----------------------------------------------- |
-| `install_deps.sh` | install npm and python dependencies             |
-| `run_all.sh`      | run django and next.js dev servers concurrently |
-| `test_all.sh`     | run django and next.js test suites              |
-
-**Note:** `run_all.sh` has a dependency on `rn`. [See src.](./scripts/run_all.sh)
+Set the `DJANGO_DEBUG` environment variable to any truthy value. This not only
+puts django into debug mode, but also uses separate development settings in
+`fast_grader/settings/development.py`.
