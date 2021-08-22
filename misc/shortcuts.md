@@ -11,6 +11,8 @@ implemented later.
 | shift + spacebar | page through student submission |
 | enter            | next student                    |
 | shift + enter    | previous student                |
+| _any number_     | input a grade                   |
+| backspace        | delete a grade                  |
 | c                | compose comment                 |
 | s                | sync with google classroom      |
 | b\<register\>    | comment bank                    |
