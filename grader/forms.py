@@ -13,9 +13,5 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-from django.apps import AppConfig
+from django import forms
 
-
-class GraderConfig(AppConfig):
-    default_auto_field = 'django.db.models.BigAutoField'
-    name = 'grader'

@@ -1,7 +1,24 @@
+# Copyright (C) 2021 John DeVries
+
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 from dataclasses import dataclass
+from typing import Union
 
 from allauth.socialaccount.models import SocialToken
 from django.contrib.auth.models import User
+from django.http.response import Http404
 from googleapiclient.discovery import build
 from google.oauth2.credentials import Credentials
 
@@ -16,10 +33,11 @@ except ImportError:
 
 
 def _get_google_api_service(*, user: User, service: str, version: str):
-    token = SocialToken.objects.get(  # type: ignore
+    qs = SocialToken.objects.filter(  # type: ignore
         account__user=user,
-        account__provider='google'
+        account__provider='google',
     )
+    token = qs.order_by('-expires_at').first()
 
     credentials = Credentials(
         token=token.token,
@@ -44,20 +62,31 @@ def get_google_classroom_service(*, user: User):
 
 
 @ dataclass
-class ClassworkResource:
-    courseId: str
-    courseworkId: str
+class ClassItem:
+    id_: str
+    name: str
 
 
-def parse_assignment_url(*, url) -> ClassworkResource:
-    """Parse the user-pasted url and convert it to a ClassworkResource object,
-    which can be used to fetch more information about the assignment"""
-    # TODO: parse a variety of urls.
-    # note: we will need to parse a variety of url patterns, as described in
-    # the wireframe:
-    # - assg't instructions
-    # - assg't dtails
-    # - assg't submission detail
-    # - assg't grading view
+@ dataclass
+class ClassesList:
+    next_page_token: str
+    classes: list[ClassItem]
 
-    return ClassworkResource('MzgxNTMyMDA3ODU5', 'MzgxNTMyMjU4NTcw')
+
+def list_all_class_names(*, user: User, page_token: Union[str, None]
+                         ) -> ClassesList:
+    # initialize service
+    service = get_google_classroom_service(user=user)
+
+    # fetch data
+    request = service.courses().list(pageSize=30, pageToken=page_token)  # type: ignore
+    response = request.execute()
+    result = response.get('courses')
+
+    # validate response
+    if result is None:
+        raise Http404('User does not have any courses')
+
+    # format data and wrap in dataclasses
+    classes = [ClassItem(r['id'], r['name']) for r in result]
+    return ClassesList(response.get('nextPageToken'), classes)

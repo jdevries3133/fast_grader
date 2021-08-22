@@ -1,6 +1,7 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
+from django.urls.base import reverse
 
 # Create your views here.
 
 def profile_home(request):
-    return render(request, 'subscriptions/home.html')
+    return redirect(reverse('grader'))

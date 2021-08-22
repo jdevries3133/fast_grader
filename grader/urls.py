@@ -15,8 +15,9 @@
 
 from django.urls import path
 
-from .views import grader
+from .views import grader, ChooseCourseView
 
 urlpatterns = [
-    path('', grader),
+    path('', grader, name='grader'),
+    path('list_classes/', ChooseCourseView.as_view(), name='list_classes'),
 ]

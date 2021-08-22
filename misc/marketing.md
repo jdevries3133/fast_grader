@@ -6,25 +6,26 @@ use this.
 
 ## Advertising
 
-Since we are using Next.js (server side rendering), it should be possible to
-set up advertising. Removing the optional message bank component will make
-plenty of room for banner ads on both sides.
+It should be possible to set up advertising. Removing the optional message bank
+component will make plenty of room for banner ads on both sides.
 
-## Guilt
+## Ad-blockers
 
-For people with ad blockers, it would be cool if we could do a dynamic
-component like "hi, this app was created by a New Jersey music teacher, Jack
-DeVries. You have currently spent $\_\_ of his money by using this website with
-an adblocker. Please turn your ad blocker off for this website.
-
-In the meantime, we should just do the spiel without anything fancy.
+For starters, just tell users that I am a teacher and ask kindly. Analytics
+will determine how big of a problem this is in time.
 
 ## Freemium
 
 We can enable additional features for $? per month:
 
+- Clickable UI
 - Message box sidebar
 - Mobile and tablet view (see wireframe)
+
+We will have tight control over who our users are; i.e. they will need to be
+signed into the google accounts bound to their classrooms to use the site.
+That means we can probably offer a free trial and resonably enforce that
+users are not jumping from trial to trial.
 
 ## School Districts
 

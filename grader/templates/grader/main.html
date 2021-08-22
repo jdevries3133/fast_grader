@@ -4,6 +4,6 @@
 
 <h1>Fast Grader</h1>
 
-<code>{{ course }}</code>
+<div hx-get="{% url 'list_classes' %}" hx-trigger="load">
 
 {% endblock %}

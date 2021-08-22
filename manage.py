@@ -37,7 +37,7 @@ def my_modifications(main):
 @ my_modifications
 def main():
     """Run administrative tasks."""
-    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'gravy.settings')
+    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'fast_grader.settings')
     try:
         from django.core.management import execute_from_command_line
     except ImportError as exc:
