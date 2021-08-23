@@ -69,11 +69,11 @@ class ClassItem:
 
 @ dataclass
 class ClassesList:
-    next_page_token: str
+    next_page_token: Union[str, None]
     classes: list[ClassItem]
 
 
-def list_all_class_names(*, user: User, page_token: Union[str, None]
+def list_all_class_names(*, user: User, page_token: Union[str, None]=None
                          ) -> ClassesList:
     # initialize service
     service = get_google_classroom_service(user=user)

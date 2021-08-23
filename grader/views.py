@@ -17,6 +17,7 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 from django.utils.decorators import method_decorator
 from django.views import View
+from django.views.defaults import bad_request
 
 from .services import (
     list_all_class_names
@@ -64,7 +65,7 @@ class ChooseCourseView(View):
         page_token = request.GET.get('next')
         classes = list_all_class_names(user=request.user, page_token=page_token)
 
-        request.session['id_to_course_name_mapping'] = {
+        request.session['_id_to_course_name_mapping'] = {
             c.id_ : c.name for c in classes.classes
         }
         context = {'classes': classes}
@@ -76,7 +77,18 @@ class ChooseCourseView(View):
         _course_choice_made view."""
         choice = request.POST.get('choice')
 
-        choice_name = request.session.get('id_to_course_name_mapping').get(choice)
+        # TODO: the ergonomics of this are not so good. There is no reason
+        # that a deterministic sequence of requests are necessary here. We
+        # could build the mapping at post-request time. However, in the real
+        # world, there is no way for clients to know the ids without first
+        # getting the ids from us. Just like we cannot know Google's ids
+        # before getting it from them. Therefore, this is ok for now and
+        # maybe will be ok forever, but nonetheless is a bit awkward.
+        if not (mapping := request.session.get('_id_to_course_name_mapping')):
+            msg =  'Post request sent before form was acquired via get request'
+            return bad_request(request, msg)
+
+        choice_name = mapping.get(choice)
         request.session['course'] = {'id': choice, 'name': choice_name}
 
         return self._course_choice_made(request)
