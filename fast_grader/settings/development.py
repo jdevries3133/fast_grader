@@ -25,6 +25,10 @@ django_stubs_ext.monkeypatch()
 # for django-tailwind
 INTERNAL_IPS = ['127.0.0.1']
 
+CORS_ORIGIN_ALLOW_ALL = True
+CORS_ALLOW_CREDENTIALS = True
+ALLOWED_HOSTS = ['localhost']
+
 # see Python's logging levels for valid strings to use
 # https://docs.python.org/3/library/logging.html#logging-levels
 LOG_LEVEL = 'DEBUG'

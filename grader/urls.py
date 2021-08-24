@@ -15,11 +15,18 @@
 
 from django.urls import path
 
-from .views import grader, flush_selections, ChooseCourseView, ChooseAssignmentView
+from .views import (
+    grader,
+    flush_selections,
+    grading_tool,
+    ChooseCourseView,
+    ChooseAssignmentView
+)
 
 urlpatterns = [
     path('', grader, name='grader'),
     path('flush_selections/', flush_selections, name='flush_selections'),
+    path('tool/', grading_tool, name='grading_tool'),
     path('choose_course/', ChooseCourseView.as_view(), name='choose_course'),
     path('choose_assignment/', ChooseAssignmentView.as_view(), name='choose_assignment')
 ]

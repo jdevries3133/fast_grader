@@ -49,6 +49,20 @@ def flush_selections(request):
     return redirect(reverse('grader'))
 
 
+@ login_required
+def grading_tool(request):
+    """The main grading tool, which will be fetched after the two setup flows
+    below have been completed."""
+    return render(
+        request,
+        'grader/partials/tool.html',
+        context={
+            'course': request.session['course'],
+            'assignment': request.session['assignment'],
+        }
+    )
+
+
 @ method_decorator(login_required, name='dispatch')
 class ChooseCourseView(View):
     """Flow of htmx partials that leads to request.session['course'] being set.

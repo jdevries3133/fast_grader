@@ -6,12 +6,20 @@ we will immediately fetch the assignment choice partial.
 {% endcomment %}
 
 
-<div>
-  <h3><b>Course </b>{{ course.name }}</h3>
-</div>
+<h3 class="text-black">
+
+  <span class="font-bold text-grey-700">
+    Course:
+  <span/>
+
+  <span class="font-normal text-normal">
+    {{ course.name }}
+  </span>
+
+</h3>
 
 
 <form
   hx-get="{% url 'choose_assignment' %}"
-  hx-trigger="load" 
-  hx-swap="outerHtml" />
+  hx-trigger="load"
+  hx-swap="outerHTML" />

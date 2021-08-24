@@ -1,0 +1,22 @@
+{% comment %}
+
+The main grading tool.
+
+{% endcomment %}
+
+
+<div id="tool-wireframe" class="w-full h-full" hx-get="/grader/tool/" hx-trigger="start">
+
+  <div class="w-full h-full grid gap-1 grid-cols-3">
+    <div class="w-full h-full m-3 bg-gradient-to-br from-gray-100 via-purple-100 to-gray-200 col-span-2">
+      {% comment %}Student Content Panel{% endcomment %}
+
+    </div>
+
+    <div class="w-full h-full m-3 bg-gradient-to-tr from-gray-100 via-purple-100 to-gray-300 col-auto">
+      {% comment %}Interaction Feedback Panel{% endcomment %}
+
+    </div>
+  </div>
+
+</div>

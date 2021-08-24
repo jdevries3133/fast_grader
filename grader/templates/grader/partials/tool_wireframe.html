@@ -1,0 +1,17 @@
+{% comment %}
+
+Wireframe for the grading tool. It will swap with the real grading tool after
+recieving a signal from the end of the course and assignment selection
+process.
+
+{% endcomment %}
+
+
+<div id="tool-wireframe" class="w-full h-full" hx-get="/grader/tool/" hx-trigger="start">
+
+  <div class="w-full h-full grid gap-1 blur-sm grid-cols-3">
+    <div class="w-full h-full m-3 bg-gradient-to-br from-gray-100 via-purple-100 to-gray-300 col-span-2"></div>
+    <div class="w-full h-full m-3 bg-gradient-to-tr from-gray-100 via-purple-100 to-gray-300 col-auto"></div>
+  </div>
+
+</div>

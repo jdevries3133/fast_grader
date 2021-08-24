@@ -2,12 +2,34 @@
 
 {% block content %}
 
-<h1>Fast Grader</h1>
+<header class="container w-screen p-4 m-3 rounded bg-grey">
 
-{% include 'grader/partials/initial_selections.html' %}
 
-<a href="{% url 'flush_selections' %}">
-  <button>Reset</button>
-</a>
+  <h1 class="">Fast Grader</h1>
+
+
+  {% comment %}
+    this div unfolds a chain of htmx modules that ultimately facilitate
+    choosing:
+    - course
+    - assignment
+  {% endcomment %}
+  <div
+    hx-get="{% url 'choose_course' %}"
+    hx-trigger="load"
+    hx-swap="outerHTML"></div>
+
+
+  <a href="{% url 'flush_selections' %}">
+    <button class="p-1 m-1 font-medium text-white bg-red-700 rounded ">Restart</button>
+  </a>
+
+</header>
+
+<main class="container w-screen h-screen">
+  {% include 'grader/partials/tool_wireframe.html' %}
+</main>
+
+
 
 {% endblock %}

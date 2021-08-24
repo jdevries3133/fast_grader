@@ -5,6 +5,20 @@ Is served after the assignment choice has been made.
 {% endcomment %}
 
 
-<div>
-  <h3><b>Assigment: </b>{{ name }}</h3>
-</div>
+<h3 class="text-black">
+
+  <span class="font-bold text-grey-700">
+    Assigment:
+  <span/>
+
+  <span class="font-normal text-normal">
+    {{ name }}
+  </span>
+
+</h3>
+
+
+  <script>
+    // send an event to the grading tool to let it know that we are ready
+    htmx.trigger(htmx.find("#tool-wireframe"), 'start');
+</script>

@@ -6,7 +6,7 @@ selections-wrapper container.
 {% endcomment %}
 
 
-<form hx-post="{% url 'choose_assignment' %}" hx-swap="innerHtml">
+<form hx-post="{% url 'choose_assignment' %}" hx-swap="outerHTML">
 
   {% csrf_token %}
 
@@ -16,12 +16,14 @@ selections-wrapper container.
   {% endif %}
 
 
-  <label for="choice">
+  <label class="block text-sm text-gray-600" for="choice">
     Assignment
   </label>
 
 
-  <select name="choice">
+  <select 
+    class="text-sm md:text-lg"
+    name="choice">
 
     <option>Please choose an assignment</option>
 
@@ -32,5 +34,8 @@ selections-wrapper container.
   </select>
 
 
-  <button>Submit</button>
+  <button
+    class="p-1 m-1 font-medium font-bold text-white bg-indigo-500 rounded">
+    Submit
+  </button>
 </form>

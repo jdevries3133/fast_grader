@@ -37,6 +37,9 @@ def _get_google_api_service(*, user: User, service: str, version: str):
         account__user=user,
         account__provider='google',
     )
+
+    # TODO: sometimes, this token will be empty, and we need to handle
+    # that case somehow. Right now, it just causes an exception.
     token = qs.order_by('-expires_at').first()
 
     credentials = Credentials(
