@@ -76,7 +76,8 @@ class TestChooseCourseView(TestCase):
         html = str(response.content, response.charset)  # type: ignore
 
         # assertion: now, we should just get the placeholder content
-        self.assertInHTML('<h3><b>Course </b>foo course</h3>', html)
+        self.assertIn('Course:', html)
+        self.assertIn('foo course', html)
 
 
     @ patch('grader.views.list_all_class_names')
@@ -123,5 +124,8 @@ class TestChooseCourseView(TestCase):
             'id': 'a_id'
         })
 
-        # assert: some html tag should have this in it
-        self.assertIn(b'>course name a<', response.content)  # type: ignore
+        # assert: we the 'choice made' template should now be served
+        self.assertEqual(
+            response.templates[0].name,
+            'grader/partials/course_choice_made.html'
+        )
