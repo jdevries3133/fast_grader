@@ -1,0 +1,17 @@
+{% comment %}
+
+This partial will load as soon as the class selection is complete. On load,
+we will immediately fetch the assignment choice partial.
+
+{% endcomment %}
+
+
+<div>
+  <h3><b>Course </b>{{ course.name }}</h3>
+</div>
+
+
+<form
+  hx-get="{% url 'choose_assignment' %}"
+  hx-trigger="load" 
+  hx-swap="outerHtml" />

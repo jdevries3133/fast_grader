@@ -4,6 +4,10 @@
 
 <h1>Fast Grader</h1>
 
-<div hx-get="{% url 'list_classes' %}" hx-trigger="load">
+{% include 'grader/partials/initial_selections.html' %}
+
+<a href="{% url 'flush_selections' %}">
+  <button>Reset</button>
+</a>
 
 {% endblock %}

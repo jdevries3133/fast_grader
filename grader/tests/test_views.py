@@ -19,7 +19,7 @@ from django.contrib.auth.models import User
 from django.test import TestCase
 from django.urls.base import reverse
 
-from ..services import ClassItem, ClassesList
+from ..services import Course, CourseList
 
 
 class TestChooseCourseView(TestCase):
@@ -35,17 +35,17 @@ class TestChooseCourseView(TestCase):
     @ patch('grader.views.list_all_class_names')
     def test_get_initial(self, mock):
         # setup mock
-        mock.return_value = ClassesList(next_page_token=None, classes=[
-            ClassItem(id_='a_id', name='a'),
-            ClassItem(id_='b_id', name='b')
+        mock.return_value = CourseList(next_page_token=None, classes=[
+            Course(id_='a_id', name='a'),
+            Course(id_='b_id', name='b')
         ])
 
         # action: make request 
-        response = self.client.get(reverse('list_classes'))
+        response = self.client.get(reverse('choose_course'))
         html = str(response.content, response.charset)  # type: ignore
 
         # assertion: initially, we get the form when no selection is made
-        self.assertIn('<form hx-post="/grader/list_classes/">', html)
+        self.assertIn(f'form hx-post="{reverse("choose_course")}"', html)
         self.assertIn('<option value="a_id">a</option>', html)
         self.assertIn('<option value="b_id">b</option>', html)
 
@@ -61,22 +61,22 @@ class TestChooseCourseView(TestCase):
     @ patch('grader.views.list_all_class_names')
     def test_get_after_choice_made(self, mock):
         # setup: mock
-        mock.return_value = ClassesList(next_page_token=None, classes=[
-            ClassItem(id_='a_id', name='a'),
-            ClassItem(id_='b_id', name='b')
+        mock.return_value = CourseList(next_page_token=None, classes=[
+            Course(id_='a_id', name='a'),
+            Course(id_='b_id', name='b')
         ])
 
         # setup: this mocks the choice being made
         session = self.client.session
-        session['course'] = 'foo'  # not None
+        session['course'] = {'name': 'foo course'}
         session.save()
 
         # action: make the request
-        response = self.client.get(reverse('list_classes'))
+        response = self.client.get(reverse('choose_course'))
         html = str(response.content, response.charset)  # type: ignore
 
         # assertion: now, we should just get the placeholder content
-        self.assertNotIn('form', html)
+        self.assertInHTML('<h3><b>Course </b>foo course</h3>', html)
 
 
     @ patch('grader.views.list_all_class_names')
@@ -84,23 +84,23 @@ class TestChooseCourseView(TestCase):
         """It is important that _id_to_course_name_mapping is defined before
         the post request is made."""
         # setup: mock
-        mock.return_value = ClassesList(next_page_token=None, classes=[
-            ClassItem(id_='a_id', name='a'),
-            ClassItem(id_='b_id', name='b')
+        mock.return_value = CourseList(next_page_token=None, classes=[
+            Course(id_='a_id', name='a'),
+            Course(id_='b_id', name='b')
         ])
 
         # assertion: selection will fail without mapping in client session
-        response = self.client.post(reverse('list_classes'), {
+        response = self.client.post(reverse('choose_course'), {
             'choice': 'a_id'
         })
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, 400)  # type: ignore
 
     @ patch('grader.views.list_all_class_names')
     def test_post_valid_state(self, mock):
         # setup: mock
-        mock.return_value = ClassesList(next_page_token=None, classes=[
-            ClassItem(id_='a_id', name='a'),
-            ClassItem(id_='b_id', name='b')
+        mock.return_value = CourseList(next_page_token=None, classes=[
+            Course(id_='a_id', name='a'),
+            Course(id_='b_id', name='b')
         ])
 
         # setup: put the mapping into the session
@@ -112,16 +112,16 @@ class TestChooseCourseView(TestCase):
         s.save()
 
         # action: make the request with the mapping set up
-        response = self.client.post(reverse('list_classes'), {
+        response = self.client.post(reverse('choose_course'), {
             'choice': 'a_id'
         })
 
         # assert: request shold succeed and session['course'] should be set
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)  # type: ignore
         self.assertEqual(self.client.session['course'], {
             'name': 'course name a',
             'id': 'a_id'
         })
 
         # assert: some html tag should have this in it
-        self.assertIn(b'>course name a<', response.content)
+        self.assertIn(b'>course name a<', response.content)  # type: ignore

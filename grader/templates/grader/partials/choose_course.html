@@ -1,0 +1,28 @@
+<form hx-post="{% url 'choose_course' %}" hx-swap="innerHtml">
+
+  {% csrf_token %}
+
+
+  {% if classes.next_page_token %}
+    <input type="hidden" value="{{ classes.next_page_token }}" />
+  {% endif %}
+
+
+  <label for="choice">
+    Course
+  </label>
+
+
+  <select name="choice">
+
+    <option>Please choose a Google Classroom</option>
+
+    {% for class in classes.classes %}
+      <option value="{{ class.id_ }}">{{ class.name }}</option>
+    {% endfor %}
+
+  </select>
+
+
+  <button>Submit</button>
+</form>

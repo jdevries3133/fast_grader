@@ -1,0 +1,36 @@
+{% comment %}
+
+Loads after the course choose has been made, appended inside the
+selections-wrapper container.
+
+{% endcomment %}
+
+
+<form hx-post="{% url 'choose_assignment' %}" hx-swap="innerHtml">
+
+  {% csrf_token %}
+
+
+  {% if next_page_token %}
+    <input type="hidden" value="{{ next_page_token }}" />
+  {% endif %}
+
+
+  <label for="choice">
+    Assignment
+  </label>
+
+
+  <select name="choice">
+
+    <option>Please choose an assignment</option>
+
+    {% for id, name in assignments.items %}
+      <option value="{{ id }}">{{ name }}</option>
+    {% endfor %}
+
+  </select>
+
+
+  <button>Submit</button>
+</form>

@@ -1,0 +1,18 @@
+{% comment %}
+
+This is the entrypoint for the flow through selecting a course and assignment,
+which uses these partials in this order:
+
+- choose_course.html
+- course_choice_made.html
+- assignment_choice_made.html
+- choose_assignment.html
+
+{% endcomment %}
+
+
+<div>
+
+  <div hx-get="{% url 'choose_course' %}" hx-trigger="load" />
+
+</div>

@@ -62,19 +62,25 @@ def get_google_classroom_service(*, user: User):
 
 
 @ dataclass
-class ClassItem:
+class ClassroomAPIItem:
     id_: str
     name: str
 
 
 @ dataclass
-class ClassesList:
+class Course(ClassroomAPIItem): ...
+
+
+@ dataclass
+class CourseList:
     next_page_token: Union[str, None]
-    classes: list[ClassItem]
+
+    # TODO: rename this field "items" because courses.courses is nasty
+    classes: list[Course]
 
 
 def list_all_class_names(*, user: User, page_token: Union[str, None]=None
-                         ) -> ClassesList:
+                         ) -> CourseList:
     # initialize service
     service = get_google_classroom_service(user=user)
 
@@ -88,5 +94,44 @@ def list_all_class_names(*, user: User, page_token: Union[str, None]=None
         raise Http404('User does not have any courses')
 
     # format data and wrap in dataclasses
-    classes = [ClassItem(r['id'], r['name']) for r in result]
-    return ClassesList(response.get('nextPageToken'), classes)
+    classes = [Course(r['id'], r['name']) for r in result]
+    return CourseList(response.get('nextPageToken'), classes)
+
+
+@ dataclass
+class Assignment(ClassroomAPIItem): ...
+
+
+@ dataclass
+class AssignmentList:
+    next_page_token: Union[str, None]
+
+    # TODO: rename this field "items" because assignments.assignments is nasty
+    assignments: list[Assignment]
+
+
+def list_all_assignment_names(
+    *,
+    user: User,
+    course: Course,
+    page_token: Union[str, None]=None
+) -> AssignmentList:
+    # initialize service
+    service = get_google_classroom_service(user=user)
+
+    # fetch data
+    response = service.courses().courseWork().list(  # type: ignore
+        pageSize=30,
+        pageToken=page_token,
+        courseId=course.id_,
+        orderBy='dueDate'
+    ).execute()
+    data = response.get('courseWork')
+
+    # validate resonse
+    if data is None:
+        raise Http404('User does not have any courses')
+
+    # format data and wrap in dataclasses
+    classes = [Assignment(r['id'], r['title']) for r in data]
+    return AssignmentList(response.get('nextPageToken'), classes)
