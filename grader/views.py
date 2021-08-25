@@ -22,10 +22,18 @@ from django.urls import reverse
 from django.views import View
 from django.views.defaults import bad_request, page_not_found
 
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+from rest_framework.permissions import IsAuthenticated
+
 from .services import (
     Course,
     list_all_class_names,
-    list_all_assignment_names
+    list_all_assignment_names,
+    get_assignment_data,
+    get_student_data,
+    sync_assignment_data
 )
 
 logger = logging.getLogger(__name__)
@@ -166,6 +174,12 @@ class ChooseAssignmentView(View):
             - the purpose of this view is to define this value
             - keys are `id` and `name`
 
+        student_id_to_name_mapping: dict
+            - responses later in the process only return student ids
+            - if we want the user to be able to see the name, we need to
+              make sure that the mapping is saved after this class's flow
+              has completed.
+
         _id_to_assignment_name_mapping: dict
             - private mapping used by this view only and discarded when view
             - flow is complete
@@ -193,6 +207,8 @@ class ChooseAssignmentView(View):
 
         # 2. quick exit if the assgt is already chosen
         if self.request.session.get('assignment') is not None:
+            print(f'{self.request.session.get("course")=}')
+            print(f'{self.request.session.get("assignment")=}')
             return self._choice_made()
 
         return super().dispatch(*a, **kw)
@@ -248,9 +264,60 @@ class ChooseAssignmentView(View):
 
         return result.next_page_token
 
+    def map_student_ids_to_names(self):
+        """There comes a point in all of this where we get student ids with
+        their coursework, but the names are not included. When that happens,
+        we need to be able to lookup the names by id."""
+        names = get_student_data(
+            user=self.request.user,
+            course_id=self.request.session['course']['id']
+        )
+        self.request.session['student_id_to_name_mapping'] = {
+            n.id_ : n.name for n in names
+        }
+
     def _choice_made(self):
+        # TODO: grabbing the names here is kind of a quick hack. Is there a
+        # better way?
+        if self.request.session.get('student_id_to_name_mapping') is None:
+            self.map_student_ids_to_names()
         return render(
             self.request,
             'grader/partials/assignment_choice_made.html',
             context=self.request.session['assignment']
         )
+
+
+
+class AssessmentDataView(APIView):
+    """Interacts with frontend javascript in static/script.js for serving and
+    recieving assessment feedback data."""
+
+    permission_classes = [IsAuthenticated]
+
+    def dispatch(self, request, *a, **kw):
+        if (
+            request.session.get('course') is None
+            or request.session.get('assignment') is None
+        ):
+            msg = (
+                'Course and assignment must be selected before assignment '
+                'data can be served.'
+            )
+            return Response(msg, status.HTTP_400_BAD_REQUEST)
+        return super().dispatch(request, *a, **kw)
+
+    def get(self, request):
+        # note: we should let the client pick the text wrapping with a url
+        # param, then format it here in python where that is easier to do.
+        data = get_assignment_data(
+            course_id=request.session['course']['id'],
+            assignment_id=request.session['assignment']['id'],
+            user=request.user,
+            page_token=request.query_params.get('next_page')
+        )
+        return Response(data)
+
+    def post(self, request):
+        """Sync the data"""
+        return Response('')

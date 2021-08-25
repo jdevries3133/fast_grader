@@ -45,10 +45,30 @@ work and work well, because it is here to stay.
 If it is possible for th site to turn a profit, we definitely want it to scale
 automatically and do its thing.
 
-# Detail on Beta Features
+# Pre-Release Chores
+
+- [ ] set up advertising
+- [ ] deploy to an auto-scaling service
+- [ ] profile the application to ensure that advertising will be profitable
+      on its own, and that we need not impose additional limits
+
+# Detail on Post-Release and Premium Features
 
 ### Data Model
 
 Although the application will primarily be an intermediary between the user
 and their google data, we will still need our own database to manage user
 permissions and subscriptions.
+
+### Rich Data?
+
+Turns out we can easily export docs to any MIME type, presumably including
+text/html. So, it might be trivial to create a rich data view:
+
+[docs](https://developers.google.com/resources/api-libraries/documentation/drive/v3/python/latest/drive_v3.files.html#export)
+
+### Security
+
+The XSS vulnerabilities noted in [htmx's security
+documentation](https://htmx.org/docs/#security) needs to be protected against.
+Maybe there is a library for this already?

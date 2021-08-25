@@ -3,7 +3,6 @@
 @tailwind utilities;
 
 @layer base {
-
   h1 {
     @apply text-3xl;
   }
@@ -17,4 +16,13 @@
     @apply text-grey;
   }
 
+  button {
+    @apply rounded;
+    @apply shadow;
+    @apply bg-green-100;
+    @apply hover:bg-green-200;
+    @apply p-1;
+    @apply m-1;
+    @apply focus:ring-green-400;
+  }
 }
