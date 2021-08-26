@@ -20,9 +20,12 @@
  * globals and application state
  */
 
-const data_uri = "/grader/assignment_data/";
+const dataUri = "/grader/assignment_data/";
 
 const state = {
+  // set to true after data is fetched
+  ready: false,
+
   // the global shortcut listener is paused when we are recieving keyboard
   // input and don't want it to do anything
   shortcutListenerActive: true,
@@ -47,9 +50,8 @@ const state = {
         id: "",
         studentName: "",
         studentSubmission: "", // this will be a *long* string (plain text)
-        grade: null,
         maxGrade: 100,
-        comment: "",
+        comment: [""], // list of strings, to map to <p> tags
       },
     ],
   },
@@ -88,8 +90,10 @@ function copyStr(str) {
  * Populate state.assignmentData.assignments
  */
 async function fetchData() {
-  const data = await fetch(data_uri);
-  console.log(data);
+  const data = await fetch(dataUri);
+  state.assignmentData.assignments = await data.json();
+  state.ready = true;
+  updateView();
 }
 
 /**
@@ -102,7 +106,23 @@ function syncData() {}
  * We aren't in happy react land anymore, so this will update the DOM, and we
  * can call it from other functions whenever we update the global state.
  */
-function updateView() {}
+function updateView() {
+  current =
+    state.assignmentData.assignments[
+      state.assignmentData.currentlyViewingIndex
+    ];
+  const nameEl = document.getElementById("grName");
+  const gradeEl = document.getElementById("grGrade");
+  const commentEl = document.getElementById("grComment");
+  const pagerEl = document.getElementById("studentContent");
+
+  nameEl.innerText = current.studentName;
+  gradeEl.innerText = current.grade || "__";
+  commentEl.innerText = current.comment || "__";
+  pagerEl.innerHTML = current.studentSubmission.map(
+    (parText) => `<code class="break-word my-3 block">${parText}</code>`
+  );
+}
 
 /**
  * The student submission can be paged by any integer; a percentage of the
@@ -216,6 +236,9 @@ function handleCommentBank(postfix) {
  * can disable shortcuts when they are recieving text input, for example.
  */
 function handleKeyPress(e) {
+  if (!state.ready) {
+    return;
+  }
   switch (e.key) {
     // comment bank
     case "b":
@@ -246,7 +269,6 @@ function handleKeyPress(e) {
  * Shift key inverts some commands
  */
 function handleKeyDown(e) {
-  console.log(e);
   if (e.key === "Shift") {
     state.shiftHeld = true;
   }
@@ -266,6 +288,5 @@ document.body.addEventListener("keypress", handleKeyPress);
 document.body.addEventListener("keydown", handleKeyDown);
 document.body.addEventListener("keyup", handleKeyUp);
 
-// initialize data. This needs to respond to an event at the end of the
-// course and assignment selection flow, though; not just fire right away.
-fetchData();
+// TODO: custom event for fetching data that can be triggered by htmx
+setTimeout(fetchData, 1000);

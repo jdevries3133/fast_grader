@@ -6,18 +6,63 @@ The main grading tool.
 
 
 
-<div id="tool-wireframe" class="w-full h-full" hx-get="/grader/tool/" hx-trigger="start">
+<div id="tool-wireframe" class="h-3/5" hx-get="/grader/tool/" hx-trigger="start">
 
   <div class="w-full h-full grid gap-1 grid-cols-3">
-    <div class="w-full h-full m-3 bg-gradient-to-br from-gray-100 via-purple-100 to-gray-200 col-span-2">
+    <div id="studentContent" class="w-full h-full p-3 m-3 text-code bg-gradient-to-br from-gray-100 via-purple-100 to-gray-200 col-span-2">
       {% comment %}Student Content Panel{% endcomment %}
 
     </div>
 
-    <div class="w-full h-full m-3 bg-gradient-to-tr from-gray-100 via-purple-100 to-gray-300 col-auto">
+    <div class="w-full h-full p-3 m-3 bg-gradient-to-tr from-gray-100 via-purple-100 to-gray-300 col-auto">
       {% comment %}Interaction Feedback Panel{% endcomment %}
 
+      <div class="sticky top-0">
+        <div>
+          <h3 class="text-black">StudentName</h3>
+          <p id="grName" class="text-grey-800">...</p>
+          <h3 class="text-black">Grade</h3>
+          <p id="grGrade" class="text-grey-800">...</p>
+          <h3 class="text-black">Current Comment</h3>
+          <p id="grComment" class="text-grey-800">...</p>
+        </div>
+        <div>
+          <h2>Keyboard Shortcuts</h2>
+          <div class="grid grid-cols-2">
+            <p class="text-black bold">spacebar</p>
+            <p class="text-black ">Page through student submission</p>
+
+            <p class="text-black bold">shift + spacebar</p>
+            <p class="text-black ">Page backwards through student submission</p>
+
+            <p class="text-black bold">enter</p>
+            <p class="text-black ">Next student</p>
+
+            <p class="text-black bold">shift + enter</p>
+            <p class="text-black ">Previous student</p>
+
+            <p class="italic text-black bold">any number</p>
+            <p class="text-black ">Input grade</p>
+
+            <p class="text-black bold">backspace</p>
+            <p class="text-black ">delete grade</p>
+
+            <p class="text-black bold">c</p>
+            <p class="text-black ">compose comment</p>
+
+            <p class="text-black bold">s</p>
+            <p class="text-black ">sync with google classroom</p>
+
+            <p class="text-black bold">b <span class="italic"><character></span></p>
+            <p class="text-black ">
+              comment bank
+
+              <a class="inline" href="{% url 'faq' %}#comment_bank">
+                <button class="w-8 h-8 rounded-full">?</button>
+              </a>
+            </p>
+        </div>
+      </div>
     </div>
   </div>
-
 </div>

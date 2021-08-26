@@ -32,6 +32,8 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 
+def noop(r):
+    return 'noop'
 
 urlpatterns = [
     path('', include('theme.urls')),
@@ -39,4 +41,6 @@ urlpatterns = [
     path('accounts/profile/', include('subscriptions.urls')),
     path('grader/', include('grader.urls')),
     path('admin/', admin.site.urls),
+
+    path('faq/', noop, name='faq')  # temp
 ]

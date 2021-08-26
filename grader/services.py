@@ -176,10 +176,11 @@ class AssignmentSubmission(TypedDict):
     the actual names."""
     id_: str
     student_profile_id: str
-    # this is the submission processed down into plain text
-    student_submission: str
+    # this is the submission processed down into plain text. Each entry will
+    # be mapped to a <p> tag on the frontend
+    student_submission: list[str]
     # grade: Union[int, None]
-    # max_grade: int
+    max_grade: int
     comment: str
 
 
@@ -190,8 +191,16 @@ def _fetch_raw_assignment_data(
     page_token:
     str=None
 ):
+    """Returns a tuple of submission_data and assignment_data.
+
+    Submission data contains information about the students' submissions,
+    like google drive links.
+
+    Assignment data constains details about the assignment, like the
+    maximum number of points
+    """
     service = get_google_classroom_service(user=user)
-    return service.courses().courseWork().studentSubmissions().list(  # type: ignore
+    submsision_data = service.courses().courseWork().studentSubmissions().list(  # type: ignore
         courseId=course_id,
         courseWorkId=assignment_id,
         pageToken=page_token,
@@ -199,6 +208,11 @@ def _fetch_raw_assignment_data(
         # a single comment would be a *pretty sweet* premium feature
         states='TURNED_IN'
     ).execute()
+    assignment_data = service.courses().courseWork().get(  # type: ignore
+        courseId=course_id,
+        id=assignment_id,
+    ).execute()
+    return submsision_data, assignment_data
 
 
 def download_drive_file_as(*, user: User, id_: str, mime_type: str) -> str:
@@ -215,7 +229,7 @@ def download_drive_file_as(*, user: User, id_: str, mime_type: str) -> str:
     ).execute()
 
 
-def concatenate_attachments(*, user: User, attachments: list[dict]) -> str:
+def concatenate_attachments(*, user: User, attachments: list[dict]) -> list[str]:
     """Given a submission object from the google classroom api, download each
     attachment as plain text and concatenate them together, inserting the
     name of the document into the concatednated string."""
@@ -233,7 +247,7 @@ def concatenate_attachments(*, user: User, attachments: list[dict]) -> str:
             data = service.files().export(  # type: ignore
                 fileId=a['driveFile']['id'],
                 mimeType='text/plain'
-            ).execute()
+            )
 
             # TODO: confirm that utf8 is *always* the correct encoding. I don't
             # see where I can get the google api client to tell me what
@@ -257,7 +271,7 @@ def concatenate_attachments(*, user: User, attachments: list[dict]) -> str:
                 'from a GSuite program like Google Docs, Google Slides, etc.'
             )
 
-    return '\n'.join(output)
+    return output
 
 
 def get_assignment_data(
@@ -284,20 +298,29 @@ def get_assignment_data(
         This is a wrapper service that calls into .assignment_data, which
         contains the nitty gritty details
     """
-    data = _fetch_raw_assignment_data(course_id, assignment_id, user, page_token)
-    raw_submissions = data.get('studentSubmissions', [])
-    submissions = []
-    for sub in raw_submissions:
-        submissions.append(AssignmentSubmission(
+    # TODO: if we want to implement diff mode, the links to the original
+    # assignment materials are included in the assignment object
+    submissions, assignment = _fetch_raw_assignment_data(
+        course_id,
+        assignment_id,
+        user,
+        page_token
+    )
+
+    submissions = submissions.get('studentSubmissions', [])
+    output = []
+    for sub in submissions:
+        output.append(AssignmentSubmission(
             id_=sub['id'],
             student_profile_id=sub['userId'],
             student_submission=concatenate_attachments(
                 user=user,
                 attachments=sub['assignmentSubmission']['attachments']
             ),
+            max_grade=assignment['maxPoints'],
             comment=''
         ))
-    return submissions
+    return output
 
 
 
@@ -312,4 +335,5 @@ def sync_assignment_data(*, data: list[AssignmentSubmission]):
         - This is a wrapper service that calls into .assignment_data, which
           contains the nitty gritty details
     """
+    raise NotImplementedError
 

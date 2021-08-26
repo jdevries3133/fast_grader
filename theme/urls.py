@@ -17,7 +17,7 @@ from django.shortcuts import render
 from django.urls import path
 
 
-async def index(request):
+def index(request):
     return render(request, 'index.html')
 
 

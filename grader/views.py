@@ -14,6 +14,8 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import logging
+from pathlib import Path
+import json
 
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
@@ -31,8 +33,8 @@ from .services import (
     Course,
     list_all_class_names,
     list_all_assignment_names,
-    get_assignment_data,
     get_student_data,
+    get_assignment_data,
     sync_assignment_data
 )
 
@@ -316,7 +318,19 @@ class AssessmentDataView(APIView):
             user=request.user,
             page_token=request.query_params.get('next_page')
         )
-        return Response(data)
+        map_ = request.session['student_id_to_name_mapping']
+
+        # get name from mapping, and adapt to a more javascript-friendly
+        # data structure
+        formatted_data = [
+            {
+                'id': i['id_'],
+                'studentName': map_[i['student_profile_id']],
+                'studentSubmission': i['student_submission'],
+                'comment': i['comment']
+            } for i in data
+        ]
+        return Response(formatted_data)
 
     def post(self, request):
         """Sync the data"""
