@@ -239,15 +239,15 @@ def concatenate_attachments(*, user: User, attachments: list[dict]) -> list[str]
     for a in attachments:
         attachment_name = a.get('driveFile', {}).get('title') or 'Unknown'
         # header
-        output.append('\n'.join((
+        output.extend((
             attachment_name,
             '=' * len(attachment_name)
-        )))
+        ))
         try:
             data = service.files().export(  # type: ignore
                 fileId=a['driveFile']['id'],
                 mimeType='text/plain'
-            )
+            ).execute()
 
             # TODO: confirm that utf8 is *always* the correct encoding. I don't
             # see where I can get the google api client to tell me what
@@ -323,6 +323,15 @@ def get_assignment_data(
     return output
 
 
+def apply_comment(*, comment: str, documentId: str):
+    """Comments will, for now, be applied as unanchored comments on the first
+    assignment attachment.
+
+    Note:
+        - The classroom API does not allow programmatic comments in Google
+          Classroom.
+    """
+    raise NotImplementedError
 
 
 def sync_assignment_data(*, data: list[AssignmentSubmission]):
@@ -336,4 +345,3 @@ def sync_assignment_data(*, data: list[AssignmentSubmission]):
           contains the nitty gritty details
     """
     raise NotImplementedError
-

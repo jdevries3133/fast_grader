@@ -23,8 +23,9 @@
 const dataUri = "/grader/assignment_data/";
 
 const state = {
-  // set to true after data is fetched
-  ready: false,
+  // The init event may fire more than once, but we only want to respond to
+  // it the first time
+  started: false,
 
   // the global shortcut listener is paused when we are recieving keyboard
   // input and don't want it to do anything
@@ -93,7 +94,6 @@ async function fetchData() {
   const data = await fetch(dataUri);
   state.assignmentData.assignments = await data.json();
   state.ready = true;
-  updateView();
 }
 
 /**
@@ -119,9 +119,14 @@ function updateView() {
   nameEl.innerText = current.studentName;
   gradeEl.innerText = current.grade || "__";
   commentEl.innerText = current.comment || "__";
-  pagerEl.innerHTML = current.studentSubmission.map(
-    (parText) => `<code class="break-word my-3 block">${parText}</code>`
-  );
+  pagerEl.innerHTML = current.studentSubmission
+    .map((parText) => `<code class="break-word my-3 block">${parText}</code>`)
+    .join("\n");
+}
+
+function removeBlur() {
+  const container = document.getElementById("toolContainer");
+  container.classList.remove("blur-sm");
 }
 
 /**
@@ -236,9 +241,6 @@ function handleCommentBank(postfix) {
  * can disable shortcuts when they are recieving text input, for example.
  */
 function handleKeyPress(e) {
-  if (!state.ready) {
-    return;
-  }
   switch (e.key) {
     // comment bank
     case "b":
@@ -281,12 +283,19 @@ function handleKeyUp(e) {
 }
 
 /****************************************************************************
- * Register event listeners
+ * Initialization and event listeners
  */
 
-document.body.addEventListener("keypress", handleKeyPress);
-document.body.addEventListener("keydown", handleKeyDown);
-document.body.addEventListener("keyup", handleKeyUp);
+async function init() {
+  if (!state.started) {
+    state.starated = true;
+    await fetchData();
+    removeBlur();
+    updateView();
+    document.body.addEventListener("keypress", handleKeyPress);
+    document.body.addEventListener("keydown", handleKeyDown);
+    document.body.addEventListener("keyup", handleKeyUp);
+  }
+}
 
-// TODO: custom event for fetching data that can be triggered by htmx
-setTimeout(fetchData, 1000);
+document.body.addEventListener("startGrader", init);

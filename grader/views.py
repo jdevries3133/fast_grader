@@ -279,16 +279,18 @@ class ChooseAssignmentView(View):
         }
 
     def _choice_made(self):
-        # TODO: grabbing the names here is kind of a quick hack. Is there a
-        # better way?
+        # after the choice is made, we can get the students' names
         if self.request.session.get('student_id_to_name_mapping') is None:
             self.map_student_ids_to_names()
-        return render(
+        response =  render(
             self.request,
             'grader/partials/assignment_choice_made.html',
-            context=self.request.session['assignment']
+            context=self.request.session['assignment'],
         )
-
+        # after the choice is made, we can send a signal to the frontend to
+        # initialize the grading tool
+        response['Hx-Trigger'] = 'startGrader'
+        return response
 
 
 class AssessmentDataView(APIView):
