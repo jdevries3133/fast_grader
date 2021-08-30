@@ -38,11 +38,11 @@ from .services import (
     sync_assignment_data
 )
 
-logger = logging.getLogger(__name__)
 
-# TODO: social login is required for these views. We need a means of
-# either preventing non-social-login users all together , or directing them
-# through a different authentication flow.
+# TODO: test paging in all cases
+
+
+logger = logging.getLogger(__name__)
 
 
 @ login_required
@@ -85,27 +85,37 @@ class ChooseCourseView(View):
         POST: select a class
 
     Session Data:
-        course: services.Course
+        course: dict(id: str, name: str)
             - the course that will be used throughout the grading session
             - the purpose of this view is to define this value
-            - keys are `id` and `name`
 
         _id_to_course_name_mapping: dict
-            - private mapping used by this view only and discarded when view
-            - flow is complete
+            - private mapping used by this view only
 
     Note:
         This view does not use a Django form, because the choices are dynamic.
         This implementation mirrors the below ChooseAssignmentView
+
+    Refactor:
+        In a future refactor, it might be a good idea to move some state into
+        hidden form fields, or otherwise be a bit more flexible about the
+        sequence that requests come in. Currently, POSTing a class choice
+        before GETting the form, for example, is a bad request. In reality,
+        we could be more flexible about taking what we get, and we could
+        also keep some of the session data stored in hypertext. Just something
+        to think about, and it applys for the assignment choice view below,
+        as well.
     """
+
+    def dispatch(self, request, *a, **kw):
+        """Early exit if the course choice was already made."""
+        if request.session.get('course') is not None:
+            return self._course_choice_made(request)
+        return super().dispatch(request, *a, **kw)
 
     def get(self, request):
         """Return the form to set the course if it is not already set.
         Otherwise, return the _course_choice_made view."""
-        if request.session.get('course') is not None:
-            return self._course_choice_made(request)
-
-        # TODO: test paging
         page_token = request.GET.get('next')
         classes = list_all_class_names(user=request.user, page_token=page_token)
 
@@ -121,13 +131,6 @@ class ChooseCourseView(View):
         _course_choice_made view."""
         choice_id = request.POST.get('choice')
 
-        # TODO: the ergonomics of this are not so good. There is no reason
-        # that a deterministic sequence of requests are necessary here. We
-        # could build the mapping at post-request time. However, in the real
-        # world, there is no way for clients to know the ids without first
-        # getting the ids from us. Just like we cannot know Google's ids
-        # before getting it from them. Therefore, this is ok for now and
-        # maybe will be ok forever, but nonetheless is a bit awkward.
         if not (mapping := request.session.get('_id_to_course_name_mapping')):
             msg =  'Post request sent before form was acquired via get request'
             return bad_request(request, msg)
@@ -136,12 +139,6 @@ class ChooseCourseView(View):
         if not choice_name:
             return page_not_found(request, 'Course does not exist in course names')
 
-        # TODO: there is a coupling problem here, because we need to unset the
-        # assignment before changing the course if the assignment has been
-        # previously set. This creates coupling between this class and the
-        # class below; it's not clear to me what the solution is, but for
-        # now I just clear session['assignment'] here where we set
-        # session['course']
         if request.session.get('assignment'):
             del request.session.get['assignment']
         request.session['course'] = {'id': choice_id, 'name': choice_name}
@@ -193,7 +190,7 @@ class ChooseAssignmentView(View):
         in the fact that the mapping is created if not defined on a post
         request.
     """
-    # TODO: test paging
+
 
     def dispatch(self, *a, **kw):
 
@@ -209,8 +206,6 @@ class ChooseAssignmentView(View):
 
         # 2. quick exit if the assgt is already chosen
         if self.request.session.get('assignment') is not None:
-            print(f'{self.request.session.get("course")=}')
-            print(f'{self.request.session.get("assignment")=}')
             return self._choice_made()
 
         return super().dispatch(*a, **kw)

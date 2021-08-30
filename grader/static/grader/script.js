@@ -39,6 +39,7 @@ const state = {
     currentlyViewingIndex: 0,
     assignments: [
       {
+        // this is example will be replaced after the call to fetchData()
         id: "",
         studentName: "",
         studentSubmission: [""],
@@ -48,13 +49,10 @@ const state = {
     ],
   },
 
-  // comment bank store
-  // TODO: sync with and read from localStorage (premium feature?)
   commentBank: {
     sequenceStarted: false,
     registers: {
-      // store for the comment bank. For example:
-      // v: 'I am the comment in register `v`'
+      // comments in each comment bank register will be stored here
     },
     sequenceType: {
       value: "noop",

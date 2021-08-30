@@ -72,3 +72,14 @@ text/html. So, it might be trivial to create a rich data view:
 The XSS vulnerabilities noted in [htmx's security
 documentation](https://htmx.org/docs/#security) needs to be protected against.
 Maybe there is a library for this already?
+
+### Nicities
+
+- Sorting and filtering by assignment type
+- Returning all unsubmitted assignments with a zero and a single comment
+- Email the student and/or parents directly from the app with "e" to write a
+  student-directed email or "E" for student and parent(s) according to the
+  contact information in google classroom
+- Save comment bank
+- Keyboard shortcut for jumping to a specific student
+- Grade the same assignment _across_ multiple classrooms

@@ -26,6 +26,9 @@ from googleapiclient.discovery import build
 from google.oauth2.credentials import Credentials
 from googleapiclient.errors import HttpError as GoogClientHttpError
 
+
+# in testing environments, the secrets file may not exist, so it's ok in those
+# cases to continue, since google api services will be mocked, anyway
 try:
     from fast_grader.settings.secrets import (
         GOOGLE_CLIENT_ID,
@@ -36,9 +39,11 @@ except ImportError:
     GOOGLE_CLIENT_SECRET = None
 
 
-# TODO: refactor this into smaller modules by factoring out:
-# - types and enumerations
+# todo: refactor this into smaller modules by factoring out:
+# - dataclasses
 # - google api adapter
+#
+# especially because we might end up with several api adapter integrations
 
 
 logger = logging.getLogger(__name__)
@@ -89,8 +94,6 @@ class Course(ClassroomAPIItem): ...
 @ dataclass
 class CourseList:
     next_page_token: Union[str, None]
-
-    # TODO: rename this field "items" because courses.courses is nasty
     classes: list[Course]
 
 
@@ -137,8 +140,6 @@ class Assignment(ClassroomAPIItem): ...
 @ dataclass
 class AssignmentList:
     next_page_token: Union[str, None]
-
-    # TODO: rename this field "items" because assignments.assignments is nasty
     assignments: list[Assignment]
 
 
@@ -204,8 +205,6 @@ def _fetch_raw_assignment_data(
         courseId=course_id,
         courseWorkId=assignment_id,
         pageToken=page_token,
-        # TODO: this reminds me, giving a zero to all missing submissions with
-        # a single comment would be a *pretty sweet* premium feature
         states='TURNED_IN'
     ).execute()
     assignment_data = service.courses().courseWork().get(  # type: ignore
@@ -248,10 +247,8 @@ def concatenate_attachments(*, user: User, attachments: list[dict]) -> list[str]
                 fileId=a['driveFile']['id'],
                 mimeType='text/plain'
             ).execute()
-
-            # TODO: confirm that utf8 is *always* the correct encoding. I don't
-            # see where I can get the google api client to tell me what
-            # encoding it was requesting
+            # localization/internationalization: this may become an issue if
+            # utf8 is not the encoding in all locales
             output.append(str(data, 'utf8'))
 
         except GoogClientHttpError as e:
@@ -298,8 +295,6 @@ def get_assignment_data(
         This is a wrapper service that calls into .assignment_data, which
         contains the nitty gritty details
     """
-    # TODO: if we want to implement diff mode, the links to the original
-    # assignment materials are included in the assignment object
     submissions, assignment = _fetch_raw_assignment_data(
         course_id,
         assignment_id,
