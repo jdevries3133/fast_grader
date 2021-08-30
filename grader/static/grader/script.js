@@ -25,7 +25,7 @@ const dataUri = "/grader/assignment_data/";
 const state = {
   // The init event may fire more than once, but we only want to respond to
   // it the first time
-  started: false,
+  isAppInitialized: false,
 
   // the global shortcut listener is paused when we are recieving keyboard
   // input and don't want it to do anything
@@ -34,15 +34,6 @@ const state = {
   // shift key inverts some commands
   shiftHeld: true,
 
-  // allow an escape hatch from keyboard-only scroll to be more user friendly
-  scrollMode: {
-    value: "k",
-    choices: {
-      keyboardOnly: "k",
-      scrollableDiv: "s",
-    },
-  },
-
   // all google classroom data
   assignmentData: {
     currentlyViewingIndex: 0,
@@ -50,9 +41,9 @@ const state = {
       {
         id: "",
         studentName: "",
-        studentSubmission: "", // this will be a *long* string (plain text)
+        studentSubmission: [""],
         maxGrade: 100,
-        comment: [""], // list of strings, to map to <p> tags
+        comment: [""],
       },
     ],
   },
@@ -81,6 +72,25 @@ const state = {
  */
 
 /**
+ * Responds to the event that starts the application. Before the application
+ * is started, there are some htmx elements on the page for settings
+ * configuration
+ */
+async function init() {
+  if (!state.isAppInitialized) {
+    state.isAppInitialized = true;
+
+    await fetchData();
+    updateView();
+    removeBlur();
+
+    document.body.addEventListener("keypress", handleKeyPress);
+    document.body.addEventListener("keydown", handleKeyDown);
+    document.body.addEventListener("keyup", handleKeyUp);
+  }
+}
+
+/**
  * Hack to force a string to be copied.
  */
 function copyStr(str) {
@@ -106,7 +116,7 @@ function syncData() {}
  * We aren't in happy react land anymore, so this will update the DOM, and we
  * can call it from other functions whenever we update the global state.
  */
-function updateView() {
+async function updateView() {
   current =
     state.assignmentData.assignments[
       state.assignmentData.currentlyViewingIndex
@@ -120,7 +130,8 @@ function updateView() {
   gradeEl.innerText = current.grade || "__";
   commentEl.innerText = current.comment || "__";
   pagerEl.innerHTML = current.studentSubmission
-    .map((parText) => `<code class="break-word my-3 block">${parText}</code>`)
+    .slice(current.currentlyViewingIndex)
+    .map((chunk) => `<code class="break-word my-3 block">${chunk}</code>`)
     .join("\n");
 }
 
@@ -129,44 +140,95 @@ function removeBlur() {
   container.classList.remove("blur-sm");
 }
 
-/**
- * The student submission can be paged by any integer; a percentage of the
- * height of the text pager element. Negative values will cause a scroll
- * backwards while positive ones will scroll forwards.
- *
- * This is only used when the sroll mode is set to keyboard only (the default).
- */
-function pageSubmission(scrollBy) {}
-
-/**
- * Recieve the event from the scroll mode toggle switch.
- *
- * In keyboard-only mode, the text will not be "scrollable," but users can
- * page through with the keyboard like a terminal application. This is the
- * default because it is much faster and is part of the core concept of the
- * app.
- *
- * However, users can also switch to normal scroll mode, where we will just let
- * the student work pane be a plain scrollable div.
- */
-function handleScrollModeToggle(e) {}
+function applyBlur() {
+  const container = document.getElementById("toolContainer");
+  container.classList.add("blur-sm");
+}
 
 /**
  * Every time the user types an number or backspace, it will be entered into
  * the grade "field".
  */
-function handleGradeInput(char) {}
+function handleGradeInput(char) {
+  const current =
+    state.assignmentData.assignments[
+      state.assignmentData.currentlyViewingIndex
+    ];
+  // concatenate the input to the grade field, only if it is a number
+  if (char !== "Backspace") {
+    value = parseInt(char);
+    if (!isNaN(value)) {
+      const newValue = current.grade + value.toString();
+      // prevent leading zeroes
+      if (value === 0 && !current.grade) {
+        return;
+      }
+      // prevent excessive values
+      if (newValue <= current.maxGrade) {
+        current.grade = newValue;
+      }
+    }
+  } else {
+    // "backspace" the last number from the grade field
+    current.grade = current.grade.slice(0, -1);
+  }
+  updateView();
+}
 
 /**
  * Called when the user types "c": the shortcut for writing a comment. This
  * opens the comment field for editing.
  */
-function handleManualComment() {}
+function handleManualComment(e) {
+  e.preventDefault();
+  console.log(e);
+}
 
 /**
- * Prompt the user for a new comment bank comment
+ * Inject a form for the user to compose a comment, either into a comment
+ * bank register, or as a manual comment.
  */
-function _combankGetNewValue(registerName, currentValue) {}
+function commentBankPrompt(
+  registerName,
+  currentValue,
+  prompt = "Please enter your comment"
+) {
+  // validate register
+  let register;
+  if (!/[a-zA-Z,.\/;']/.test(registerName)) {
+    register = registerName;
+  } else {
+    // manual comment
+    register = null;
+  }
+
+  // update DOM
+  applyBlur();
+
+  f = document.createElement("form", {
+    id: "commentForm",
+  });
+  f.addEventListener(
+    "submit",
+    register ? handleCommentBank : handleManualComment
+  );
+  f.classList.add(...["bg-red-900", "fixed", "z-10"]);
+  f.innerHTML = `
+    ${
+      (register &&
+        `<input type="hidden" name="register" value="${register}" />`) ||
+      ""
+    }
+    <label for="comment">${prompt}</label>
+    <textarea name="comment" placeholder="Enter your comment">${
+      currentValue || ""
+    }</textarea>
+    <input type="submit" value="Submit" />
+  `;
+  container = document
+    .getElementById("toolContainer")
+    .parentNode.appendChild(f);
+}
 
 /**
  * A comment bank sequence is 'b' or 'B' followed by any postfix character.
@@ -180,7 +242,8 @@ function _combankGetNewValue(registerName, currentValue) {}
  * comment bank entries.
  *
  */
-function handleCommentBank(postfix) {
+function handleCommentBank(e) {
+  e.preventDefault();
   // it only *is* a postfix if some prefix was set
   if (
     state.commentBank.sequenceType.value ===
@@ -208,7 +271,7 @@ function handleCommentBank(postfix) {
     const currentValue = state.commentBank.registers[postfix];
     if (currentValue === undefined) {
       // the register was undefined, we need to get a new value
-      const newVal = _combankGetNewValue(postfix);
+      const newVal = commentBankPrompt(postfix);
       state.commentBank.registers[postfix] = newVal;
       return restoreNoop();
     } else {
@@ -227,7 +290,7 @@ function handleCommentBank(postfix) {
     // allow the user to input a new comment no matter what; allow them to
     // edit a value if it is already there, and then apply the value.
     const currentValue = state.commentBank.registers[postfix] || "";
-    const newVal = _combankGetNewValue(postfix, currentValue);
+    const newVal = commentBankPrompt(postfix, currentValue);
     state.commentBank.registers[postfix] = newVal;
     return restoreNoop();
   }
@@ -253,6 +316,7 @@ function handleKeyPress(e) {
       break;
     case "c":
       // manual comment
+      commentBankPrompt();
       break;
     case " ":
       // keyboard shortcut scroll
@@ -261,9 +325,14 @@ function handleKeyPress(e) {
       // next or prev student
       break;
     default:
-      // the only other possibility is that this is a comment bank postfix.
-      // the handler will determine whether that is the case
-      handleCommentBank(e.target.value);
+      if (e.keyCode >= 48 && e.keyCode <= 71) {
+        // number or backspace
+        handleGradeInput(e.key);
+      } else {
+        // the only other possibility is that this is a comment bank postfix.
+        // the handler will determine whether that is the case
+        handleCommentBank(e.target.value);
+      }
   }
 }
 
@@ -271,8 +340,12 @@ function handleKeyPress(e) {
  * Shift key inverts some commands
  */
 function handleKeyDown(e) {
-  if (e.key === "Shift") {
-    state.shiftHeld = true;
+  switch (e.key) {
+    case "Shift":
+      state.shiftHeld = true;
+      break;
+    case "Backspace":
+      handleGradeInput(e.key);
   }
 }
 
@@ -283,19 +356,6 @@ function handleKeyUp(e) {
 }
 
 /****************************************************************************
- * Initialization and event listeners
+ * Main event listener
  */
-
-async function init() {
-  if (!state.started) {
-    state.starated = true;
-    await fetchData();
-    removeBlur();
-    updateView();
-    document.body.addEventListener("keypress", handleKeyPress);
-    document.body.addEventListener("keydown", handleKeyDown);
-    document.body.addEventListener("keyup", handleKeyUp);
-  }
-}
-
 document.body.addEventListener("startGrader", init);

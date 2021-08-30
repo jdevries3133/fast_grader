@@ -2,13 +2,21 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <title>{% block title %}Fast GC Grader{% endblock %}</title>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+
+    {% if enable_logrocket %}
+      <script src="https://cdn.lr-in.com/LogRocket.min.js" crossorigin="anonymous"></script>
+      <script>window.LogRocket && window.LogRocket.init('gbwkwf/fast-grader');</script>
+    {% endif %}
+
     <script src="https://unpkg.com/htmx.org@1.5.0"></script>
-    {% tailwind_css %}
+
+    <title>{% block title %}Fast GC Grader{% endblock %}</title>
     {% block head %}{% endblock %}
+
+    {% tailwind_css %}
   </head>
 
   <body>

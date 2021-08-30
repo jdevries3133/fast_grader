@@ -1,36 +1,45 @@
 {% extends 'base.html' %}
 {% load static %}
 
+
+{% block title %}Grading Tool{% endblock %}
+
+
 {% block content %}
 
-<header class="container w-screen p-4 m-3 rounded bg-grey">
+<header class="container p-4 m-3 rounded grid grid-cols-2 bg-grey">
+
+  <div>
+    <h1 class="">Fast Grader</h1>
+  </div>
 
 
-  <h1 class="">Fast Grader</h1>
+  <div>
+    {% comment %}
+      this div unfolds a chain of htmx modules that ultimately facilitate
+      choosing:
+      - course
+      - assignment
+    {% endcomment %}
+    <div
+      hx-get="{% url 'choose_course' %}"
+      hx-trigger="load"
+      hx-swap="outerHTML"></div>
 
-
-  {% comment %}
-    this div unfolds a chain of htmx modules that ultimately facilitate
-    choosing:
-    - course
-    - assignment
-  {% endcomment %}
-  <div
-    hx-get="{% url 'choose_course' %}"
-    hx-trigger="load"
-    hx-swap="outerHTML"></div>
-
-
-  <a href="{% url 'flush_selections' %}">
-    <button class="p-1 m-1 font-medium text-white bg-red-700 rounded shadow hover:bg-red-600 ">Restart</button>
-  </a>
+    <a href="{% url 'flush_selections' %}">
+      <button class="p-1 m-1 font-medium text-white bg-red-700 rounded shadow hover:bg-red-600 ">Restart</button>
+    </a>
+  </div>
 
 </header>
+
 
 <main class="container w-screen h-screen">
   {% include 'grader/partials/tool.html' %}
 </main>
 
+
 <script src="{% static 'grader/script.js' %}"></script>
+
 
 {% endblock %}

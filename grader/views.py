@@ -329,7 +329,9 @@ class AssessmentDataView(APIView):
                 'id': i['id_'],
                 'studentName': map_[i['student_profile_id']],
                 'studentSubmission': i['student_submission'],
-                'comment': i['comment']
+                'comment': i['comment'],
+                'maxGrade': i['max_grade'],
+                'grade': ''
             } for i in data
         ]
         return Response(formatted_data)
