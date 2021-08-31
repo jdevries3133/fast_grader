@@ -17,7 +17,7 @@ import json
 import logging
 
 from dataclasses import dataclass
-from typing import TypedDict, Union
+from typing import Union
 
 from allauth.socialaccount.models import SocialToken
 from django.contrib.auth.models import User
@@ -170,7 +170,8 @@ def list_all_assignment_names(
     return AssignmentList(response.get('nextPageToken'), classes)
 
 
-class AssignmentSubmission(TypedDict):
+@ dataclass
+class AssignmentSubmission:
     """This structure mirrors how the data is represented in the client
     javascript for easy synchronization. The only difference being that
     it contains the student_profile_id, because this response does not provide
@@ -180,7 +181,7 @@ class AssignmentSubmission(TypedDict):
     # this is the submission processed down into plain text. Each entry will
     # be mapped to a <p> tag on the frontend
     student_submission: list[str]
-    # grade: Union[int, None]
+    grade: Union[int, None]
     max_grade: int
     comment: str
 
@@ -312,6 +313,7 @@ def get_assignment_data(
                 user=user,
                 attachments=sub['assignmentSubmission']['attachments']
             ),
+            grade=None,
             max_grade=assignment['maxPoints'],
             comment=''
         ))
@@ -339,4 +341,6 @@ def sync_assignment_data(*, data: list[AssignmentSubmission]):
         - This is a wrapper service that calls into .assignment_data, which
           contains the nitty gritty details
     """
-    raise NotImplementedError
+    import pprint
+    pprint.pprint(data)
+    # TODO: send the data back to google!

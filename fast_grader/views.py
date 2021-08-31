@@ -14,13 +14,12 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 from django.shortcuts import render
-from django.urls import path
 
 
-def index(request):
-    return render(request, 'index.html')
+def faq(request): return render(request, 'core/faq.html')
 
+def home(request): return render(request, 'core/index.html')
 
-urlpatterns = [
-    path('', index, name='homepage')
-]
+def privacy(request): return render(request, 'core/privacy_policy.html')
+
+def tos(request): return render(request, 'core/terms_of_service.html')

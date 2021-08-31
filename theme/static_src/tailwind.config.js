@@ -53,8 +53,6 @@ module.exports = {
       green: "hsl(152, 71%, 38%)",
       yellow: "hsl(45, 93%, 50%)",
       purple: "hsl(271, 16%, 50%)",
-      black: "hsl(71, 11%, 20%)",
-      grey: "hsl(0, 21%, 92%)",
       ...defaultTheme.colors,
     },
     fontFamily: {

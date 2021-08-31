@@ -14,8 +14,6 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import logging
-from pathlib import Path
-import json
 
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
@@ -30,6 +28,7 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 
 from .services import (
+    AssignmentSubmission,
     Course,
     list_all_class_names,
     list_all_assignment_names,
@@ -321,16 +320,28 @@ class AssessmentDataView(APIView):
         # data structure
         formatted_data = [
             {
-                'id': i['id_'],
-                'studentName': map_[i['student_profile_id']],
-                'studentSubmission': i['student_submission'],
-                'comment': i['comment'],
-                'maxGrade': i['max_grade'],
-                'grade': ''
+                'id': i.id_,
+                'studentName': map_[i.student_profile_id],
+                'studentId': i.student_profile_id,
+                'studentSubmission': i.student_submission,
+                'comment': i.comment,
+                'maxGrade': i.max_grade,
+                'grade': i.grade
             } for i in data
         ]
         return Response(formatted_data)
 
-    def post(self, request):
+    def patch(self, request):
         """Sync the data"""
-        return Response('')
+        validated_data = [
+            AssignmentSubmission(
+                id_=d['id'],
+                student_profile_id=d['studentId'],
+                student_submission=[''],
+                grade=d['grade'],
+                max_grade=d['maxGrade'],
+                comment=d['comment'],
+            ) for d in request.data
+        ]
+        sync_assignment_data(data=validated_data)
+        return Response(status=status.HTTP_200_OK)

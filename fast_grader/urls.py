@@ -32,15 +32,18 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 
-def noop(r):
-    return 'noop'
+from . import views as generic_pages
+
 
 urlpatterns = [
-    path('', include('theme.urls')),
     path('accounts/', include('allauth.urls')),
     path('accounts/profile/', include('subscriptions.urls')),
     path('grader/', include('grader.urls')),
     path('admin/', admin.site.urls),
 
-    path('faq/', noop, name='faq')  # temp
+    # generic pages
+    path('', generic_pages.home, name='home'),
+    path('faq/', generic_pages.faq, name='faq'),
+    path('privacy/', generic_pages.privacy, name='privacy'),
+    path('tos/', generic_pages.tos, name='tos'),
 ]

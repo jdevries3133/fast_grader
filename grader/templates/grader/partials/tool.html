@@ -9,12 +9,12 @@ The main grading tool.
 <div id="toolContainer" class="h-3/5 blur-sm">
 
   <div class="w-full h-full grid gap-1 grid-cols-3">
-    <div id="studentContent" class="w-full h-full p-3 m-3 text-code bg-gradient-to-br from-gray-100 via-purple-100 to-gray-200 col-span-2">
+    <div id="studentContent" class="w-full h-full p-3 m-3 border-2 border-gray-200 text-code bg-gradient-to-br from-white via-green-100 to-gray-200 col-span-2">
       {% comment %}Student Content Panel{% endcomment %}
 
     </div>
 
-    <div class="w-full h-full p-3 m-3 overflow-clip bg-gradient-to-tr from-gray-100 via-purple-100 to-gray-300 col-auto">
+    <div class="w-full h-full p-3 m-3 border-2 border-gray-200 overflow-clip bg-gradient-to-tr from-gray-100 via-yellow-100 to-white col-auto">
       {% comment %}Interaction Feedback Panel{% endcomment %}
 
       <div class="sticky top-0">
@@ -22,7 +22,11 @@ The main grading tool.
           <h3 class="text-black">StudentName</h3>
           <p id="grName" class="text-grey-800">...</p>
           <h3 class="text-black">Grade</h3>
-          <p id="grGrade" class="text-grey-800">...</p>
+          <p class="text-grey-800">
+            <span id="grGrade">...</span>
+            /
+            <span id="grMaxGrade">...</span>
+          </p>
           <h3 class="text-black">Current Comment</h3>
           <p id="grComment" class="text-grey-800">...</p>
         </div>
@@ -54,13 +58,17 @@ The main grading tool.
             <p class="text-black ">sync with google classroom</p>
 
             <p class="text-black bold">b <span class="italic"><character></span></p>
-            <p class="text-black ">
-              comment bank
+            <p class="text-black ">comment bank</p>
 
-              <a class="inline" href="{% url 'faq' %}#comment_bank">
-                <button class="w-8 h-8 rounded-full">?</button>
-              </a>
+            <p class="text-black bold">B <span class="italic"><character></span></p>
+            <p class="text-black ">
+              comment bank edit mode
             </p>
+            <p>FAQ</p>
+              <a class="inline" href="{% url 'faq' %}#comment_bank">
+                <button class="w-8 h-8 bg-white rounded-full shadow transition nhover:shadow-lg">?</button>
+              </a>
+            <p>
         </div>
       </div>
     </div>

@@ -13,16 +13,15 @@
 
   h3 {
     @apply text-xl;
-    @apply text-grey;
+    @apply text-gray-500;
   }
 
   button {
     @apply rounded;
     @apply shadow;
     @apply bg-green-100;
-    @apply hover:bg-green-200;
     @apply p-1;
     @apply m-1;
-    @apply focus:ring-green-400;
+    @apply focus:ring-green-300 focus:ring;
   }
 }

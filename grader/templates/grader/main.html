@@ -7,10 +7,16 @@
 
 {% block content %}
 
-<header class="container p-4 m-3 rounded grid grid-cols-2 bg-grey">
 
-  <div>
-    <h1 class="">Fast Grader</h1>
+<header class="container p-1 bg-gray-200 rounded-b shadow-md md:p-4 md:m-3 rounded-t-xl md:flex md:items-center md:justify-center">
+
+  <div class="flex-grow">
+    <h1>Fast Grader <span class="md:text-5xl">⚡️</span></h1>
+  </div>
+
+  {% comment %}Large screen hero text{% endcomment %}
+  <div class="container flex-grow text-center">
+    <p class="invisible inline-block p-4 text-lg font-bold bg-yellow-300 rounded-full text-grey-800 lg:visible">Grade like lightning!</p>
   </div>
 
 
@@ -27,14 +33,16 @@
       hx-swap="outerHTML"></div>
 
     <a href="{% url 'flush_selections' %}">
-      <button class="p-1 m-1 font-medium text-white bg-red-700 rounded shadow hover:bg-red-600 ">Restart</button>
+      <button class="p-1 m-1 font-medium text-white bg-red-700 rounded shadow focus:ring-red-300 hover:bg-red-600 ">Restart</button>
     </a>
   </div>
 
 </header>
 
 
-<main class="container w-screen h-screen">
+<main class="container relative z-0 w-screen h-screen">
+
+
   {% include 'grader/partials/tool.html' %}
 </main>
 

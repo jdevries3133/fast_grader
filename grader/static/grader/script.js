@@ -23,16 +23,15 @@
 const dataUri = "/grader/assignment_data/";
 
 const state = {
-  // The init event may fire more than once, but we only want to respond to
-  // it the first time
-  isAppInitialized: false,
-
   // the global shortcut listener is paused when we are recieving keyboard
   // input and don't want it to do anything
   shortcutListenerActive: true,
 
   // shift key inverts some commands
-  shiftHeld: true,
+  shiftHeld: false,
+
+  // recieved when we GET the data, used when we PATCH to update
+  csrfToken: null,
 
   // all google classroom data
   assignmentData: {
@@ -50,16 +49,15 @@ const state = {
   },
 
   commentBank: {
-    sequenceStarted: false,
     registers: {
       // comments in each comment bank register will be stored here
     },
-    sequenceType: {
-      value: "noop",
+    prefixKey: {
+      value: "",
       choices: {
-        noop: "noop",
-        edit: "edit",
-        normal: "normal",
+        normalMode: "b",
+        editMode: "B",
+        noPrefix: "",
       },
     },
   },
@@ -75,32 +73,47 @@ const state = {
  * configuration
  */
 async function init() {
-  if (!state.isAppInitialized) {
-    state.isAppInitialized = true;
+  await fetchData();
+  updateView();
+  removeBlur();
 
-    await fetchData();
-    updateView();
-    removeBlur();
-
-    document.body.addEventListener("keypress", handleKeyPress);
-    document.body.addEventListener("keydown", handleKeyDown);
-    document.body.addEventListener("keyup", handleKeyUp);
-  }
+  document.body.addEventListener("keypress", handleKeyPress);
+  document.body.addEventListener("keydown", handleKeyDown);
+  document.body.addEventListener("keyup", handleKeyUp);
 }
 
 /**
  * Hack to force a string to be copied.
  */
 function copyStr(str) {
-  return " " + str.slice(1);
+  return (" " + str).slice(1);
+}
+
+/**
+ * Utility for getting the value of a cookie by name
+ */
+function getCookie(name) {
+  let cookieValue = null;
+  if (document.cookie && document.cookie !== "") {
+    const cookies = document.cookie.split(";");
+    for (let i = 0; i < cookies.length; i++) {
+      const cookie = cookies[i].trim();
+      // Does this cookie string begin with the name we want?
+      if (cookie.substring(0, name.length + 1) === name + "=") {
+        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+        break;
+      }
+    }
+  }
+  return cookieValue;
 }
 
 /**
  * Populate state.assignmentData.assignments
  */
 async function fetchData() {
-  const data = await fetch(dataUri);
-  state.assignmentData.assignments = await data.json();
+  const response = await fetch(dataUri);
+  state.assignmentData.assignments = await response.json();
   state.ready = true;
 }
 
@@ -108,7 +121,20 @@ async function fetchData() {
  * Send state.assignmentData.assignments to the backend, and append any new
  * assignments to the list.
  */
-function syncData() {}
+async function syncData() {
+  const response = await fetch(dataUri, {
+    headers: new Headers({
+      "Content-Type": "application/json",
+      "X-CSRFToken": getCookie("csrftoken"),
+    }),
+    method: "PATCH",
+    body: JSON.stringify(state.assignmentData.assignments),
+    mode: "same-origin",
+  });
+  if (!response.ok) {
+    throw new Error("Update failed");
+  }
+}
 
 /**
  * We aren't in happy react land anymore, so this will update the DOM, and we
@@ -121,11 +147,13 @@ async function updateView() {
     ];
   const nameEl = document.getElementById("grName");
   const gradeEl = document.getElementById("grGrade");
+  const maxGradeEl = document.getElementById("grMaxGrade");
   const commentEl = document.getElementById("grComment");
   const pagerEl = document.getElementById("studentContent");
 
   nameEl.innerText = current.studentName;
   gradeEl.innerText = current.grade || "__";
+  maxGradeEl.innerText = current.maxGrade || "??";
   commentEl.innerText = current.comment || "__";
   pagerEl.innerHTML = current.studentSubmission
     .slice(current.currentlyViewingIndex)
@@ -156,7 +184,7 @@ function handleGradeInput(char) {
   if (char !== "Backspace") {
     value = parseInt(char);
     if (!isNaN(value)) {
-      const newValue = current.grade + value.toString();
+      const newValue = (current.grade || "") + value.toString();
       // prevent leading zeroes
       if (value === 0 && !current.grade) {
         return;
@@ -174,26 +202,63 @@ function handleGradeInput(char) {
 }
 
 /**
- * Called when the user types "c": the shortcut for writing a comment. This
- * opens the comment field for editing.
+ * Apply the comment from a given register to the current assignment.
+ * The register MUST have a comment value already defined.
  */
-function handleManualComment(e) {
+function applyComment(register) {
+  const comment = state.commentBank.registers[register];
+  if (!comment) {
+    throw new Error("Comment in register is undefined", register);
+  }
+
+  state.assignmentData.assignments[
+    state.assignmentData.currentlyViewingIndex
+  ].comment = comment;
+
+  updateView();
+}
+
+/**
+ * onSubmit handler for the modal comment input when it is a manual comment;
+ * i.e.  the `c` key was pressed.
+ */
+function handleManualCommentInputRecieved(e) {
   e.preventDefault();
-  console.log(e);
+
+  const userInput = e.target.elements.comment.value;
+  const register = e.target.elements.register.value;
+
+  state.commentBank.registers[register] = userInput;
+  applyComment(register);
+  removeCommentBankModal();
+}
+
+/**
+ * onSubmit handler for the modal comment input when it is a comment-bank
+ * comment; i.e.  the `b` key was pressed.
+ */
+function handleCommentBankInputRecieved(e) {
+  e.preventDefault();
+  const userInput = e.target.elements.comment.value;
+  const register = e.target.elements.register.value;
+  state.commentBank.registers[register] = userInput;
+
+  applyComment(register);
+  removeCommentBankModal();
 }
 
 /**
  * Inject a form for the user to compose a comment, either into a comment
  * bank register, or as a manual comment.
  */
-function commentBankPrompt(
+function injectCommentBankModal(
   registerName,
   currentValue,
   prompt = "Please enter your comment"
 ) {
-  // validate register
+  // validate register choice. It can be null, in the case of a manual comment
   let register;
-  if (!/[a-zA-Z,.\/;']/.test(registerName)) {
+  if (/[a-zA-Z,.\/;']/.test(registerName)) {
     register = registerName;
   } else {
     // manual comment
@@ -203,29 +268,74 @@ function commentBankPrompt(
   // update DOM
   applyBlur();
 
-  f = document.createElement("form", {
-    id: "commentForm",
-  });
+  // block keyboard shortcut response
+  state.shortcutListenerActive = false;
+
+  // inject the form
+  f = document.createElement("form");
+  f.id = "commentInputForm";
   f.addEventListener(
     "submit",
-    register ? handleCommentBank : handleManualComment
+    // whether a prefix register is defined determines which event handler
+    // gets used
+    register ? handleCommentBankInputRecieved : handleManualCommentInputRecieved
   );
-  f.classList.add(...["bg-red-900", "fixed", "z-10"]);
+
+  f.classList.add(
+    ...[
+      "transiton",
+      "fixed",
+      "w-full",
+      "h-full",
+      "top-0",
+      "left-0",
+      "flex",
+      "items-center",
+      "justify-center",
+    ]
+  );
+
   f.innerHTML = `
-    ${
-      (register &&
-        `<input type="hidden" name="register" value="${register}" />`) ||
-      ""
-    }
-    <label for="comment">${prompt}</label>
-    <textarea name="comment" placeholder="Enter your comment">${
-      currentValue || ""
-    }</textarea>
-    <input type="submit" value="Submit" />
+    <div class="modal-overlay absolute w-full h-full bg-gray-900 opacity-50"></div>
+      <div class="modal-container relative lg:p-3 bg-white w-11/12 md:max-w-md mx-auto rounded shadow-lg z-50 overflow-y-auto">
+
+        ${/* close button */ ""}
+        <div class="container">
+          <input type="hidden" value="${register}" name="register" />
+          <div>
+            ${/* single form input; this is where the comment will go*/ ""}
+            <label for="comment">${prompt}</label>
+
+            <p class="mb-1 text-xs text-gray-600">
+              Tip: did you know that you can use the <code>tab</code> key to
+              focus on the "submit" button, then the <code>spacebar</code> to
+              click it without your mouse?
+              <span class="text-green-700"> Very speedy!</span>
+            </p>
+
+            <textarea id="commentInput" name="comment" placeholder="Enter your comment">${
+              currentValue || ""
+            }</textarea>
+          </div>
+          <input class="p-1 rounded shadow focus:ring-2 focus:ring-black" type="submit" value="Submit" />
+          <button class="p-1 m-1 font-medium text-white bg-red-700 rounded shadow focus:ring-red-300" hover:bg-red-600 onClick="removeCommentBankModal()">Close</button>
+        </div>
+      </div>
+    </div>
   `;
-  container = document
-    .getElementById("toolContainer")
-    .parentNode.appendChild(f);
+
+  document.body.appendChild(f);
+  document.getElementById("commentInput").focus();
+}
+
+/**
+ * In response to user pressing the "close" button. Does not mean that we
+ * recieved input, so we will just restore the state and return.
+ */
+function removeCommentBankModal() {
+  document.getElementById("commentInputForm").remove();
+  removeBlur();
+  state.shortcutListenerActive = true;
 }
 
 /**
@@ -240,57 +350,66 @@ function commentBankPrompt(
  * comment bank entries.
  *
  */
-function handleCommentBank(e) {
-  e.preventDefault();
-  // it only *is* a postfix if some prefix was set
-  if (
-    state.commentBank.sequenceType.value ===
-    state.commentBank.sequenceType.choices.noop
-  ) {
-    return;
+function beginCommentBankFlow(register) {
+  // validate register
+  if (!/[a-zA-Z,.\/;']/.test(register)) {
+    console.error("Invalid register: ", register);
   }
+  if (
+    state.commentBank.registers[register] &&
+    state.commentBank.prefixKey.value ===
+      state.commentBank.prefixKey.choices.normalMode
+  ) {
+    // the register is has a comment, and we are in normal mode; let's apply
+    // the saved comment
+    state.assignmentData.assignments[
+      state.assignmentData.currentlyViewingIndex
+    ].comment = copyStr(state.commentBank.registers[register]);
+    updateView();
+  } else if (
+    // if the prefix key was `B`, we are going to edit the stored comment
+    // bank value no matter what
+    state.commentBank.prefixKey.value ===
+      state.commentBank.prefixKey.choices.editMode ||
+    // also, we need input if the register is empty
+    state.commentBank.registers[register] === undefined
+  ) {
+    // at this point, we are done with the prefix, so let's unset it before
+    // injecting the user input modal
+    state.commentBank.prefixKey.value =
+      state.commentBank.prefixKey.choices.noPrefix;
 
-  /**
-   * This will get called when the action branches are finished, to clear
-   * the prefix key from global state.
-   */
-  function restoreNoop() {
-    state.commentBank.sequenceType.value =
-      state.commentBank.sequenceType.choices.noop;
+    injectCommentBankModal(
+      register,
+      state.commentBank.registers[register],
+      `Enter a comment for comment bank register ${register}`
+    );
   }
+}
 
-  // a prefix flag was set, lets handle it
-  if (
-    // the comment bank state is normal mode because the prefix was 'b'
-    state.commentBank.sequenceType.value ===
-    state.commentBank.sequenceType.choices.normal
-  ) {
-    // get comment bank register
-    const currentValue = state.commentBank.registers[postfix];
-    if (currentValue === undefined) {
-      // the register was undefined, we need to get a new value
-      const newVal = commentBankPrompt(postfix);
-      state.commentBank.registers[postfix] = newVal;
-      return restoreNoop();
-    } else {
-      // the register had a value, we will apply it
-      state.assignmentData.assignments[
-        state.assignmentData.currentlyViewingIndex
-      ].comment = copyStr(currentValue);
-      return restoreNoop();
-    }
-  }
-  if (
-    // the comment bank state is edit mode because the prefix was 'B'
-    state.commentBank.sequenceType.value ===
-    state.commentBank.sequenceType.choices.edit
-  ) {
-    // allow the user to input a new comment no matter what; allow them to
-    // edit a value if it is already there, and then apply the value.
-    const currentValue = state.commentBank.registers[postfix] || "";
-    const newVal = commentBankPrompt(postfix, currentValue);
-    state.commentBank.registers[postfix] = newVal;
-    return restoreNoop();
+/**
+ * Move to the next or previous student, depending on whether the shift key
+ * is held:
+ *    shift key held => move back
+ *    no shift held  => move forward
+ */
+function switchStudent() {
+  let newIndex;
+  switch (state.shiftHeld) {
+    case false:
+      newIndex = state.assignmentData.currentlyViewingIndex + 1;
+      if (newIndex < state.assignmentData.assignments.length) {
+        state.assignmentData.currentlyViewingIndex = newIndex;
+        updateView();
+      }
+      break;
+    case true:
+      newIndex = state.assignmentData.currentlyViewingIndex - 1;
+      if (newIndex >= 0) {
+        state.assignmentData.currentlyViewingIndex = newIndex;
+        updateView();
+      }
+      break;
   }
 }
 
@@ -302,34 +421,43 @@ function handleCommentBank(e) {
  * can disable shortcuts when they are recieving text input, for example.
  */
 function handleKeyPress(e) {
+  // early exit if we are not listening for shortcuts
+  if (!state.shortcutListenerActive) return;
+
   switch (e.key) {
     // comment bank
-    case "b":
-      state.commentBank.sequenceType.value =
-        state.commentBank.sequenceType.choices.normal;
+    case state.commentBank.prefixKey.choices.normalMode:
+      state.commentBank.prefixKey.value =
+        state.commentBank.prefixKey.choices.normalMode;
       break;
-    case "B":
-      state.commentBank.sequenceType.value =
-        state.commentBank.sequenceType.choices.edit;
+    case state.commentBank.prefixKey.choices.editMode:
+      state.commentBank.prefixKey.value =
+        state.commentBank.prefixKey.choices.editMode;
       break;
     case "c":
       // manual comment
-      commentBankPrompt();
+      injectCommentBankModal();
       break;
-    case " ":
-      // keyboard shortcut scroll
+    case "s":
+      syncData();
       break;
     case "Enter":
       // next or prev student
+      switchStudent();
       break;
     default:
       if (e.keyCode >= 48 && e.keyCode <= 71) {
         // number or backspace
         handleGradeInput(e.key);
       } else {
-        // the only other possibility is that this is a comment bank postfix.
-        // the handler will determine whether that is the case
-        handleCommentBank(e.target.value);
+        // if a comment bank prefix has been set, then *this* is the postfix
+        // character, so we will respond to it
+        if (
+          state.commentBank.prefixKey.value !==
+          state.commentBank.prefixKey.choices.noPrefix
+        ) {
+          beginCommentBankFlow(e.key);
+        }
       }
   }
 }
@@ -343,7 +471,7 @@ function handleKeyDown(e) {
       state.shiftHeld = true;
       break;
     case "Backspace":
-      handleGradeInput(e.key);
+      state.shortcutListenerActive && handleGradeInput(e.key);
   }
 }
 
