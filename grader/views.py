@@ -13,6 +13,7 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+from grader.models import Assignment
 import logging
 
 from django.contrib.auth.decorators import login_required
@@ -28,14 +29,14 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 
 from .services import (
-    AssignmentSubmission,
     Course,
     list_all_class_names,
     list_all_assignment_names,
     get_student_data,
     get_assignment_data,
-    sync_assignment_data
 )
+
+from .serializers import AssignmentSerializer
 
 
 # TODO: test paging in all cases
@@ -308,40 +309,27 @@ class AssessmentDataView(APIView):
     def get(self, request):
         # note: we should let the client pick the text wrapping with a url
         # param, then format it here in python where that is easier to do.
-        data = get_assignment_data(
+        assignment = get_assignment_data(
             course_id=request.session['course']['id'],
             assignment_id=request.session['assignment']['id'],
             user=request.user,
-            page_token=request.query_params.get('next_page')
+            page_token=request.query_params.get('next_page'),
+            student_id_to_name=request.session['student_id_to_name_mapping']
         )
-        map_ = request.session['student_id_to_name_mapping']
-
-        # get name from mapping, and adapt to a more javascript-friendly
-        # data structure
-        formatted_data = [
-            {
-                'id': i.id_,
-                'studentName': map_[i.student_profile_id],
-                'studentId': i.student_profile_id,
-                'studentSubmission': i.student_submission,
-                'comment': i.comment,
-                'maxGrade': i.max_grade,
-                'grade': i.grade
-            } for i in data
-        ]
-        return Response(formatted_data)
+        return Response(AssignmentSerializer(assignment).data)
 
     def patch(self, request):
         """Sync the data"""
-        validated_data = [
-            AssignmentSubmission(
-                id_=d['id'],
-                student_profile_id=d['studentId'],
-                student_submission=[''],
-                grade=d['grade'],
-                max_grade=d['maxGrade'],
-                comment=d['comment'],
-            ) for d in request.data
-        ]
-        sync_assignment_data(data=validated_data)
-        return Response(status=status.HTTP_200_OK)
+        id_ = request.data.get('assignment_id', '')
+        try:
+            replace = Assignment.objects.get(assignment_id=id_)  # type: ignore
+        except Assignment.DoesNotExist:  # type: ignore
+            return Response(
+                {'message': f'assignment with id of {id_} not found'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+        serializer = AssignmentSerializer(replace, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

@@ -26,6 +26,8 @@ from googleapiclient.discovery import build
 from google.oauth2.credentials import Credentials
 from googleapiclient.errors import HttpError as GoogClientHttpError
 
+from .models import Assignment, AssignmentSubmission
+
 
 # in testing environments, the secrets file may not exist, so it's ok in those
 # cases to continue, since google api services will be mocked, anyway
@@ -134,13 +136,9 @@ def list_all_class_names(*, user: User, page_token: Union[str, None]=None
 
 
 @ dataclass
-class Assignment(ClassroomAPIItem): ...
-
-
-@ dataclass
 class AssignmentList:
     next_page_token: Union[str, None]
-    assignments: list[Assignment]
+    assignments: list[ClassroomAPIItem]
 
 
 def list_all_assignment_names(
@@ -166,24 +164,8 @@ def list_all_assignment_names(
         raise Http404('User does not have any courses')
 
     # format data and wrap in dataclasses
-    classes = [Assignment(r['id'], r['title']) for r in data]
+    classes = [ClassroomAPIItem(r['id'], r['title']) for r in data]
     return AssignmentList(response.get('nextPageToken'), classes)
-
-
-@ dataclass
-class AssignmentSubmission:
-    """This structure mirrors how the data is represented in the client
-    javascript for easy synchronization. The only difference being that
-    it contains the student_profile_id, because this response does not provide
-    the actual names."""
-    id_: str
-    student_profile_id: str
-    # this is the submission processed down into plain text. Each entry will
-    # be mapped to a <p> tag on the frontend
-    student_submission: list[str]
-    grade: Union[int, None]
-    max_grade: int
-    comment: str
 
 
 def _fetch_raw_assignment_data(
@@ -277,24 +259,12 @@ def get_assignment_data(
     course_id: str,
     assignment_id: str,
     user: User,
-    page_token: str=None
-) -> list[AssignmentSubmission]:
+    page_token: str=None,
+    student_id_to_name: dict
+) -> Assignment:
     """Student submissions are fetched and squashed into a single string of
     text. If there are multiple attachments, they are concatenated with titles
     in-between.
-
-    Future Improvements:
-        There are a few improvements to be made here after MVP:
-        - after getting the first assignment, pass the rest of the processing
-          to an async worker, and also make an async request in the frontend
-          for the extra data so that the grading can start right away.
-        - provide a diff_only option, where we fetch the corresponding document
-          from the teacher, then only display the diff against that when
-          looking at student work.
-
-    Note:
-        This is a wrapper service that calls into .assignment_data, which
-        contains the nitty gritty details
     """
     submissions, assignment = _fetch_raw_assignment_data(
         course_id,
@@ -303,21 +273,27 @@ def get_assignment_data(
         page_token
     )
 
+    assignment = Assignment.objects.create(  # type: ignore
+        api_course_id=course_id,
+        api_assignment_id=assignment_id,
+        max_grade=assignment['maxPoints'],
+    )
+
     submissions = submissions.get('studentSubmissions', [])
-    output = []
+    submission_models = []
     for sub in submissions:
-        output.append(AssignmentSubmission(
-            id_=sub['id'],
-            student_profile_id=sub['userId'],
-            student_submission=concatenate_attachments(
+        submission_models.append(AssignmentSubmission(
+            assignment=assignment,
+            api_student_submission_id=sub['id'],
+            api_student_profile_id=sub['userId'],
+            student_name=student_id_to_name[sub['userId']],
+            submission=concatenate_attachments(
                 user=user,
                 attachments=sub['assignmentSubmission']['attachments']
             ),
-            grade=None,
-            max_grade=assignment['maxPoints'],
-            comment=''
         ))
-    return output
+    AssignmentSubmission.objects.bulk_create(submission_models)  # type: ignore
+    return assignment
 
 
 def apply_comment(*, comment: str, documentId: str):
