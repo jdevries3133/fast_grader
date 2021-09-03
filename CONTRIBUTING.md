@@ -17,3 +17,13 @@ Look in the `./misc` folder for the plan.
 Set the `DJANGO_DEBUG` environment variable to any truthy value. This not only
 puts django into debug mode, but also uses separate development settings in
 `fast_grader/settings/development.py`.
+
+# Coverage Report
+
+Run the following:
+
+```bash
+coverage run --source "." manage.py test \
+  && coverage html --omit "venv/*,fast_grader/*sgi.py,fast_grader/manage.py" \
+  && open htmlcov/index.html
+```

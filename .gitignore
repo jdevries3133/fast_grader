@@ -6,6 +6,8 @@ venv
 *.so
 *.log
 dist
+.coverage
+htmlcov
 
 # editor
 Session.vim
