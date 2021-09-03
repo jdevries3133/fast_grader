@@ -19,6 +19,78 @@ features. The alpha build will be able to:
 
 # Detail on Alpha Features
 
+## Grade Update Problem
+
+I have hit a **major** snag. Namely, it is not possible to update assignments
+through the web api that are not associated with my application. See [Google
+Classroom Issue Tracker](https://issuetracker.google.com/issues/67748271)
+
+As a result, a convoluted flow will be necessary for actually getting grades
+into google classroom:
+
+```text
+       User Flow                           Server-Side Flow
+┌──────=========                           ================
+│
+│   ┌────────────────────┐POST          ┌────────────────────────────┐
+└───┤grading flow on main├─────────────►│server recieves grading     │
+    │site is completed   │              │data, and saves the         │
+ ┌──┴────────────────────┘              │information in the database │
+ │                                      └────────────────────────────┘
+ └──┬────────────────────────┐
+    │user is prompted to     │
+    │visit Google Classroom, │
+    │with a link to the      │
+    │specific assignment they│
+    │just graded             │
+ ┌──┴────────────────────────┘
+ │
+ │
+ └──┬───────────────────────────┐
+    │anytime the user opens an  │  GET  ┌──────────────────────────────────┐
+    │assignment submission page,├──────►│server responds to the extension's│
+    │our *browser extension*    │       │request, providing the grading    │
+    │checks for pending         │◄──────┤data pending import, if present   │
+    │grading session data that  │       └──────────────────────────────────┘
+    │can be imported            │
+┌───┴───────────────────────────┘
+│
+└──┬───────────────────────────┐
+   │ if data exists, the       │
+   │ extension window will     │
+   │ "pop-up" with a big       │
+   │ CTA button, asking the    │
+   │ user to import the grades │
+   │                           │
+   │     **user approves       │
+   │         import?(y/n)**    │
+ ┌─┴─────────────────┬─┬───────┘
+ │                   │ │
+ │                   │ │      PATCH     ┌───────────────────────────────┐
+ │             ┌─────┘ └───────────────►│update the database to mark the│
+ │             │                        │session data as rejected and   │
+ │             ▼                        │no longer pending import       │
+ └──┬──────────────────────────┐        └───────────────────────────────┘
+    │the extension will trigger│
+    │a content script that     │
+    │traverses the DOM and     │
+    │inputs grades for the     │
+    │user                      │ PATCH  ┌──────────────────────────────────────┐
+ ┌──┴──────────────────────────┴──────► │on successful import, update the grade│
+ │                                      │data to mark it as accepted and no    │
+ │                                      │longer pending import                 │
+ │                                      └──────────────────────────────────────┘
+ └──┬──────────────────────────┐
+    │on successful import,     │
+    │"pop-up" the extension    │
+    │dialogue again to notify  │
+    │the user of success, and  │
+    │provide a button for the  │
+    │user to return to fast    │
+    │grader to continue grading│
+    └──────────────────────────┘
+```
+
 ### Limit Access
 
 > limit access to the product via email login
