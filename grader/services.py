@@ -26,7 +26,7 @@ from googleapiclient.discovery import build
 from google.oauth2.credentials import Credentials
 from googleapiclient.errors import HttpError as GoogClientHttpError
 
-from .models import Assignment, AssignmentSubmission
+from .models import GradingSession, AssignmentSubmission
 
 
 # in testing environments, the secrets file may not exist, so it's ok in those
@@ -211,7 +211,8 @@ def download_drive_file_as(*, user: User, id_: str, mime_type: str) -> str:
     ).execute()
 
 
-def concatenate_attachments(*, user: User, attachments: list[dict]) -> list[str]:
+def concatenate_attachments(*, user: User, attachments: list[dict]
+                            ) -> str:
     """Given a submission object from the google classroom api, download each
     attachment as plain text and concatenate them together, inserting the
     name of the document into the concatednated string."""
@@ -232,7 +233,9 @@ def concatenate_attachments(*, user: User, attachments: list[dict]) -> list[str]
             ).execute()
             # localization/internationalization: this may become an issue if
             # utf8 is not the encoding in all locales
-            output.append(str(data, 'utf8'))
+            output.extend(
+                [l.strip() for l in str(data, 'utf8').split('\n') if l]
+            )
 
         except GoogClientHttpError as e:
             messages = [
@@ -251,7 +254,7 @@ def concatenate_attachments(*, user: User, attachments: list[dict]) -> list[str]
                 'from a GSuite program like Google Docs, Google Slides, etc.'
             )
 
-    return output
+    return '\n'.join(output)
 
 
 def get_assignment_data(
@@ -261,7 +264,7 @@ def get_assignment_data(
     user: User,
     page_token: str=None,
     student_id_to_name: dict
-) -> Assignment:
+) -> GradingSession:
     """Student submissions are fetched and squashed into a single string of
     text. If there are multiple attachments, they are concatenated with titles
     in-between.
@@ -273,16 +276,55 @@ def get_assignment_data(
         page_token
     )
 
-    assignment = Assignment.objects.create(  # type: ignore
+    # if there is an existing session, we will update it rather than creating
+    # a new one
+    existing = GradingSession.objects.filter(  # type: ignore
+        api_course_id=course_id,
+        api_assignment_id=assignment_id,
+        owner=user
+    ).prefetch_related('submissions')
+    if existing:
+        existing = existing.first()
+        if existing.max_grade != assignment['maxPoints']:
+            existing.max_grade = assignment['maxPoints']
+            existing.save()
+        submission_updates = []
+        for submission in existing.submissions.all():
+            for new_submission in submissions.get('studentSubmissions', []):
+                if submission.api_student_submission_id == new_submission['id']:
+                    # we have a match; perform the update
+                    submission.api_student_profile_id = new_submission['userId']
+                    submission.student_name = (
+                        student_id_to_name[new_submission['userId']]
+                    )
+                    submission.submission = concatenate_attachments(
+                        user=user,
+                        attachments=(
+                            new_submission['assignmentSubmission']['attachments']
+                        )
+                    )
+                    submission_updates.append(submission)
+        AssignmentSubmission.objects.bulk_update(  # type: ignore
+            submission_updates,
+            (
+                # fields to update
+                'api_student_profile_id',
+                'student_name',
+                'submission',
+            )
+        )
+        return existing
+
+    assignment = GradingSession.objects.create(  # type: ignore
+        owner=user,
         api_course_id=course_id,
         api_assignment_id=assignment_id,
         max_grade=assignment['maxPoints'],
     )
 
     submissions = submissions.get('studentSubmissions', [])
-    submission_models = []
-    for sub in submissions:
-        submission_models.append(AssignmentSubmission(
+    submission_models = [
+        AssignmentSubmission(
             assignment=assignment,
             api_student_submission_id=sub['id'],
             api_student_profile_id=sub['userId'],
@@ -291,7 +333,8 @@ def get_assignment_data(
                 user=user,
                 attachments=sub['assignmentSubmission']['attachments']
             ),
-        ))
+        ) for sub in submissions
+    ]
     AssignmentSubmission.objects.bulk_create(submission_models)  # type: ignore
     return assignment
 
@@ -305,18 +348,3 @@ def apply_comment(*, comment: str, documentId: str):
           Classroom.
     """
     raise NotImplementedError
-
-
-def sync_assignment_data(*, data: list[AssignmentSubmission]):
-    """Recieve a modified list of assignment submissions and push the comments
-    and grades back into the google classroom api.
-
-    Note:
-        - Changes to any fields other than grade and comment will have no
-          effect.
-        - This is a wrapper service that calls into .assignment_data, which
-          contains the nitty gritty details
-    """
-    import pprint
-    pprint.pprint(data)
-    # TODO: send the data back to google!

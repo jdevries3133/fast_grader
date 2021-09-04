@@ -13,20 +13,27 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+from django.contrib.auth.models import User
 from django.db import models
 
 
-class Assignment(models.Model):
+class GradingSession(models.Model):
+    owner = models.ForeignKey(User, on_delete=models.CASCADE)
+    created = models.DateTimeField(auto_now_add=True)
     api_course_id = models.CharField(max_length=50)
-    api_assignment_id = models.CharField(max_length=50)
+
+    # only one session can exist for a given assignment. Users can resume
+    # previous sessions, and submission data may need to be updated when
+    # it is out of sync
+    api_assignment_id = models.CharField(max_length=50, unique=True)
     max_grade = models.IntegerField()
-    teacher_template = models.TextField(null=True)
+    teacher_template = models.TextField(blank=True)
 
 
 class AssignmentSubmission(models.Model):
     # id's needed to fetch more data at different levels
     assignment = models.ForeignKey(
-        Assignment,
+        GradingSession,
         related_name='submissions',
         on_delete=models.CASCADE
     )
@@ -35,6 +42,8 @@ class AssignmentSubmission(models.Model):
 
     # information about this assignment
     student_name = models.CharField(max_length=200)
-    grade = models.IntegerField(null=True)
-    submission = models.TextField(null=True)
-    comment = models.TextField(null=True)
+    grade = models.IntegerField(blank=True, null=True)
+
+    # TODO: rename to `content`?
+    submission = models.TextField(blank=True)
+    comment = models.TextField(blank=True)

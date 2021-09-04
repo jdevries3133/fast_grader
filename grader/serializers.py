@@ -13,58 +13,54 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import logging
+from django.core.exceptions import ValidationError
+
 from rest_framework import serializers
 
-from .models import Assignment, AssignmentSubmission
+from .models import GradingSession, AssignmentSubmission
+
+
+logger = logging.getLogger(__name__)
 
 
 class AssignmentSubmissionSerializer(serializers.ModelSerializer):
     class Meta:
         model = AssignmentSubmission
         fields = (
+            'pk',
             'api_student_profile_id',
             'api_student_submission_id',
+            'submission',
             'student_name',
             'grade',
             'comment'
         )
 
+    def validate_submission(self, data):
+        if isinstance(data, list):
+            try:
+                data = '\n'.join(data)
+            except TypeError as e:
+                raise ValidationError(e)
+        return data
 
-class AssignmentSerializer(serializers.ModelSerializer):
+    def to_representation(self, instance):
+        repr_ = super().to_representation(instance)
+        repr_['submission'] = repr_['submission'].split('\n')
+        return repr_
+
+
+
+class GradingSessionSerializer(serializers.ModelSerializer):
+    submissions = AssignmentSubmissionSerializer(many=True)
     class Meta:
-        depth = 2
-        model = Assignment
-        fields =  (
+        model = GradingSession
+        fields = (
+            'pk',
             'api_course_id',
             'api_assignment_id',
             'max_grade',
             'teacher_template',
-            'submissions',
+            'submissions'
         )
-
-    # def update(self, instance, validated_data):
-    #     # top-level data
-    #     instance.api_course_id = validated_data.get(
-    #         'api_course_id',
-    #         instance.api_course_id
-    #     )
-    #     instance.api_assignment_id = validated_data.get(
-    #         'api_assignment_id',
-    #         instance.api_assignment_id
-    #     )
-    #     instance.max_grade = validated_data.get(
-    #         'max_grade',
-    #         instance.max_grade
-    #     )
-    #     instance.teacher_template = validated_data.get(
-    #         'teacher_template',
-    #         instance.teacher_template
-    #     )
-    #     instance.save()
-
-    #     # nested data
-    #     items = validated_data.get('assignments', instance.assignments)
-    #     for i in items:
-    #         a = 
-    #         if a.is_valid(raise_exception=True):
-    #             a.save()

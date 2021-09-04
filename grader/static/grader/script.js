@@ -33,17 +33,27 @@ const state = {
   // recieved when we GET the data, used when we PATCH to update
   csrfToken: null,
 
+  // index into assignmentData.submissions
+  currentlyViewingIndex: 0,
+
   // all google classroom data
   assignmentData: {
-    currentlyViewingIndex: 0,
-    assignments: [
+    // other misc data will get inserted here, like various id's, which will
+    // ultimately be passed through to the backend
+    submissions: [
       {
-        // this is example will be replaced after the call to fetchData()
-        id: "",
-        studentName: "",
-        studentSubmission: [""],
-        maxGrade: 100,
-        comment: [""],
+        // this placeholder object is what the UI will render while waiting
+        // for a response, but it is a somewhat incomplete picture of the full
+        // object coming back from the API. View the API data in the browsable
+        // API at `/grader/assignment_data`
+        student_name: "...",
+        grade: null,
+        comment: null,
+        submission: "",
+        assignment: {
+          max_grade: 75,
+          teacher_template: null,
+        },
       },
     ],
   },
@@ -109,31 +119,41 @@ function getCookie(name) {
 }
 
 /**
- * Populate state.assignmentData.assignments
+ * Populate state.assignmentData.submissions
  */
 async function fetchData() {
   const response = await fetch(dataUri);
-  state.assignmentData.assignments = await response.json();
+  const data = await response.json();
+  state.assignmentData = data;
   state.ready = true;
 }
 
 /**
- * Send state.assignmentData.assignments to the backend, and append any new
+ * Send state.assignmentData.submissions to the backend, and append any new
  * assignments to the list.
  */
 async function syncData() {
+  // sending the submission is problematic because the serializer on the
+  // backend is jank and broken. We don't need to update the submission
+  // anyway, so let's just remove it from the request data
+  const data = { ...state.assignmentData };
+  data.submissions = state.assignmentData.submissions.map((i) => {
+    delete i.submission;
+    return i;
+  });
   const response = await fetch(dataUri, {
     headers: new Headers({
       "Content-Type": "application/json",
       "X-CSRFToken": getCookie("csrftoken"),
     }),
     method: "PATCH",
-    body: JSON.stringify(state.assignmentData.assignments),
+    body: JSON.stringify(data),
     mode: "same-origin",
   });
   if (!response.ok) {
     throw new Error("Update failed");
   }
+  fetchData();
 }
 
 /**
@@ -141,24 +161,20 @@ async function syncData() {
  * can call it from other functions whenever we update the global state.
  */
 async function updateView() {
-  current =
-    state.assignmentData.assignments[
-      state.assignmentData.currentlyViewingIndex
-    ];
+  current = state.assignmentData.submissions[state.currentlyViewingIndex];
   const nameEl = document.getElementById("grName");
   const gradeEl = document.getElementById("grGrade");
   const maxGradeEl = document.getElementById("grMaxGrade");
   const commentEl = document.getElementById("grComment");
   const pagerEl = document.getElementById("studentContent");
 
-  nameEl.innerText = current.studentName;
+  nameEl.innerText = current.student_name;
   gradeEl.innerText = current.grade || "__";
-  maxGradeEl.innerText = current.maxGrade || "??";
+  maxGradeEl.innerText = state.assignmentData.max_grade || "??";
   commentEl.innerText = current.comment || "__";
-  pagerEl.innerHTML = current.studentSubmission
-    .slice(current.currentlyViewingIndex)
-    .map((chunk) => `<code class="break-word my-3 block">${chunk}</code>`)
-    .join("\n");
+  pagerEl.innerHTML = current.submission
+    .map((chunk) => `<code class="break-word my-1 block">${chunk}</code>`)
+    .join("");
 }
 
 function removeBlur() {
@@ -176,10 +192,7 @@ function applyBlur() {
  * the grade "field".
  */
 function handleGradeInput(char) {
-  const current =
-    state.assignmentData.assignments[
-      state.assignmentData.currentlyViewingIndex
-    ];
+  const current = state.assignmentData.submissions[state.currentlyViewingIndex];
   // concatenate the input to the grade field, only if it is a number
   if (char !== "Backspace") {
     value = parseInt(char);
@@ -190,7 +203,7 @@ function handleGradeInput(char) {
         return;
       }
       // prevent excessive values
-      if (newValue <= current.maxGrade) {
+      if (newValue <= state.assignmentData.max_grade) {
         current.grade = newValue;
       }
     }
@@ -211,9 +224,8 @@ function applyComment(register) {
     throw new Error("Comment in register is undefined", register);
   }
 
-  state.assignmentData.assignments[
-    state.assignmentData.currentlyViewingIndex
-  ].comment = comment;
+  state.assignmentData.submissions[state.currentlyViewingIndex].comment =
+    comment;
 
   updateView();
 }
@@ -297,7 +309,7 @@ function injectCommentBankModal(
 
   f.innerHTML = `
     <div class="modal-overlay absolute w-full h-full bg-gray-900 opacity-50"></div>
-      <div class="modal-container relative lg:p-3 bg-white w-11/12 md:max-w-md mx-auto rounded shadow-lg z-50 overflow-y-auto">
+      <div class="modal-container relative p-1 lg:p-3 bg-white w-11/12 md:max-w-md mx-auto rounded shadow-lg z-50 overflow-y-auto">
 
         ${/* close button */ ""}
         <div class="container">
@@ -362,9 +374,8 @@ function beginCommentBankFlow(register) {
   ) {
     // the register is has a comment, and we are in normal mode; let's apply
     // the saved comment
-    state.assignmentData.assignments[
-      state.assignmentData.currentlyViewingIndex
-    ].comment = copyStr(state.commentBank.registers[register]);
+    state.assignmentData.submissions[state.currentlyViewingIndex].comment =
+      copyStr(state.commentBank.registers[register]);
     updateView();
   } else if (
     // if the prefix key was `B`, we are going to edit the stored comment
@@ -397,16 +408,16 @@ function switchStudent() {
   let newIndex;
   switch (state.shiftHeld) {
     case false:
-      newIndex = state.assignmentData.currentlyViewingIndex + 1;
-      if (newIndex < state.assignmentData.assignments.length) {
-        state.assignmentData.currentlyViewingIndex = newIndex;
+      newIndex = state.currentlyViewingIndex + 1;
+      if (newIndex < state.assignmentData.submissions.length) {
+        state.currentlyViewingIndex = newIndex;
         updateView();
       }
       break;
     case true:
-      newIndex = state.assignmentData.currentlyViewingIndex - 1;
+      newIndex = state.currentlyViewingIndex - 1;
       if (newIndex >= 0) {
-        state.assignmentData.currentlyViewingIndex = newIndex;
+        state.currentlyViewingIndex = newIndex;
         updateView();
       }
       break;

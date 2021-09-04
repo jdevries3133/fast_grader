@@ -11,7 +11,12 @@
       <script>window.LogRocket && window.LogRocket.init('gbwkwf/fast-grader');</script>
     {% endif %}
 
-    <script src="https://unpkg.com/htmx.org@1.5.0"></script>
+    {% comment %}use unminified htmx in debug mode {% endcomment %}
+    {% if debug %}
+      <script src="https://unpkg.com/htmx.org@1.5.0/dist/htmx.js"></script>
+    {% else %}
+      <script src="https://unpkg.com/htmx.org@1.5.0"></script>
+    {% endif %}
 
     <title>{% block title %}Fast GC Grader{% endblock %}</title>
     {% block head %}{% endblock %}

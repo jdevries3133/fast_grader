@@ -15,4 +15,7 @@
 
 from django.contrib import admin
 
-# Register your models here.
+from .models import GradingSession, AssignmentSubmission
+
+admin.site.register(GradingSession)
+admin.site.register(AssignmentSubmission)

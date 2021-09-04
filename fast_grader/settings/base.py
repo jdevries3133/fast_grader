@@ -81,6 +81,12 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'fast_grader.urls'
 
+
+ENABLE_LOGROCKET = False
+
+
+def debug_context(_): return {'debug': DEBUG}
+def logrocket_context(_): return {'enable_logrocket': ENABLE_LOGROCKET}
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -94,6 +100,8 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'fast_grader.settings.base.debug_context',
+                'fast_grader.settings.base.logrocket_context',
             ],
         },
     },

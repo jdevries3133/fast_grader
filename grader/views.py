@@ -12,10 +12,11 @@
 
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
-
-from grader.models import Assignment
+import json
 import logging
 
+from django.http.response import HttpResponse
+from grader.models import AssignmentSubmission, GradingSession
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from django.utils.decorators import method_decorator
@@ -36,7 +37,7 @@ from .services import (
     get_assignment_data,
 )
 
-from .serializers import AssignmentSerializer
+from .serializers import AssignmentSubmissionSerializer, GradingSessionSerializer
 
 
 # TODO: test paging in all cases
@@ -289,8 +290,8 @@ class ChooseAssignmentView(View):
 
 
 class AssessmentDataView(APIView):
-    """Interacts with frontend javascript in static/script.js for serving and
-    recieving assessment feedback data."""
+    """Interacts with frontend javascript in static/grader/script.js for
+    serving and recieving assessment feedback data."""
 
     permission_classes = [IsAuthenticated]
 
@@ -299,16 +300,16 @@ class AssessmentDataView(APIView):
             request.session.get('course') is None
             or request.session.get('assignment') is None
         ):
-            msg = (
-                'Course and assignment must be selected before assignment '
-                'data can be served.'
-            )
-            return Response(msg, status.HTTP_400_BAD_REQUEST)
+            data = {
+                'msg': ('Course and assignment must be selected before '
+                        'assignment data can be manipulated.')
+            }
+            res = HttpResponse(json.dumps(data), content_type='application/json')
+            res.status_code = 400
+            return res
         return super().dispatch(request, *a, **kw)
 
     def get(self, request):
-        # note: we should let the client pick the text wrapping with a url
-        # param, then format it here in python where that is easier to do.
         assignment = get_assignment_data(
             course_id=request.session['course']['id'],
             assignment_id=request.session['assignment']['id'],
@@ -316,20 +317,41 @@ class AssessmentDataView(APIView):
             page_token=request.query_params.get('next_page'),
             student_id_to_name=request.session['student_id_to_name_mapping']
         )
-        return Response(AssignmentSerializer(assignment).data)
+        return Response(GradingSessionSerializer(assignment).data)
 
     def patch(self, request):
-        """Sync the data"""
-        id_ = request.data.get('assignment_id', '')
+        """This is just hacked together rather than a proper nested serializer
+        or viewset. Rewrite after deployment of an MVP."""
+        pk = request.data.get('pk', '')
+        submissions = request.data.pop('submissions', [])
+        # update session
         try:
-            replace = Assignment.objects.get(assignment_id=id_)  # type: ignore
-        except Assignment.DoesNotExist:  # type: ignore
+            update = GradingSession.objects.get(pk=pk)  # type: ignore
+        except GradingSession.DoesNotExist:  # type: ignore
             return Response(
-                {'message': f'assignment with id of {id_} not found'},
+                {'message': f'assignment with id of {pk} not found'},
                 status=status.HTTP_404_NOT_FOUND
             )
-        serializer = AssignmentSerializer(replace, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        serializer = GradingSessionSerializer(update, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        for s in submissions:
+            try:
+                update = AssignmentSubmission.objects.get(pk=s['pk'])  # type: ignore
+            except AssignmentSubmission.DoesNotExist:  # type: ignore
+                return Response(
+                    {'message': (
+                        f'student submission with id of {pk} not found'
+                    )},
+                    status=status.HTTP_404_NOT_FOUND
+                )
+            cereal = AssignmentSubmissionSerializer(
+                update,
+                data=s,
+                partial=True
+            )
+            cereal.is_valid(raise_exception=True)
+            cereal.save()
+
+        # update student submissions
+        return Response(status=status.HTTP_200_OK)
