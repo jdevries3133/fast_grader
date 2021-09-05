@@ -47,7 +47,7 @@ const state = {
         // object coming back from the API. View the API data in the browsable
         // API at `/grader/assignment_data`
         student_name: "...",
-        grade: null,
+        grade: null, // number!
         comment: null,
         submission: "",
         assignment: {
@@ -169,7 +169,7 @@ async function updateView() {
   const pagerEl = document.getElementById("studentContent");
 
   nameEl.innerText = current.student_name;
-  gradeEl.innerText = current.grade || "__";
+  gradeEl.innerText = current.grade.toString() || "__";
   maxGradeEl.innerText = state.assignmentData.max_grade || "??";
   commentEl.innerText = current.comment || "__";
   pagerEl.innerHTML = current.submission
@@ -190,26 +190,42 @@ function applyBlur() {
 /**
  * Every time the user types an number or backspace, it will be entered into
  * the grade "field".
+ *
+ * Note the tricky fact that the grade is represented as a number in state,
+ * but naturally we treat it as both a string and a number in the midst of
+ * this function:
+ *
+ * - string: the user hits backspace to remove the last character
+ * - number: check if the grade is greater than the max grade
+ * - number: disallow leading zeroes
  */
 function handleGradeInput(char) {
   const current = state.assignmentData.submissions[state.currentlyViewingIndex];
+  const curGradeStr = current.grade === 0 ? "" : current.grade.toString();
   // concatenate the input to the grade field, only if it is a number
   if (char !== "Backspace") {
-    value = parseInt(char);
+    const value = parseInt(char);
     if (!isNaN(value)) {
-      const newValue = (current.grade || "") + value.toString();
-      // prevent leading zeroes
-      if (value === 0 && !current.grade) {
-        return;
-      }
-      // prevent excessive values
-      if (newValue <= state.assignmentData.max_grade) {
+      const newValue = parseInt(curGradeStr + value.toString());
+      if (
+        // prevent trailing zeroes by taking no action when there is no
+        // current grade and the input character is zero
+        (value === 0 && !curGradeStr) ||
+        // only take action if the new value is less than the maximum possible
+        // grade
+        newValue <= state.assignmentData.max_grade
+      ) {
+        // set current.grade only if the newValue is valid.
         current.grade = newValue;
       }
     }
   } else {
     // "backspace" the last number from the grade field
-    current.grade = current.grade.slice(0, -1);
+    if (curGradeStr.length === 1) {
+      current.grade = 0;
+    } else {
+      current.grade = parseInt(curGradeStr.slice(0, -1));
+    }
   }
   updateView();
 }
@@ -325,9 +341,7 @@ function injectCommentBankModal(
               <span class="text-green-700"> Very speedy!</span>
             </p>
 
-            <textarea id="commentInput" name="comment" placeholder="Enter your comment">${
-              currentValue || ""
-            }</textarea>
+            <textarea id="commentInput" name="comment" placeholder="Enter your comment"></textarea>
           </div>
           <input class="p-1 rounded shadow focus:ring-2 focus:ring-black" type="submit" value="Submit" />
           <button class="p-1 m-1 font-medium text-white bg-red-700 rounded shadow focus:ring-red-300" hover:bg-red-600 onClick="removeCommentBankModal()">Close</button>
@@ -337,7 +351,16 @@ function injectCommentBankModal(
   `;
 
   document.body.appendChild(f);
-  document.getElementById("commentInput").focus();
+
+  // the setTimeout is necessary here because for some reason, focusing the
+  // textarea causes the keyboard shortcut key to end up in the text input,
+  // and even if the value is reset here, the bug still happens, but wrapping
+  // it in setTimeout capitulates the cursed javascript overlords
+  setTimeout(() => {
+    const commentInput = document.getElementById("commentInput");
+    commentInput.focus();
+    commentInput.value = currentValue || "";
+  });
 }
 
 /**
