@@ -129,10 +129,23 @@ function getModal(containerElement, innerHTML) {
  * Populate state.assignmentData.submissions
  */
 async function fetchData() {
-  const response = await fetch(dataUri);
-  const data = await response.json();
-  state.assignmentData = data;
-  state.ready = true;
+  const removeLoading = indicateLoading();
+  try {
+    const response = await fetch(dataUri);
+    if (!response.ok) {
+      throw new Error("Data get request failed");
+    }
+    const data = await response.json();
+    state.assignmentData = data;
+    state.ready = true;
+    indicateSuccess("Your assignment data was loaded.");
+  } catch (e) {
+    indicateFailure(
+      "Your assignment data failed to load. Please refresh the page"
+    );
+    console.error("Failed due to error: ", e);
+  }
+  removeLoading();
 }
 
 /**
@@ -143,7 +156,8 @@ async function syncData() {
   // sending the submission is problematic because the serializer on the
   // backend is jank and broken. We don't need to update the submission
   // anyway, so let's just remove it from the request data
-  const data = {...state.assignmentData};
+  const removeLoading = indicateLoading();
+  const data = { ...state.assignmentData };
   data.submissions = state.assignmentData.submissions.map((i) => {
     delete i.submission;
     return i;
@@ -158,8 +172,11 @@ async function syncData() {
     mode: "same-origin",
   });
   if (!response.ok) {
+    indicateFailure("Data did not sync, please try again");
     throw new Error("Update failed");
   }
+  indicateSuccess("Data was saved", (clearAfterSeconds = null));
+  removeLoading();
   fetchData();
 }
 
@@ -201,6 +218,83 @@ function applyBlur() {
 }
 
 /**
+ * Block the grading tool and indicate to the user that something is loading.
+ *
+ * @returns a function that will return the UI to the original state
+ */
+function indicateLoading() {
+  applyBlur();
+  const INDICATOR_ID = "loadingIndicator";
+  const innerHTML = `
+  <style> .lds-roller { display: inline-block; position: relative; width: 80px; height: 80px; } .lds-roller div { animation: lds-roller 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite; transform-origin: 40px 40px; } .lds-roller div:after { content: " "; display: block; position: absolute; width: 7px; height: 7px; border-radius: 50%; background: #fff; margin: -4px 0 0 -4px; } .lds-roller div:nth-child(1) { animation-delay: -0.036s; } .lds-roller div:nth-child(1):after { top: 63px; left: 63px; } .lds-roller div:nth-child(2) { animation-delay: -0.072s; } .lds-roller div:nth-child(2):after { top: 68px; left: 56px; } .lds-roller div:nth-child(3) { animation-delay: -0.108s; } .lds-roller div:nth-child(3):after { top: 71px; left: 48px; } .lds-roller div:nth-child(4) { animation-delay: -0.144s; } .lds-roller div:nth-child(4):after { top: 72px; left: 40px; } .lds-roller div:nth-child(5) { animation-delay: -0.18s; } .lds-roller div:nth-child(5):after { top: 71px; left: 32px; } .lds-roller div:nth-child(6) { animation-delay: -0.216s; } .lds-roller div:nth-child(6):after { top: 68px; left: 24px; } .lds-roller div:nth-child(7) { animation-delay: -0.252s; } .lds-roller div:nth-child(7):after { top: 63px; left: 17px; } .lds-roller div:nth-child(8) { animation-delay: -0.288s; } .lds-roller div:nth-child(8):after { top: 56px; left: 12px; } @keyframes lds-roller { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+  </style>
+  <div class="lds-roller"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
+  `;
+  const container = getModal("div", innerHTML);
+  container.id = INDICATOR_ID;
+  document.body.appendChild(container);
+  return () => {
+    document.getElementById(INDICATOR_ID)?.remove();
+    removeBlur();
+  };
+}
+
+/**
+ * Add a banner indicating success, for network related things like saving
+ * your session. Banner will auto-remove itself after three seconds.
+ *
+ */
+function indicateSuccess(msg, clearAfterSeconds = 3) {
+  const id = msg + Math.random();
+  const statBar = document.getElementById("status");
+  statBar.innerHTML = `
+  <div id="${id}" class="m-1 lg:m-3 p-1 lg:p-3 bg-green-200 rounded w-full flex flex-row items-center">
+    <p class="text-md text-green-900 flex-grow">
+      Success: ${msg}
+    </p>
+    <button
+      id="closeStatus"
+      onClick="document.getElementById('${id}').remove();"
+      class="text-lg text-black focus:ring hover:bg-red-200 p-2 bg-grey-100">
+        x
+      </button>
+  </div>
+  `;
+  if (clearAfterSeconds) {
+    setTimeout(() => {
+      document.getElementById(id).remove();
+    }, clearAfterSeconds * 1000);
+  }
+}
+
+/**
+ * Add a banner indicating failure, for network related things like saving
+ * your session. Banner will auto-remove itself after three seconds.
+ *
+ */
+function indicateFailure(msg, clearAfterSeconds = null) {
+  const id = msg + Math.random();
+  const statBar = document.getElementById("status");
+  statBar.innerHTML = `
+  <div id="${id}" class="m-1 lg:m-3 p-1 lg:p-3 bg-red-200 rounded w-full flex flex-row items-center">
+    <p class="text-md text-green-900 flex-grow">
+      Failure: ${msg}
+    </p>
+    <button
+      onClick="document.getElementById('${id}').remove();"
+      id="closeStatus"
+      class="text-lg text-black focus:ring hover:bg-red-200 bg-red-100 p-2">
+        x
+      </button>
+  </div>
+  `;
+  if (clearAfterSeconds) {
+    setTimeout(() => {
+      document.getElementById("${id}").remove();
+    }, clearAfterSeconds * 1000);
+  }
+}
+
 /****************************************************************************
  * keyboard shortcuts
  */
@@ -391,7 +485,7 @@ function beginCommentBankFlow(register) {
   if (
     state.commentBank.registers[register] &&
     state.commentBank.prefixKey.value ===
-    state.commentBank.prefixKey.choices.normalMode
+      state.commentBank.prefixKey.choices.normalMode
   ) {
     // the register is has a comment, and we are in normal mode; let's apply
     // the saved comment
@@ -402,7 +496,7 @@ function beginCommentBankFlow(register) {
     // if the prefix key was `B`, we are going to edit the stored comment
     // bank value no matter what
     state.commentBank.prefixKey.value ===
-    state.commentBank.prefixKey.choices.editMode ||
+      state.commentBank.prefixKey.choices.editMode ||
     // also, we need input if the register is empty
     state.commentBank.registers[register] === undefined
   ) {
