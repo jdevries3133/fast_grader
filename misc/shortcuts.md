@@ -14,5 +14,5 @@ implemented later.
 | _any number_     | input a grade                   |
 | backspace        | delete a grade                  |
 | c                | compose comment                 |
-| s                | sync with google classroom      |
 | b\<register\>    | comment bank                    |
+| s                | save                            |

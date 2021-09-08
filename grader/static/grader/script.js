@@ -575,7 +575,8 @@ function handleKeyPress(e) {
         state.commentBank.prefixKey.choices.editMode;
       break;
     case "c":
-      // manual comment
+      // TODO: this should open the current comment for editing. Currently,
+      // it just opens a blank input, even if a comment was already entered.
       injectCommentBankModal();
       break;
     case "s":
