@@ -74,23 +74,8 @@ const state = {
 };
 
 /****************************************************************************
- * functions
+ * utils
  */
-
-/**
- * Responds to the event that starts the application. Before the application
- * is started, there are some htmx elements on the page for settings
- * configuration
- */
-async function init() {
-  await fetchData();
-  updateView();
-  removeBlur();
-
-  document.body.addEventListener("keypress", handleKeyPress);
-  document.body.addEventListener("keydown", handleKeyDown);
-  document.body.addEventListener("keyup", handleKeyUp);
-}
 
 /**
  * Hack to force a string to be copied.
@@ -118,6 +103,28 @@ function getCookie(name) {
   return cookieValue;
 }
 
+function getModal(containerElement, innerHTML) {
+  const el = document.createElement(containerElement);
+  el.classList.add(
+    "transiton",
+    "fixed",
+    "w-full",
+    "h-full",
+    "top-0",
+    "left-0",
+    "flex",
+    "items-center",
+    "justify-center"
+  );
+  el.innerHTML = `
+    <div class="modal-overlay absolute w-full h-full bg-gray-900 opacity-50"></div>
+    <div class="container w-full h-full flex items-center flex-col justify-center">
+        ${innerHTML}
+    </div>
+  `;
+  return el;
+}
+
 /**
  * Populate state.assignmentData.submissions
  */
@@ -136,7 +143,7 @@ async function syncData() {
   // sending the submission is problematic because the serializer on the
   // backend is jank and broken. We don't need to update the submission
   // anyway, so let's just remove it from the request data
-  const data = { ...state.assignmentData };
+  const data = {...state.assignmentData};
   data.submissions = state.assignmentData.submissions.map((i) => {
     delete i.submission;
     return i;
@@ -155,6 +162,12 @@ async function syncData() {
   }
   fetchData();
 }
+
+/****************************************************************************
+ * UI & DOM
+ */
+
+/*
 
 /**
  * We aren't in happy react land anymore, so this will update the DOM, and we
@@ -186,6 +199,11 @@ function applyBlur() {
   const container = document.getElementById("toolContainer");
   container.classList.add("blur-sm");
 }
+
+/**
+/****************************************************************************
+ * keyboard shortcuts
+ */
 
 /**
  * Every time the user types an number or backspace, it will be entered into
@@ -300,57 +318,37 @@ function injectCommentBankModal(
   state.shortcutListenerActive = false;
 
   // inject the form
-  f = document.createElement("form");
-  f.id = "commentInputForm";
-  f.addEventListener(
+  const innerHTML = `
+    <div class="modal-container relative p-1 lg:p-3 bg-white w-11/12 md:max-w-md mx-auto rounded shadow-lg z-50 overflow-y-auto">
+      <input type="hidden" value="${register}" name="register" />
+      <div>
+        <label for="comment">${prompt}</label>
+
+        <p class="mb-1 text-xs text-gray-600">
+          Tip: did you know that you can use the <code>tab</code> key to
+          focus on the "submit" button, then the <code>spacebar</code> to
+          click it without your mouse?
+          <span class="text-green-700"> Very speedy!</span>
+        </p>
+
+        <textarea id="commentInput" name="comment" placeholder="Enter your comment"></textarea>
+      </div>
+      <input class="p-1 rounded shadow focus:ring-2 focus:ring-black" type="submit" value="Submit" />
+      <button class="p-1 m-1 font-medium text-white bg-red-700 rounded shadow focus:ring-red-300" hover:bg-red-600 onClick="removeCommentBankModal()">Close</button>
+    </div>
+  `;
+
+  const form = getModal("form", innerHTML);
+
+  form.id = "commentInputForm";
+  form.addEventListener(
     "submit",
     // whether a prefix register is defined determines which event handler
     // gets used
     register ? handleCommentBankInputRecieved : handleManualCommentInputRecieved
   );
 
-  f.classList.add(
-    ...[
-      "transiton",
-      "fixed",
-      "w-full",
-      "h-full",
-      "top-0",
-      "left-0",
-      "flex",
-      "items-center",
-      "justify-center",
-    ]
-  );
-
-  f.innerHTML = `
-    <div class="modal-overlay absolute w-full h-full bg-gray-900 opacity-50"></div>
-      <div class="modal-container relative p-1 lg:p-3 bg-white w-11/12 md:max-w-md mx-auto rounded shadow-lg z-50 overflow-y-auto">
-
-        ${/* close button */ ""}
-        <div class="container">
-          <input type="hidden" value="${register}" name="register" />
-          <div>
-            ${/* single form input; this is where the comment will go*/ ""}
-            <label for="comment">${prompt}</label>
-
-            <p class="mb-1 text-xs text-gray-600">
-              Tip: did you know that you can use the <code>tab</code> key to
-              focus on the "submit" button, then the <code>spacebar</code> to
-              click it without your mouse?
-              <span class="text-green-700"> Very speedy!</span>
-            </p>
-
-            <textarea id="commentInput" name="comment" placeholder="Enter your comment"></textarea>
-          </div>
-          <input class="p-1 rounded shadow focus:ring-2 focus:ring-black" type="submit" value="Submit" />
-          <button class="p-1 m-1 font-medium text-white bg-red-700 rounded shadow focus:ring-red-300" hover:bg-red-600 onClick="removeCommentBankModal()">Close</button>
-        </div>
-      </div>
-    </div>
-  `;
-
-  document.body.appendChild(f);
+  document.body.appendChild(form);
 
   // the setTimeout is necessary here because for some reason, focusing the
   // textarea causes the keyboard shortcut key to end up in the text input,
@@ -393,7 +391,7 @@ function beginCommentBankFlow(register) {
   if (
     state.commentBank.registers[register] &&
     state.commentBank.prefixKey.value ===
-      state.commentBank.prefixKey.choices.normalMode
+    state.commentBank.prefixKey.choices.normalMode
   ) {
     // the register is has a comment, and we are in normal mode; let's apply
     // the saved comment
@@ -404,7 +402,7 @@ function beginCommentBankFlow(register) {
     // if the prefix key was `B`, we are going to edit the stored comment
     // bank value no matter what
     state.commentBank.prefixKey.value ===
-      state.commentBank.prefixKey.choices.editMode ||
+    state.commentBank.prefixKey.choices.editMode ||
     // also, we need input if the register is empty
     state.commentBank.registers[register] === undefined
   ) {
@@ -446,6 +444,10 @@ function switchStudent() {
       break;
   }
 }
+
+/****************************************************************************
+ * event handlers
+ */
 
 /**
  * Global switch listening to any and every key press to facilitate global
@@ -516,6 +518,21 @@ function handleKeyUp(e) {
 }
 
 /****************************************************************************
- * Main event listener
+ * setup & initialization
  */
+
+/**
+ * Responds to the event that starts the application. Before the application
+ * is started, there are some htmx elements on the page for settings
+ * configuration
+ */
+async function init() {
+  await fetchData();
+  updateView();
+
+  document.body.addEventListener("keypress", handleKeyPress);
+  document.body.addEventListener("keydown", handleKeyDown);
+  document.body.addEventListener("keyup", handleKeyUp);
+}
+
 document.body.addEventListener("startGrader", init);
