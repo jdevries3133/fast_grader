@@ -172,12 +172,13 @@ async function syncData() {
     mode: "same-origin",
   });
   if (!response.ok) {
-    indicateFailure("Data did not sync, please try again");
+    indicateFailure(
+      "Data did not sync, please sync again. IF YOU REFRESH THE PAGE, YOUR CHANGES WILL BE LOST."
+    );
     throw new Error("Update failed");
   }
-  indicateSuccess("Data was saved", (clearAfterSeconds = null));
+  indicateSuccess("Data was saved");
   removeLoading();
-  fetchData();
 }
 
 /****************************************************************************
@@ -223,18 +224,26 @@ function applyBlur() {
  * @returns a function that will return the UI to the original state
  */
 function indicateLoading() {
-  applyBlur();
   const INDICATOR_ID = "loadingIndicator";
+  function isIndicatorInDomAlready() {
+    return !!document.getElementById(INDICATOR_ID);
+  }
+  if (isIndicatorInDomAlready()) {
+    return () => {};
+  }
+  applyBlur();
   const innerHTML = `
   <style> .lds-roller { display: inline-block; position: relative; width: 80px; height: 80px; } .lds-roller div { animation: lds-roller 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite; transform-origin: 40px 40px; } .lds-roller div:after { content: " "; display: block; position: absolute; width: 7px; height: 7px; border-radius: 50%; background: #fff; margin: -4px 0 0 -4px; } .lds-roller div:nth-child(1) { animation-delay: -0.036s; } .lds-roller div:nth-child(1):after { top: 63px; left: 63px; } .lds-roller div:nth-child(2) { animation-delay: -0.072s; } .lds-roller div:nth-child(2):after { top: 68px; left: 56px; } .lds-roller div:nth-child(3) { animation-delay: -0.108s; } .lds-roller div:nth-child(3):after { top: 71px; left: 48px; } .lds-roller div:nth-child(4) { animation-delay: -0.144s; } .lds-roller div:nth-child(4):after { top: 72px; left: 40px; } .lds-roller div:nth-child(5) { animation-delay: -0.18s; } .lds-roller div:nth-child(5):after { top: 71px; left: 32px; } .lds-roller div:nth-child(6) { animation-delay: -0.216s; } .lds-roller div:nth-child(6):after { top: 68px; left: 24px; } .lds-roller div:nth-child(7) { animation-delay: -0.252s; } .lds-roller div:nth-child(7):after { top: 63px; left: 17px; } .lds-roller div:nth-child(8) { animation-delay: -0.288s; } .lds-roller div:nth-child(8):after { top: 56px; left: 12px; } @keyframes lds-roller { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
   </style>
-  <div class="lds-roller"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
+  <div id="loadingSpinner" class="lds-roller"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
   `;
   const container = getModal("div", innerHTML);
   container.id = INDICATOR_ID;
   document.body.appendChild(container);
   return () => {
-    document.getElementById(INDICATOR_ID)?.remove();
+    const el = document.getElementById(INDICATOR_ID);
+    console.log(el);
+    el && el.remove();
     removeBlur();
   };
 }
@@ -248,6 +257,7 @@ function indicateSuccess(msg, clearAfterSeconds = 3) {
   const id = msg + Math.random();
   const statBar = document.getElementById("status");
   statBar.innerHTML = `
+  ${statBar.innerHTML}
   <div id="${id}" class="m-1 lg:m-3 p-1 lg:p-3 bg-green-200 rounded w-full flex flex-row items-center">
     <p class="text-md text-green-900 flex-grow">
       Success: ${msg}
