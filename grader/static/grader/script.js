@@ -23,6 +23,7 @@
 const dataUri = "/grader/assignment_data/";
 
 const state = {
+  isInitialized: false,
   // the global shortcut listener is paused when we are recieving keyboard
   // input and don't want it to do anything
   shortcutListenerActive: true,
@@ -153,33 +154,42 @@ async function fetchData() {
  * assignments to the list.
  */
 async function syncData() {
+  const removeLoading = indicateLoading();
+  const _fail = () => {
+    indicateFailure(
+      "Data did not sync, please sync again. Do not refresh, or your changes " +
+        "will be lost"
+    );
+    removeLoading();
+    throw new Error("Update failed");
+  };
   // sending the submission is problematic because the serializer on the
   // backend is jank and broken. We don't need to update the submission
   // anyway, so let's just remove it from the request data
-  const removeLoading = indicateLoading();
   const data = { ...state.assignmentData };
   data.submissions = state.assignmentData.submissions.map((i) => {
     delete i.submission;
     return i;
   });
-  const response = await fetch(dataUri, {
-    headers: new Headers({
-      "Content-Type": "application/json",
-      "X-CSRFToken": getCookie("csrftoken"),
-    }),
-    method: "PATCH",
-    body: JSON.stringify(data),
-    mode: "same-origin",
-  });
-  if (!response.ok) {
-    indicateFailure(
-      "Data did not sync, please sync again. Do not refresh, or your changes " +
-        "will be lost"
-    );
-    throw new Error("Update failed");
+  try {
+    const res = await fetch(dataUri, {
+      headers: new Headers({
+        "Content-Type": "application/json",
+        "X-CSRFToken": getCookie("csrftoken"),
+      }),
+      method: "PATCH",
+      body: JSON.stringify(data),
+      mode: "same-origin",
+    });
+    if (res.ok) {
+      indicateSuccess("Data was saved");
+      removeLoading();
+    } else {
+      _fail();
+    }
+  } catch (e) {
+    _fail();
   }
-  indicateSuccess("Data was saved");
-  removeLoading();
 }
 
 /****************************************************************************
@@ -559,15 +569,23 @@ function switchStudent() {
  * redirect to account home upon successful save.
  */
 async function handleSaveAndExit() {
-  try {
-    await syncData();
-    window.location.href = `${window.location.origin}/accounts/profile/`;
-  } catch (e) {
-    indicateFailure(
-      "Abandoning request to leave grader to avoid losing work. Please try " +
-        "saving again",
-      null
-    );
+  const _exit = () =>
+    (window.location.href = `${window.location.origin}/accounts/profile/`);
+
+  if (!state.isInitialized) {
+    // if the app is not initialized, there is nothing to save and nothing to
+    // lose. We can exit safely without care.
+    exit();
+  } else {
+    try {
+      await syncData();
+      _exit();
+    } catch (e) {
+      indicateFailure(
+        "Abandoning request to leave grader to avoid losing work. Please try " +
+          "saving again"
+      );
+    }
   }
 }
 
@@ -661,6 +679,11 @@ async function init() {
   document.body.addEventListener("keypress", handleKeyPress);
   document.body.addEventListener("keydown", handleKeyDown);
   document.body.addEventListener("keyup", handleKeyUp);
+
+  state.isInitialized = true;
 }
 
 document.body.addEventListener("startGrader", init);
+document
+  .getElementById("leaveGrader")
+  .addEventListener("click", handleSaveAndExit);
