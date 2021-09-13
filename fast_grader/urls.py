@@ -36,8 +36,8 @@ from . import views as generic_pages
 
 
 urlpatterns = [
+    path('accounts/', include('accounts.urls')),
     path('accounts/', include('allauth.urls')),
-    path('accounts/profile/', include('subscriptions.urls')),
     path('grader/', include('grader.urls')),
     path('admin/', admin.site.urls),
 

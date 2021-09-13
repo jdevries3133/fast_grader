@@ -58,9 +58,9 @@ INSTALLED_APPS = [
     'rest_framework',
     'tailwind',
 
+    'accounts',
     'theme',
     'grader',
-    'subscriptions'
 
 ]
 

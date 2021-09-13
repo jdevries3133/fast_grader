@@ -13,11 +13,9 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-from django.urls import path
-
-from .views import profile_home
+from django.apps import AppConfig
 
 
-urlpatterns = [
-    path('', profile_home)
-]
+class AccountsConfig(AppConfig):
+    default_auto_field = 'django.db.models.BigAutoField'
+    name = 'accounts'
