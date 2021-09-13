@@ -173,7 +173,8 @@ async function syncData() {
   });
   if (!response.ok) {
     indicateFailure(
-      "Data did not sync, please sync again. IF YOU REFRESH THE PAGE, YOUR CHANGES WILL BE LOST."
+      "Data did not sync, please sync again. Do not refresh, or your changes " +
+        "will be lost"
     );
     throw new Error("Update failed");
   }
@@ -242,7 +243,6 @@ function indicateLoading() {
   document.body.appendChild(container);
   return () => {
     const el = document.getElementById(INDICATOR_ID);
-    console.log(el);
     el && el.remove();
     removeBlur();
   };
@@ -402,13 +402,13 @@ function handleCommentBankInputRecieved(e) {
  * bank register, or as a manual comment.
  */
 function injectCommentBankModal(
-  registerName,
-  currentValue,
+  registerName = null,
+  currentValue = "",
   prompt = "Please enter your comment"
 ) {
   // validate register choice. It can be null, in the case of a manual comment
   let register;
-  if (/[a-zA-Z,.\/;']/.test(registerName)) {
+  if (registerName && /[a-zA-Z,.\/;']/.test(registerName)) {
     register = registerName;
   } else {
     // manual comment
@@ -554,6 +554,24 @@ function switchStudent() {
  */
 
 /**
+ * Handler will trigger when user presses the "Save and Exit" button. If the
+ * grader is initialized, we will save their work before exiting, then
+ * redirect to account home upon successful save.
+ */
+async function handleSaveAndExit() {
+  try {
+    await syncData();
+    window.location.href = `${window.location.origin}/accounts/profile/`;
+  } catch (e) {
+    indicateFailure(
+      "Abandoning request to leave grader to avoid losing work. Please try " +
+        "saving again",
+      null
+    );
+  }
+}
+
+/**
  * Global switch listening to any and every key press to facilitate global
  * keyboard shortcuts.
  *
@@ -575,9 +593,10 @@ function handleKeyPress(e) {
         state.commentBank.prefixKey.choices.editMode;
       break;
     case "c":
-      // TODO: this should open the current comment for editing. Currently,
-      // it just opens a blank input, even if a comment was already entered.
-      injectCommentBankModal();
+      injectCommentBankModal(
+        null,
+        state.assignmentData.submissions[state.currentlyViewingIndex].comment
+      );
       break;
     case "s":
       syncData();
@@ -613,6 +632,10 @@ function handleKeyDown(e) {
       break;
     case "Backspace":
       state.shortcutListenerActive && handleGradeInput(e.key);
+      break;
+    case "Escape":
+      removeCommentBankModal();
+      break;
   }
 }
 
