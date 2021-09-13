@@ -211,7 +211,7 @@ async function updateView() {
   const pagerEl = document.getElementById("studentContent");
 
   nameEl.innerText = current.student_name;
-  gradeEl.innerText = current.grade.toString() || "__";
+  gradeEl.innerText = current?.grade?.toString() || "__";
   maxGradeEl.innerText = state.assignmentData.max_grade || "??";
   commentEl.innerText = current.comment || "__";
   pagerEl.innerHTML = current.submission
@@ -333,7 +333,7 @@ function indicateFailure(msg, clearAfterSeconds = null) {
  */
 function handleGradeInput(char) {
   const current = state.assignmentData.submissions[state.currentlyViewingIndex];
-  const curGradeStr = current.grade === 0 ? "" : current.grade.toString();
+  const curGradeStr = current.grade ? current?.grade?.toString() : "";
   // concatenate the input to the grade field, only if it is a number
   if (char !== "Backspace") {
     const value = parseInt(char);
