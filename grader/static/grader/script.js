@@ -37,6 +37,8 @@ const state = {
   // index into assignmentData.submissions
   currentlyViewingIndex: 0,
 
+  viewDiffOnly: false,
+
   // all google classroom data
   assignmentData: {
     // other misc data will get inserted here, like various id's, which will
@@ -132,7 +134,8 @@ function getModal(containerElement, innerHTML) {
 async function fetchData() {
   const removeLoading = indicateLoading();
   try {
-    const response = await fetch(dataUri);
+    const uri = state.viewDiffOnly ? dataUri + "?diff=true" : dataUri;
+    const response = await fetch(uri);
     if (!response.ok) {
       throw new Error("Data get request failed");
     }
@@ -203,7 +206,7 @@ async function syncData() {
  * can call it from other functions whenever we update the global state.
  */
 async function updateView() {
-  current = state.assignmentData.submissions[state.currentlyViewingIndex];
+  const current = state.assignmentData.submissions[state.currentlyViewingIndex];
   const nameEl = document.getElementById("grName");
   const gradeEl = document.getElementById("grGrade");
   const maxGradeEl = document.getElementById("grMaxGrade");
@@ -589,6 +592,15 @@ async function handleSaveAndExit() {
   }
 }
 
+async function handleDiffSelectSlider() {
+  const inputEl = document.getElementById("diffSelectInput");
+  const newState = !inputEl.checked;
+  state.viewDiffOnly = newState;
+  inputEl.checked = newState;
+  await fetchData();
+  updateView();
+}
+
 /**
  * Global switch listening to any and every key press to facilitate global
  * keyboard shortcuts.
@@ -679,6 +691,9 @@ async function init() {
   document.body.addEventListener("keypress", handleKeyPress);
   document.body.addEventListener("keydown", handleKeyDown);
   document.body.addEventListener("keyup", handleKeyUp);
+  document
+    .getElementById("diffSelectSlider")
+    .addEventListener("click", handleDiffSelectSlider);
 
   state.isInitialized = true;
 }

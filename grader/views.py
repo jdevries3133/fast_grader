@@ -315,7 +315,8 @@ class AssessmentDataView(APIView):
             assignment_id=request.session['assignment']['id'],
             user=request.user,
             page_token=request.query_params.get('next_page'),
-            student_id_to_name=request.session['student_id_to_name_mapping']
+            student_id_to_name=request.session['student_id_to_name_mapping'],
+            diff_only=request.GET.get('diff') or False
         )
         return Response(GradingSessionSerializer(assignment).data)
 

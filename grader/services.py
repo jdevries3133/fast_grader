@@ -18,6 +18,7 @@ import logging
 
 from dataclasses import dataclass
 from typing import Union
+from difflib import unified_diff
 
 from allauth.socialaccount.models import SocialToken
 from django.contrib.auth.models import User
@@ -211,30 +212,61 @@ def download_drive_file_as(*, user: User, id_: str, mime_type: str) -> str:
     ).execute()
 
 
-def concatenate_attachments(*, user: User, attachments: list[dict]
-                            ) -> str:
-    """Given a submission object from the google classroom api, download each
-    attachment as plain text and concatenate them together, inserting the
-    name of the document into the concatednated string."""
+class DriveAttachment(ClassroomAPIItem): ...
+
+
+@ dataclass
+class StringifiedAttachment:
+    header: list[str]
+    content: list[str]
+
+
+@ dataclass
+class ConcatOutput:
+    data: list[StringifiedAttachment]
+
+    def join_lines(self) -> list[str]:
+        out = []
+        for i in self.data:
+            out.extend(i.header)
+            out.extend(i.content)
+        return out
+
+
+def concatenate_attachments(*, user: User, attachments: list[DriveAttachment]
+                            ) -> ConcatOutput:
+    """Download each attachment as plain text and concatenate them together,
+    returning a ConcatOutput object.
+
+    Note:
+        An object is returned because we can separate the header, which
+        includes the name of the document, from the content body. This is
+        useful if a downstream service wants to perform transformations to
+        the content, while treating the header separately, like in the case
+        of diffing.
+    """
     service = _get_google_api_service(user=user, service='drive', version='v3')
-    output: list[str] = []
+    output: list[StringifiedAttachment] = []
 
     for a in attachments:
-        attachment_name = a.get('driveFile', {}).get('title') or 'Unknown'
         # header
-        output.extend((
-            attachment_name,
-            '=' * len(attachment_name)
-        ))
+        header = [
+            a.name,
+            '=' * len(a.name)
+        ]
         try:
             data = service.files().export(  # type: ignore
-                fileId=a['driveFile']['id'],
+                fileId=a.id_,
                 mimeType='text/plain'
             ).execute()
             # localization/internationalization: this may become an issue if
             # utf8 is not the encoding in all locales
-            output.extend(
-                [l.strip() for l in str(data, 'utf8').split('\n') if l]
+            content = [l.strip() for l in str(data, 'utf8').split('\n') if l]
+            output.append(
+                StringifiedAttachment(
+                    header,
+                    content
+                )
             )
 
         except GoogClientHttpError as e:
@@ -250,11 +282,14 @@ def concatenate_attachments(*, user: User, attachments: list[dict]
                 logger.error('Unexpected condition prevented file export')
                 logger.exception(e)
             output.append(
-                f'{attachment_name} could not be imported because it is not '
-                'from a GSuite program like Google Docs, Google Slides, etc.'
+                StringifiedAttachment(
+                    header,
+                    [f'{a.name} could not be imported because it is not '
+                    'from a GSuite program like Google Docs, Google Slides, etc.']
+                )
             )
 
-    return '\n'.join(output)
+    return ConcatOutput(output)
 
 
 def get_assignment_data(
@@ -262,22 +297,42 @@ def get_assignment_data(
     course_id: str,
     assignment_id: str,
     user: User,
+    student_id_to_name: dict,
     page_token: str=None,
-    student_id_to_name: dict
+    diff_only: bool=False
 ) -> GradingSession:
     """Student submissions are fetched and squashed into a single string of
     text. If there are multiple attachments, they are concatenated with titles
     in-between.
     """
+    # TODO: too thicc
+    # TODO: not tested
+    # TODO: doin' too much
     submissions, assignment = _fetch_raw_assignment_data(
         course_id,
         assignment_id,
         user,
         page_token
     )
+    # prepare teacher attachment to diff against, if requested
+    if diff_only:
+        attachments = [
+            DriveAttachment(
+                id_=i.get('driveFile', {}).get('driveFile', {}).get('id'),
+                name=i.get('driveFile', {}).get('driveFile', {}).get('title'),
+            )
+            for i in assignment.get('materials', {})
+        ]
+        teacher_template = concatenate_attachments(
+            user=user,
+            attachments=attachments
+        )
 
+    # ----
     # if there is an existing session, we will update it rather than creating
     # a new one
+    # ----
+
     existing = GradingSession.objects.filter(  # type: ignore
         api_course_id=course_id,
         api_assignment_id=assignment_id,
@@ -289,21 +344,79 @@ def get_assignment_data(
             existing.max_grade = assignment['maxPoints']
             existing.save()
         submission_updates = []
-        for submission in existing.submissions.all():
-            for new_submission in submissions.get('studentSubmissions', []):
-                if submission.api_student_submission_id == new_submission['id']:
-                    # we have a match; perform the update
-                    submission.api_student_profile_id = new_submission['userId']
-                    submission.student_name = (
-                        student_id_to_name[new_submission['userId']]
-                    )
-                    submission.submission = concatenate_attachments(
-                        user=user,
-                        attachments=(
-                            new_submission['assignmentSubmission']['attachments']
+        for submission_from_database in existing.submissions.all():
+            match_found = False
+            for submission_from_google in submissions.get('studentSubmissions', []):
+                if (
+                    submission_from_database.api_student_submission_id
+                    == submission_from_google['id']
+                ):
+                    match_found = True
+                    # update this record in our database, and add it to the
+                    # list of submissions to ultimately return
+                    student_id = submission_from_google['userId']
+                    submission_from_database.api_student_profile_id = student_id
+                    try:
+                        submission_from_database.student_name = (
+                            student_id_to_name[student_id]
                         )
+                    except KeyError:
+                        raise NotImplementedError(
+                            'TODO: handle case where there is a new student, '
+                            'and the new ID may not be present in our mapping.'
+                            'In this rare situation, we probably need to make '
+                            'a fresh API call to get this data. This can be '
+                            'avoided in all cases by ensuring that the mapping '
+                            'passed in by the caller is good, but it is probably '
+                            'still worthwhile to have fallback code in here.'
+                        )
+                    attachments = [
+                        DriveAttachment(
+                            id_=i.get('driveFile', {}).get('id'),
+                            name=i.get('driveFile', {}).get('title', ''),
+                        )
+                        for i in submission_from_google['assignmentSubmission']['attachments']
+                    ]
+                    output = concatenate_attachments(
+                        user=user,
+                        attachments=attachments
                     )
-                    submission_updates.append(submission)
+                    if diff_only:
+                        for index, tmp_zip_items in enumerate(zip(
+                                output.data,
+                                teacher_template.data
+                        )):
+                            # TODO: zipping together the teacher attachments
+                            # and student attachments in this way presumes
+                            # that the attachments basically match, and are
+                            # in the same order. In most cases, this is true,
+                            # but it's definitely not always true. For a more
+                            # robust implementation, it is necessary to make
+                            # sure that the teacher template and student
+                            # attachment match before moving forward. Maybe
+                            # the google drive api has a way of checking this?
+                            # Hopefully there is a better way than actually
+                            # analyzing the content and looking for the best
+                            # similarity since that'll probably be O(no bueno).
+                            student, teacher = tmp_zip_items
+                            output.data[index].content = list(unified_diff(
+                                teacher.content,
+                                student.content
+                            ))
+
+                    submission_from_database.submission = '\n'.join(output.join_lines())
+                    submission_updates.append(submission_from_database)
+                else:
+                    # I don't know if this ever happens
+                    logger.error(f'assignment pk: {existing.pk}')
+                    logger.error(
+                        'missing submission pk: '
+                         f'{submission_from_google["id"]}'
+                    )
+            if not match_found:
+                raise ValueError(
+                    'Submission id mismatch between Google and database'
+                )
         AssignmentSubmission.objects.bulk_update(  # type: ignore
             submission_updates,
             (
@@ -315,6 +428,11 @@ def get_assignment_data(
         )
         return existing
 
+    # ----
+    # Otherwise (there is not existing session), we need to take the API data
+    # and create a new one
+    # ----
+
     assignment = GradingSession.objects.create(  # type: ignore
         owner=user,
         api_course_id=course_id,
@@ -323,18 +441,26 @@ def get_assignment_data(
     )
 
     submissions = submissions.get('studentSubmissions', [])
-    submission_models = [
-        AssignmentSubmission(
-            assignment=assignment,
-            api_student_submission_id=sub['id'],
-            api_student_profile_id=sub['userId'],
-            student_name=student_id_to_name[sub['userId']],
-            submission=concatenate_attachments(
-                user=user,
-                attachments=sub['assignmentSubmission']['attachments']
-            ),
-        ) for sub in submissions
-    ]
+    submission_models = []
+    for sub in submissions:
+        output = concatenate_attachments(
+            user=user,
+            attachments=sub['assignmentSubmission']['attachments']
+        ).join_lines()
+        if diff_only:
+            output = unified_diff(
+                output,
+                teacher_template,
+            )
+        submission_models.append(
+            AssignmentSubmission(
+                assignment=assignment,
+                api_student_submission_id=sub['id'],
+                api_student_profile_id=sub['userId'],
+                student_name=student_id_to_name[sub['userId']],
+                submission='\n'.join(output)
+            )
+        )
     AssignmentSubmission.objects.bulk_create(submission_models)  # type: ignore
     return assignment
 
@@ -345,6 +471,7 @@ def apply_comment(*, comment: str, documentId: str):
 
     Note:
         - The classroom API does not allow programmatic comments in Google
-          Classroom.
+          Classroom, so I think we will need to leave a google drive comment
+          instead.
     """
-    raise NotImplementedError
+    raise NotImplementedError(f'{comment}, {documentId}')
