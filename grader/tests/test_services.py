@@ -20,7 +20,7 @@ from unittest.mock import patch, MagicMock
 from django.test import TestCase
 from django.contrib.auth.models import User
 
-from ..services import concatenate_attachments
+from ..services import concatenate_attachments, DriveAttachment
 from googleapiclient.errors import HttpError as GoogClientHttpError
 
 
@@ -53,9 +53,7 @@ class TestConcatenateAttachments(TestCase):
         concatenate_attachments(
             user=self.user,
             attachments=[
-                {
-                    'driveFile': {'id': ''}
-                }
+                DriveAttachment(id_='testId', name='foo attachment'),
             ]
         )
         self.assertEqual(len(mock_logger.debug.mock_calls), 1)
@@ -81,9 +79,7 @@ class TestConcatenateAttachments(TestCase):
         concatenate_attachments(
             user=self.user,
             attachments=[
-                {
-                    'driveFile': {'id': ''}
-                }
+                DriveAttachment(id_='testId', name='foo attachment'),
             ]
         )
         self.assertEqual(len(mock_logger.error.mock_calls), 1)
