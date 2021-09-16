@@ -218,7 +218,21 @@ async function updateView() {
   maxGradeEl.innerText = state.assignmentData.max_grade || "??";
   commentEl.innerText = current.comment || "__";
   pagerEl.innerHTML = current.submission
-    .map((chunk) => `<code class="break-word my-1 block">${chunk}</code>`)
+    .map(
+      (chunk) => `<code class="
+      break-word
+      my-1
+      block
+      ${
+        // coloring for diff view
+        state.viewDiffOnly && chunk[0] === "+"
+          ? "bg-green-100 rounded"
+          : chunk[0] === "-"
+          ? "bg-red-100 rounded"
+          : "rounded"
+      }
+    ">${chunk}</code>`
+    )
     .join("");
 }
 
