@@ -339,6 +339,7 @@ def get_assignment_data(
         owner=user
     ).prefetch_related('submissions')
     if existing:
+        assert len(existing) == 1
         existing = existing.first()
         if existing.max_grade != assignment['maxPoints']:
             existing.max_grade = assignment['maxPoints']
@@ -372,8 +373,8 @@ def get_assignment_data(
                         )
                     attachments = [
                         DriveAttachment(
-                            id_=i.get('driveFile', {}).get('id'),
-                            name=i.get('driveFile', {}).get('title', ''),
+                            id_=i['driveFile']['id'],
+                            name=i['driveFile']['title']
                         )
                         for i in submission_from_google['assignmentSubmission']['attachments']
                     ]
@@ -382,27 +383,17 @@ def get_assignment_data(
                         attachments=attachments
                     )
                     if diff_only:
-                        for index, tmp_zip_items in enumerate(zip(
-                                output.data,
-                                teacher_template.data
-                        )):
-                            # TODO: zipping together the teacher attachments
-                            # and student attachments in this way presumes
-                            # that the attachments basically match, and are
-                            # in the same order. In most cases, this is true,
-                            # but it's definitely not always true. For a more
-                            # robust implementation, it is necessary to make
-                            # sure that the teacher template and student
-                            # attachment match before moving forward. Maybe
-                            # the google drive api has a way of checking this?
-                            # Hopefully there is a better way than actually
-                            # analyzing the content and looking for the best
-                            # similarity since that'll probably be O(no bueno).
-                            student, teacher = tmp_zip_items
-                            output.data[index].content = list(unified_diff(
-                                teacher.content,
-                                student.content
-                            ))
+                        for i_st, st in enumerate(output.data):
+                            for i_te, te in enumerate(teacher_template.data):
+                                if te.header[0] in st.header[0]:
+                                    diff = list(unified_diff(
+                                        te.content,
+                                        st.content,
+                                        n=1
+                                    ))
+                                    output.data[i_st].content = diff
+
+
 
                     submission_from_database.submission = '\n'.join(output.join_lines())
                     submission_updates.append(submission_from_database)
@@ -445,20 +436,24 @@ def get_assignment_data(
     for sub in submissions:
         output = concatenate_attachments(
             user=user,
-            attachments=sub['assignmentSubmission']['attachments']
-        ).join_lines()
+            attachments=[
+                DriveAttachment(
+                    id_=i['driveFile']['id'],
+                    name=i['driveFile']['title']
+                )
+                for i in sub['assignmentSubmission']['attachments']
+            ]
+        )
         if diff_only:
-            output = unified_diff(
-                output,
-                teacher_template,
-            )
+            raise NotImplementedError
+        submission_string = '\n'.join(output.join_lines())
         submission_models.append(
             AssignmentSubmission(
                 assignment=assignment,
                 api_student_submission_id=sub['id'],
                 api_student_profile_id=sub['userId'],
                 student_name=student_id_to_name[sub['userId']],
-                submission='\n'.join(output)
+                submission=submission_string
             )
         )
     AssignmentSubmission.objects.bulk_create(submission_models)  # type: ignore
