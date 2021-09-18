@@ -214,9 +214,9 @@ async function updateView() {
   const pagerEl = document.getElementById("studentContent");
 
   nameEl.innerText = current.student_name;
-  gradeEl.innerText = current?.grade?.toString() || "__";
+  gradeEl.innerHTML = current?.grade?.toString() || "<i>No Grade</i>";
   maxGradeEl.innerText = state.assignmentData.max_grade || "??";
-  commentEl.innerText = current.comment || "__";
+  commentEl.innerHTML = current.comment || "<i>No Comment</i>";
   pagerEl.innerHTML = current.submission
     .map(
       (chunk) => `<code class="
@@ -388,12 +388,11 @@ function handleGradeInput(char) {
 function applyComment(register) {
   const comment = state.commentBank.registers[register];
   if (!comment) {
-    throw new Error("Comment in register is undefined", register);
+    state.assignmentData.submissions[state.currentlyViewingIndex].comment = "";
+  } else {
+    state.assignmentData.submissions[state.currentlyViewingIndex].comment =
+      comment;
   }
-
-  state.assignmentData.submissions[state.currentlyViewingIndex].comment =
-    comment;
-
   updateView();
 }
 
@@ -458,9 +457,14 @@ function injectCommentBankModal(
         <label for="comment">${prompt}</label>
 
         <p class="mb-1 text-xs text-gray-600">
-          Tip: did you know that you can use the <code>tab</code> key to
+          ${
+            Math.random() > 0.5
+              ? `Tip: did you know that you can use the <code>tab</code> key to
           focus on the "submit" button, then the <code>spacebar</code> to
-          click it without your mouse?
+          click it without your mouse?`
+              : `Tip: did you know you can dismiss this dialogue box by simply
+          pressing the <code>Escape</code> key instead of the close button?`
+          }
           <span class="text-green-700"> Very speedy!</span>
         </p>
 
