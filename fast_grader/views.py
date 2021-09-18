@@ -16,7 +16,9 @@
 from django.shortcuts import render
 
 
-def faq(request): return render(request, 'core/faq.html')
+def help(request): return render(request, 'core/help.html')
+
+def about(request): return render(request, 'core/about.html')
 
 def home(request): return render(request, 'core/index.html')
 

@@ -14,7 +14,7 @@
 
 
   <select
-    class="text-sm md:text-lg"
+    class="text-sm"
     name="choice">
 
     <option>Please choose a course</option>
@@ -22,9 +22,9 @@
     {% for class in classes.classes %}
       <option value="{{ class.id_ }}">{{ class.name }}</option>
     {% endfor %}
-
   </select>
 
+  <br />
 
   <button
     class="p-1 m-1 font-medium font-bold text-white bg-indigo-500 rounded focus:ring-indigo-600 hover:bg-indigo-400">

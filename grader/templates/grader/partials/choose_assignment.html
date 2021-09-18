@@ -22,7 +22,7 @@ selections-wrapper container.
 
 
   <select 
-    class="text-sm md:text-lg"
+    class="text-sm"
     name="choice">
 
     <option>Please choose an assignment</option>
@@ -30,9 +30,9 @@ selections-wrapper container.
     {% for id, name in assignments.items %}
       <option value="{{ id }}">{{ name }}</option>
     {% endfor %}
-
   </select>
 
+  <br />
 
   <button
     class="p-1 m-1 font-medium font-bold text-white bg-indigo-500 rounded focus:ring-indigo-800 hover:bg-indigo-400">

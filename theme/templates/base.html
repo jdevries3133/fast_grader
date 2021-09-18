@@ -50,6 +50,17 @@
 
     {% block content %}{% endblock %}
 
+    <footer class="container flex items-center justify-center mb-5">
+      <div class="container text-center">
+        <p>
+          <a class="text-blue-700 underline visited:text-purple-700" href="{% url 'help' %}">Help</a>
+        </p>
+        <p>
+          <a class="text-blue-700 underline visited:text-purple-700" href="{% url 'about' %}">About Us</a>
+        </p>
+      </div>
+    </footer>
+
   </body>
 
 </html>

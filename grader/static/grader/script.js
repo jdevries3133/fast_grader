@@ -120,7 +120,7 @@ function getModal(containerElement, innerHTML) {
     "justify-center"
   );
   el.innerHTML = `
-    <div class="modal-overlay absolute w-full h-full bg-gray-900 opacity-50"></div>
+    <div class="modal-overlay blur-sm absolute w-full h-full bg-gray-900 opacity-50"></div>
     <div class="container w-full h-full flex items-center flex-col justify-center">
         ${innerHTML}
     </div>
@@ -220,6 +220,8 @@ async function updateView() {
   pagerEl.innerHTML = current.submission
     .map(
       (chunk) => `<code class="
+      overflow-hidden
+      overflow-clip
       break-word
       my-1
       block

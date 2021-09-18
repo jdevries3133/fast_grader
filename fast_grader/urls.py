@@ -43,7 +43,8 @@ urlpatterns = [
 
     # generic pages
     path('', generic_pages.home, name='home'),
-    path('faq/', generic_pages.faq, name='faq'),
+    path('help/', generic_pages.help, name='help'),
+    path('about/', generic_pages.about, name='about'),
     path('privacy/', generic_pages.privacy, name='privacy'),
     path('tos/', generic_pages.tos, name='tos'),
 ]
