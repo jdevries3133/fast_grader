@@ -1,13 +1,38 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h1>Profile Home</h1>
 
+<h1>Fast Grader Profile</h1>
 
 <a href="{% url 'grader' %}">
-  <button class="p-1 m-1 font-medium text-white bg-green-700 rounded shadow focus:ring-green-300 hover:bg-green-600">
-    Go to Grader
+  <button class="p-1 m-1 text-lg font-medium text-white bg-green-700 rounded shadow focus:ring-green-300 hover:bg-green-600">
+    Start a Grading Session
   </button>
 </a>
+
+<h3>Your Grading Sessions</h3>
+
+{% for sub in submissions %}
+<div class="p-2 m-2 bg-gray-100 rounded shadow grid grid-cols-3 grid-rows-2">
+  <div class="col-span-2">
+    <p class="text-sm text-gray-600">{{ sub.time }}</p>
+    <h4 class="text-sm text-gray-700">Course Name</h4>
+    <p>{{ sub.course }}</p>
+    <h4 class="text-sm text-gray-700">Assignment Name</h4>
+    <p>{{ sub.assignment }}</p>
+  </div>
+  <div>
+    <h4 class="text-sm text-gray-700">Average Grade</h4>
+    <p>{{ sub.averageGrade }}</p>
+    <h4 class="text-sm text-gray-700">Max Grade</h4>
+    <p>{{ sub.maxGrade }}</p>
+  </div>
+  <div class="bg-gray-600 col-span-3">
+    <h1>TODO: put action buttons in here</h1>
+  </div>
+</div>
+{% endfor %}
+
+
 
 {% endblock %}

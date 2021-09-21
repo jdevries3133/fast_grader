@@ -31,6 +31,9 @@ class GradingSession(models.Model):
 
 
 class AssignmentSubmission(models.Model):
+    # TODO: we need to store the course and assignment name; course should
+    # probably be in another table so we can join by course later
+
     # id's needed to fetch more data at different levels
     assignment = models.ForeignKey(
         GradingSession,

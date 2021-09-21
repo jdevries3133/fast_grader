@@ -3,10 +3,42 @@
 {% block title %}Fast Grader Help Page{% endblock %}
 
 {% block content %}
-<div class="container bg-gray-100 rounded lg:m-4 lg:p-4 max-w-prose">
-  <h1>Help</h1>
+<div class="container p-2 bg-gray-100 rounded lg:rounded lg:m-4 lg:p-4 max-w-prose">
+  <h1 class="mb-3">Help</h1>
 
-  <h3>Coming Soon</h3>
+  <h3 class="mb-4">Where do comments and grades go?</h3>
+  <p class="m-2">
+    Since the fast grader is currently in an early stage of development,
+    your comments and grades are simply saved, and accessible to you in your
+    profile home page. Comments and grades do not make the round trip back
+    into Google Classroom currently, although after we ensure that teachers
+    like using the grading tool, the next objective will be to develop that
+    feature, so that importing comments and grades back into google classroom
+    is a seamless process.
+  </p>
+  <h3 class="mt-4 mb-4">How do I report a bug?</h3>
+    <a href="https://github.com/jdevries3133/fast_grader/issues/new">
+      <button class="block">Submit Bug Report</button>
+    </a>
+  <p class="m-2">
+    Bug reports are extremely appreciated! Click the button above to submit a
+    bug report on GitHub. Or, send me a personal email at
+    <a 
+      class="text-blue-700 underline visited:text-purple-700"
+      href="mailto:jackdevriesmusic@gmail.com">jackdevriesmusic@gmail.com.</a>
+  </p>
+  <h3 class="mt-4 mb-4">How do I request a new feature?</h3>
+    <a href="https://github.com/jdevries3133/fast_grader/issues/new">
+      <button class="block bg-blue-200 focus:ring-blue-400">Make a Feature Request</button>
+    </a>
+  <p class="m-2">
+    Use the same process as submitting a bug report! Open up an issue on the
+    GitHub repository, or 
+    <a 
+      class="text-blue-700 underline visited:text-purple-700"
+      href="mailto:jackdevriesmusic@gmail.com">send me an email!</a>
+  </p>
+
 </div>
 
 {% endblock %}
