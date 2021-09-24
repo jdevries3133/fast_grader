@@ -21,7 +21,7 @@ from django.contrib.auth.models import User
 from django.test import TestCase
 from django.urls.base import reverse
 
-from ..services import Course, CourseList
+from ..services import CourseResource, CourseList
 from ..models import GradingSession
 
 
@@ -39,8 +39,8 @@ class TestChooseCourseView(TestCase):
     def test_get_initial(self, mock):
         # setup mock
         mock.return_value = CourseList(next_page_token=None, classes=[
-            Course(id_='a_id', name='a'),
-            Course(id_='b_id', name='b')
+            CourseResource(id_='a_id', name='a'),
+            CourseResource(id_='b_id', name='b')
         ])
 
         # action: make request 
@@ -65,8 +65,8 @@ class TestChooseCourseView(TestCase):
     def test_get_after_choice_made(self, mock):
         # setup: mock
         mock.return_value = CourseList(next_page_token=None, classes=[
-            Course(id_='a_id', name='a'),
-            Course(id_='b_id', name='b')
+            CourseResource(id_='a_id', name='a'),
+            CourseResource(id_='b_id', name='b')
         ])
 
         # setup: this mocks the choice being made
@@ -89,8 +89,8 @@ class TestChooseCourseView(TestCase):
         the post request is made."""
         # setup: mock
         mock.return_value = CourseList(next_page_token=None, classes=[
-            Course(id_='a_id', name='a'),
-            Course(id_='b_id', name='b')
+            CourseResource(id_='a_id', name='a'),
+            CourseResource(id_='b_id', name='b')
         ])
 
         # assertion: selection will fail without mapping in client session
@@ -103,8 +103,8 @@ class TestChooseCourseView(TestCase):
     def test_post_valid_state(self, mock):
         # setup: mock
         mock.return_value = CourseList(next_page_token=None, classes=[
-            Course(id_='a_id', name='a'),
-            Course(id_='b_id', name='b')
+            CourseResource(id_='a_id', name='a'),
+            CourseResource(id_='b_id', name='b')
         ])
 
         # setup: put the mapping into the session

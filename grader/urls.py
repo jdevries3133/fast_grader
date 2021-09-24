@@ -16,12 +16,15 @@
 from django.urls import path
 
 from .views import (
-    grader,
+    delete_session,
     flush_selections,
+    grader,
+    get_delete_session_form,
     grading_tool,
+    session_detail,
     ChooseCourseView,
     ChooseAssignmentView,
-    AssessmentDataView
+    AssessmentDataView,
 )
 
 urlpatterns = [
@@ -30,5 +33,8 @@ urlpatterns = [
     path('tool/', grading_tool, name='grading_tool'),
     path('assignment_data/', AssessmentDataView.as_view(), name='assignment_data'),
     path('choose_course/', ChooseCourseView.as_view(), name='choose_course'),
-    path('choose_assignment/', ChooseAssignmentView.as_view(), name='choose_assignment')
+    path('choose_assignment/', ChooseAssignmentView.as_view(), name='choose_assignment'),
+    path('session/<int:pk>/', session_detail, name='session_detail'),
+    path('session/<int:pk>/delete/', delete_session, name='delete_session'),
+    path('session/<int:pk>/delete_form/', get_delete_session_form, name='delete_session_modal_form'),
 ]

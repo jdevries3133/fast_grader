@@ -27,7 +27,7 @@ from googleapiclient.discovery import build
 from google.oauth2.credentials import Credentials
 from googleapiclient.errors import HttpError as GoogClientHttpError
 
-from .models import GradingSession, AssignmentSubmission
+from .models import GradingSession, AssignmentSubmission, CourseModel
 
 
 # in testing environments, the secrets file may not exist, so it's ok in those
@@ -91,13 +91,23 @@ class ClassroomAPIItem:
 
 
 @ dataclass
-class Course(ClassroomAPIItem): ...
+class CourseResource(ClassroomAPIItem): ...
 
 
 @ dataclass
 class CourseList:
     next_page_token: Union[str, None]
-    classes: list[Course]
+    classes: list[CourseResource]
+
+
+def get_course(*, user: User, course_id: str) -> dict:
+    """Return the top-level course object from the classroom api, documented
+    here
+    https://googleapis.github.io/google-api-python-client/docs/dyn/classroom_v1.courses.html
+    """
+    service = get_google_classroom_service(user=user)
+    response = service.courses().get(id=course_id).execute()  # type: ignore
+    return response
 
 
 def get_student_data(*, user: User, course_id: str) -> list[ClassroomAPIItem]:
@@ -132,7 +142,7 @@ def list_all_class_names(*, user: User, page_token: Union[str, None]=None
         raise Http404('User does not have any courses')
 
     # format data and wrap in dataclasses
-    classes = [Course(r['id'], r['name']) for r in result]
+    classes = [CourseResource(r['id'], r['name']) for r in result]
     return CourseList(response.get('nextPageToken'), classes)
 
 
@@ -145,7 +155,7 @@ class AssignmentList:
 def list_all_assignment_names(
     *,
     user: User,
-    course: Course,
+    course: CourseResource,
     page_token: Union[str, None]=None
 ) -> AssignmentList:
     # initialize service
@@ -341,9 +351,20 @@ def get_assignment_data(
     if existing:
         assert len(existing) == 1
         existing = existing.first()
+
+        # update the top-level session object if there are new values in the
+        # fields.
         if existing.max_grade != assignment['maxPoints']:
             existing.max_grade = assignment['maxPoints']
             existing.save()
+        if existing.assignment_name != assignment['title']:
+            existing.assignment_name = assignment['title']
+        if (
+            existing.assignment_name != assignment['title'] or
+            existing.max_grade != assignment['maxPoints']
+        ):
+            existing.save()
+
         submission_updates = []
         for submission_from_database in existing.submissions.all():
             match_found = False
@@ -424,11 +445,16 @@ def get_assignment_data(
     # and create a new one
     # ----
 
-    assignment = GradingSession.objects.create(  # type: ignore
+    course_resource = get_course(user=user, course_id=assignment['courseId'])
+    course = CourseModel.objects.create(name=course_resource['name'])   # type: ignore
+
+    assignment = GradingSession.objects.create(                         # type: ignore
         owner=user,
+        assignment_name=assignment['title'],
         api_course_id=course_id,
         api_assignment_id=assignment_id,
         max_grade=assignment['maxPoints'],
+        course=course
     )
 
     submissions = submissions.get('studentSubmissions', [])

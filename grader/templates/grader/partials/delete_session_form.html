@@ -1,0 +1,28 @@
+<div id="modalDelete" class="fixed top-0 left-0 flex items-center justify-center w-full h-full transiton">
+  <div class="absolute w-full h-full bg-gray-900 opacity-50 modal-overlay blur-sm"></div>
+  <div class="container z-20 flex flex-col items-center justify-center w-full h-full">
+    <div class="p-4 bg-white rounded">
+      <h3>Delete Grading Session for {{ session.assignment_name }}</h3>
+      <p class="text-red-800">
+        Are you sure you want to delete all comments and grades from this
+        grading session from our database?
+      </p>
+      <p class="text-red-800">
+        <b>This action cannot be undone.</b>
+      </p>
+      <button
+        hx-delete="{% url 'delete_session' session.pk %}"
+        hx-target="#modalDelete"
+        hx-swap="outerHTML"
+        class="p-1 m-1 font-medium text-white bg-red-700 rounded shadow focus:ring-red-300 hover:bg-red-600">
+        Delete
+      </button>
+      <button
+        hx-get="{% url 'profile' %}"
+        hx-target="body"
+        class="p-1 m-1 font-medium text-white bg-green-700 rounded shadow focus:ring-green-300 hover:bg-green-600">
+        Do Not Delete
+      </button>
+    </div>
+  </div>
+</div>

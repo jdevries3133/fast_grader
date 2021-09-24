@@ -10,28 +10,72 @@
   </button>
 </a>
 
+{% if sessions %}
+
 <h3>Your Grading Sessions</h3>
 
-{% for sub in submissions %}
-<div class="p-2 m-2 bg-gray-100 rounded shadow grid grid-cols-3 grid-rows-2">
-  <div class="col-span-2">
-    <p class="text-sm text-gray-600">{{ sub.time }}</p>
-    <h4 class="text-sm text-gray-700">Course Name</h4>
-    <p>{{ sub.course }}</p>
-    <h4 class="text-sm text-gray-700">Assignment Name</h4>
-    <p>{{ sub.assignment }}</p>
-  </div>
-  <div>
-    <h4 class="text-sm text-gray-700">Average Grade</h4>
-    <p>{{ sub.averageGrade }}</p>
-    <h4 class="text-sm text-gray-700">Max Grade</h4>
-    <p>{{ sub.maxGrade }}</p>
-  </div>
-  <div class="bg-gray-600 col-span-3">
-    <h1>TODO: put action buttons in here</h1>
+{% comment %} One card for each submission {% endcomment %}
+{% for sub in sessions %}
+<div class="container max-w-md p-2 m-2 rounded"> {% comment %}  Outer Wrapper  {% endcomment %}
+  <div class="shadow">                           {% comment %}  Inner Wrapper  {% endcomment %}
+
+    {% comment %}  Assignment Name: Top card section  {% endcomment %}
+    <div class="p-2 bg-green-200 rounded-t col-span-3">
+      <h4 class="text-gray-700 text-md">Assignment Name</h4>
+      <p class="text-lg">{{ sub.assignment_name }}</p>
+    </div>
+
+    {% comment %}  Details: middle card section  {% endcomment %}
+    <div class="items-center justify-start p-2 bg-gray-100 sm:flex sm:flex-wrap gap-4 grid grid-rows-2 grid-cols-2 sm:max-flex-row">
+      <div class="row-start-2 col-start-1">
+        <h4 class="text-sm text-gray-700">Course Name</h4>
+        <p>{{ sub.course.name }}</p>
+      </div>
+      <div class="row-start-1 col-start-1">
+        <h4 class="text-sm text-gray-700">Graded On</h4>
+        <p>{{ sub.created|date }}</p>
+      </div>
+      <div class="row-start-1 col-start-2">
+        <h4 class="text-sm text-gray-700">
+          <span class="hidden xs:inline">Average</span>
+          <span class="xs:hidden">Avg.</span>
+          Grade
+        </h4>
+        {% if sub.average_grade %}
+          <p>{{ sub.average_grade }}</p>
+        {% else %}
+          <p>Ungraded</p>
+        {% endif %}
+      </div>
+      <div class="row-start-2 col-start-2">
+        <h4 class="text-sm text-gray-700">Max Grade</h4>
+        <p>{{ sub.max_grade }}</p>
+      </div>
+    </div>
+
+    {% comment %}  Actions: bottom card section {% endcomment %}
+    <div>
+      <div class="p-2 bg-yellow-300 rounded-b">
+        {% comment %}  View Details  {% endcomment %}
+        <a href="{% url 'session_detail' sub.pk %}"> 
+          <button class="p-2 bg-yellow-100 rounded shadow md:m-2 text-grey-800 hover:bg-yellow-200 focus:ring-yellow-400">
+            View Details
+          </button>
+        </a>
+        {% comment %}  Delete Session  {% endcomment %}
+        <button
+          hx-get="{% url 'delete_session_modal_form' sub.pk %}"
+          hx-swap="outerHTML"
+          class="p-2 bg-red-100 rounded shadow md:m-2 text-grey-800 hover:bg-red-200 focus:ring-red-400">
+          Delete Session
+        </button>
+      </div>
+    </div>
   </div>
 </div>
 {% endfor %}
+
+{% endif %} {% comment %}  the user has any sessions to begin with {% endcomment %}
 
 
 

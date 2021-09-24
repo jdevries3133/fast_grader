@@ -15,7 +15,7 @@
 import json
 import logging
 
-from django.http.response import HttpResponse
+from django.http.response import Http404, HttpResponse
 from grader.models import AssignmentSubmission, GradingSession
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
@@ -30,7 +30,7 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 
 from .services import (
-    Course,
+    CourseResource,
     list_all_class_names,
     list_all_assignment_names,
     get_student_data,
@@ -249,7 +249,7 @@ class ChooseAssignmentView(View):
         self.request.session.setdefault('_id_to_assignment_name_mapping', {})
         result = list_all_assignment_names(
             user=self.request.user,
-            course=Course(
+            course=CourseResource(
                 self.request.session['course']['id'],
                 self.request.session['course']['name'],
             ),
@@ -356,3 +356,44 @@ class AssessmentDataView(APIView):
 
         # update student submissions
         return Response(status=status.HTTP_200_OK)
+
+
+def session_detail(request, pk):
+    try:
+        obj = GradingSession.objects.get(pk=pk)             # type: ignore
+    except GradingSession.DoesNotExist:                     # type: ignore
+        raise Http404('session does not exist') from None
+
+    return render(
+        request,
+        'grader/session_detail.html',
+        context={'session': obj}
+    )
+
+
+def get_delete_session_form(request, pk):
+    try:
+        obj = GradingSession.objects.get(pk=pk)  # type: ignore
+    except GradingSession.DoesNotExist:  # type: ignore
+        raise Http404('session does not exist') from None
+
+    return render(
+        request,
+        'grader/partials/delete_session_form.html',
+        context={'session': obj}
+    )
+
+
+def delete_session(request, pk):
+    try:
+        obj = GradingSession.objects.get(pk=pk)  # type: ignore
+    except GradingSession.DoesNotExist:  # type: ignore
+        raise Http404('session does not exist') from None
+
+    context = {'assignment_name': obj.assignment_name}
+    obj.delete()
+    return render(
+        request,
+        'grader/partials/session_deleted.html',
+        context=context
+    )

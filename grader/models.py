@@ -17,9 +17,22 @@ from django.contrib.auth.models import User
 from django.db import models
 
 
+class CourseModel(models.Model):
+    name = models.CharField(max_length=255)
+
+
 class GradingSession(models.Model):
     owner = models.ForeignKey(User, on_delete=models.CASCADE)
     created = models.DateTimeField(auto_now_add=True)
+
+    assignment_name = models.CharField(max_length=255)
+    course = models.ForeignKey(
+        CourseModel,
+        related_name='grading_sessions',
+        on_delete=models.SET_NULL,
+        null=True
+    )
+
     api_course_id = models.CharField(max_length=50)
 
     # only one session can exist for a given assignment. Users can resume
@@ -29,11 +42,12 @@ class GradingSession(models.Model):
     max_grade = models.IntegerField()
     teacher_template = models.TextField(blank=True)
 
+    @ property
+    def average_grade(self):
+        return list(self.submissions.aggregate(models.Avg('grade')).values())[0]  # type: ignore
+
 
 class AssignmentSubmission(models.Model):
-    # TODO: we need to store the course and assignment name; course should
-    # probably be in another table so we can join by course later
-
     # id's needed to fetch more data at different levels
     assignment = models.ForeignKey(
         GradingSession,

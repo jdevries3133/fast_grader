@@ -11,12 +11,22 @@
       <script>window.LogRocket && window.LogRocket.init('gbwkwf/fast-grader');</script>
     {% endif %}
 
-    {% comment %}use unminified htmx in debug mode {% endcomment %}
-    {% if debug %}
-      <script src="https://unpkg.com/htmx.org@1.5.0/dist/htmx.js"></script>
-    {% else %}
-      <script src="https://unpkg.com/htmx.org@1.5.0"></script>
-    {% endif %}
+    <script src="{% static 'grader/htmx.js' %}"></script>
+
+    {% comment %}  htmx  {% endcomment %}
+    <!-- {% if debug %} -->
+    <!--   <script src="https://unpkg.com/htmx.org@1.5.0/dist/htmx.js"></script> -->
+    <!-- {% else %} -->
+    <!--   <script src="https://unpkg.com/htmx.org@1.5.0"></script> -->
+    <!-- {% endif %} -->
+    <script>
+      // htmx init script
+      document.addEventListener('DOMContentLoaded', () => {
+        document.body.addEventListener('htmx:configRequest', (event) => {
+          event.detail.headers['X-CSRFToken'] = '{{ csrf_token }}';
+        })
+      })
+    </script>
 
     <title>{% block title %}Fast GC Grader{% endblock %}</title>
     {% block head %}{% endblock %}
@@ -26,7 +36,7 @@
 
   <body>
 
-    <div class="absolute right-0">
+    <div class="fixed top-0 right-0 z-20">
     {% if request.user.is_authenticated %}
       <a href="{% url 'account_logout' %}">
         <button class="block p-2 bg-indigo-100 rounded shadow md:m-2 text-grey-800 hover:bg-indigo-200 focus:ring-indigo-400">
@@ -50,8 +60,8 @@
 
     {% block content %}{% endblock %}
 
-    <footer class="container flex items-center justify-center mb-5">
-      <div class="container text-center">
+    <footer class="flex items-center justify-center w-full mb-5">
+      <div class="text-center">
         <p>
           <a class="text-blue-700 underline visited:text-purple-700" href="{% url 'help' %}">Help</a>
         </p>
