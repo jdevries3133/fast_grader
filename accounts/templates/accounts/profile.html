@@ -2,17 +2,21 @@
 
 {% block content %}
 
-<h1>Fast Grader Profile</h1>
+<div class="p-2">
 
-<a href="{% url 'grader' %}">
-  <button class="p-1 m-1 text-lg font-medium text-white bg-green-700 rounded shadow focus:ring-green-300 hover:bg-green-600">
-    Start a Grading Session
-  </button>
-</a>
+  <h1>Fast Grader Profile</h1>
+
+  <a href="{% url 'grader' %}">
+    <button class="p-1 m-1 text-lg font-medium text-white bg-green-700 rounded shadow focus:ring-green-300 hover:bg-green-600">
+      Open Fast Grader
+    </button>
+  </a>
+
+</div>
 
 {% if sessions %}
 
-<h3>Your Grading Sessions</h3>
+<h3 class="p-2">Your Grading Sessions</h3>
 
 {% comment %} One card for each submission {% endcomment %}
 {% for sub in sessions %}
@@ -56,6 +60,12 @@
     {% comment %}  Actions: bottom card section {% endcomment %}
     <div>
       <div class="p-2 bg-yellow-300 rounded-b">
+        {% comment %}  Resume Grading  {% endcomment %}
+        <a href="{% url 'resume_grading' sub.pk %}"> 
+          <button class="p-2 bg-green-100 rounded shadow md:m-2 text-grey-800 hover:bg-green-200 focus:ring-green-400">
+            Resume Grading
+          </button>
+        </a>
         {% comment %}  View Details  {% endcomment %}
         <a href="{% url 'session_detail' sub.pk %}"> 
           <button class="p-2 bg-yellow-100 rounded shadow md:m-2 text-grey-800 hover:bg-yellow-200 focus:ring-yellow-400">
@@ -66,7 +76,7 @@
         <button
           hx-get="{% url 'delete_session_modal_form' sub.pk %}"
           hx-swap="outerHTML"
-          class="p-2 bg-red-100 rounded shadow md:m-2 text-grey-800 hover:bg-red-200 focus:ring-red-400">
+          class="p-2 bg-red-100 rounded shadow md:m-2 text-grey-800 hover:bg-red-200 active:ring-red-400 focus:ring-red-400">
           Delete Session
         </button>
       </div>

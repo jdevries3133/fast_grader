@@ -19,6 +19,7 @@ from django.db import models
 
 class CourseModel(models.Model):
     name = models.CharField(max_length=255)
+    api_course_id = models.CharField(max_length=50)
 
 
 class GradingSession(models.Model):
@@ -33,7 +34,6 @@ class GradingSession(models.Model):
         null=True
     )
 
-    api_course_id = models.CharField(max_length=50)
 
     # only one session can exist for a given assignment. Users can resume
     # previous sessions, and submission data may need to be updated when

@@ -21,6 +21,7 @@ from .views import (
     grader,
     get_delete_session_form,
     grading_tool,
+    resume_grading,
     session_detail,
     ChooseCourseView,
     ChooseAssignmentView,
@@ -29,6 +30,7 @@ from .views import (
 
 urlpatterns = [
     path('', grader, name='grader'),
+    path('<int:pk>/', resume_grading, name='resume_grading'),
     path('flush_selections/', flush_selections, name='flush_selections'),
     path('tool/', grading_tool, name='grading_tool'),
     path('assignment_data/', AssessmentDataView.as_view(), name='assignment_data'),

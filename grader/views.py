@@ -54,6 +54,23 @@ def grader(request):
 
 
 @ login_required
+def resume_grading(request, pk):
+    """Setup the request session so that we can resume a previous grading
+    session."""
+    try:
+        obj = GradingSession.objects.get(pk=pk)  # type: ignore
+    except GradingSession.DoesNotExist:  # type: ignore
+        raise Http404('grading session does not exist')
+
+    request.session['course'] = {'id': obj.course.api_course_id, 'name': obj.course.name}  # type: ignore
+    request.session['assignment'] = {
+        'id': obj.api_assignment_id,
+        'name': obj.assignment_name
+    }
+    return grader(request)
+
+
+@ login_required
 def flush_selections(request):
     for k in ('course', 'assignment'):
         request.session.pop(k, None)

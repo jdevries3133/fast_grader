@@ -344,7 +344,7 @@ def get_assignment_data(
     # ----
 
     existing = GradingSession.objects.filter(  # type: ignore
-        api_course_id=course_id,
+        course__api_course_id=course_id,
         api_assignment_id=assignment_id,
         owner=user
     ).prefetch_related('submissions')
@@ -446,12 +446,14 @@ def get_assignment_data(
     # ----
 
     course_resource = get_course(user=user, course_id=assignment['courseId'])
-    course = CourseModel.objects.create(name=course_resource['name'])   # type: ignore
+    course = CourseModel.objects.create(  # type: ignore
+        name=course_resource['name'],
+        api_course_id=course_id
+    )
 
     assignment = GradingSession.objects.create(                         # type: ignore
         owner=user,
         assignment_name=assignment['title'],
-        api_course_id=course_id,
         api_assignment_id=assignment_id,
         max_grade=assignment['maxPoints'],
         course=course

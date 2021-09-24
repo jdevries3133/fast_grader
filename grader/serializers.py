@@ -58,7 +58,6 @@ class GradingSessionSerializer(serializers.ModelSerializer):
         model = GradingSession
         fields = (
             'pk',
-            'api_course_id',
             'api_assignment_id',
             'max_grade',
             'teacher_template',
