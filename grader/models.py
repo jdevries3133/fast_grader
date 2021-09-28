@@ -21,6 +21,9 @@ class CourseModel(models.Model):
     name = models.CharField(max_length=255)
     api_course_id = models.CharField(max_length=50)
 
+    def __str__(self):
+        return self.name
+
 
 class GradingSession(models.Model):
     owner = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -46,6 +49,9 @@ class GradingSession(models.Model):
     def average_grade(self):
         return list(self.submissions.aggregate(models.Avg('grade')).values())[0]  # type: ignore
 
+    def __str__(self):
+        return self.assignment_name
+
 
 class AssignmentSubmission(models.Model):
     # id's needed to fetch more data at different levels
@@ -64,3 +70,6 @@ class AssignmentSubmission(models.Model):
     # TODO: rename to `content`?
     submission = models.TextField(blank=True)
     comment = models.TextField(blank=True)
+
+    def __str__(self):
+        return self.student_name
