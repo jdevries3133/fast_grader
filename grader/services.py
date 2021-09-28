@@ -432,10 +432,13 @@ def get_assignment_data(
     # ----
 
     course_resource = get_course(user=user, course_id=assignment['courseId'])
-    course = CourseModel.objects.create(  # type: ignore
-        name=course_resource['name'],
-        api_course_id=course_id
-    )
+    try:
+        course = CourseModel.objects.get(api_course_id=course_id)       # type: ignore
+    except CourseModel.DoesNotExist:                                    # type: ignore
+        course = CourseModel.objects.create(                            # type: ignore
+            name=course_resource['name'],
+            api_course_id=course_id
+        )
 
     assignment = GradingSession.objects.create(                         # type: ignore
         owner=user,
