@@ -598,7 +598,7 @@ async function handleSaveAndExit() {
   if (!state.isInitialized) {
     // if the app is not initialized, there is nothing to save and nothing to
     // lose. We can exit safely without care.
-    exit();
+    _exit();
   } else {
     try {
       await syncData();
