@@ -14,9 +14,12 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
 
 from grader.models import GradingSession
 
+
+@ login_required
 def profile(request):
     """This is where the user will be able to view and export previous grading
     sessions."""
