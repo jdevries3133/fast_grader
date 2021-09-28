@@ -14,6 +14,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 import json
 import logging
+from typing import Protocol
 
 from django.http.response import Http404, HttpResponse
 from grader.models import AssignmentSubmission, GradingSession
@@ -72,8 +73,8 @@ def resume_grading(request, pk):
 
 @ login_required
 def flush_selections(request):
-    for k in ('course', 'assignment'):
-        request.session.pop(k, None)
+    for session_mutating_class in (ChooseCourseView, ChooseAssignmentView):
+        session_mutating_class.flush_session(request)
     return redirect(reverse('grader'))
 
 
@@ -89,6 +90,7 @@ def grading_tool(request):
             'assignment': request.session['assignment'],
         }
     )
+
 
 
 @ method_decorator(login_required, name='dispatch')
@@ -157,8 +159,6 @@ class ChooseCourseView(View):
         if not choice_name:
             return page_not_found(request, 'Course does not exist in course names')
 
-        if request.session.get('assignment'):
-            del request.session.get['assignment']
         request.session['course'] = {'id': choice_id, 'name': choice_name}
 
         return self._course_choice_made(request)
@@ -171,6 +171,15 @@ class ChooseCourseView(View):
             'grader/partials/course_choice_made.html',
             context={'course': request.session['course']}
         )
+
+    @ staticmethod
+    def flush_session(request):
+        """Restore the request session state."""
+        for key in (
+            '_id_to_course_name_mapping',
+            'course'
+        ):
+            request.session.pop(key, None)
 
 
 @ method_decorator(login_required, name='dispatch')
@@ -304,6 +313,17 @@ class ChooseAssignmentView(View):
         # initialize the grading tool
         response['Hx-Trigger'] = 'startGrader'
         return response
+
+    @ staticmethod
+    def flush_session(request):
+        """Restore request session to the initial state before interacting
+        with this."""
+        for key in (
+            '_id_to_assignment_name_mapping',
+            'assignment',
+            'student_id_to_name_mapping'
+        ):
+            request.session.pop(key, None)
 
 
 class AssessmentDataView(APIView):
