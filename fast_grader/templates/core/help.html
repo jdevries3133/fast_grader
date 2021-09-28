@@ -3,19 +3,78 @@
 {% block title %}Fast Grader Help Page{% endblock %}
 
 {% block content %}
-<div class="container p-2 bg-gray-100 rounded lg:rounded lg:m-4 lg:p-4 max-w-prose">
+<div class="container p-2 pt-8 bg-gray-100 rounded lg:rounded lg:m-4 lg:p-4 max-w-prose">
   <h1 class="mb-3">Help</h1>
 
   <h3 class="mb-4">Where do comments and grades go?</h3>
   <p class="m-2">
-    Since the fast grader is currently in an early stage of development,
-    your comments and grades are simply saved, and accessible to you in your
-    profile home page. Comments and grades do not make the round trip back
-    into Google Classroom currently, although after we ensure that teachers
-    like using the grading tool, the next objective will be to develop that
-    feature, so that importing comments and grades back into google classroom
-    is a seamless process.
+    Fast Grader is currently in a pre-release stage of development. When
+    officially released, we will have the feature to sync grades and comments
+    to google classroom. However, that feature is not currently implemented,
+    because the purpose of this pre-release version of the site is simply to
+    give teachers the opportunity to test out the grading tool itself.
   </p>
+  <h3 class="mb-4">How does the comment bank work?</h3>
+  <p class="m-2">
+    The comment bank is a bit tricky to use at first, but once you get the hang
+    of it, it becomes blazing fast and it's a very convenient way to input
+    comments.  The comment bank uses a concept of "registers." Think of a
+    register like a bucket that comments can be saved into and later recalled
+    from. Registers have single-character names, which ties into how they are
+    accessed by keyboard shortcuts.
+  </p>
+  <p class="m-2">
+    A lowercase <code>b</code> is the keyboard shortcut for accessing the
+    comment bank, then type any other character to reference a specific
+    register of the comment bank. If no comment is already saved to that
+    register, a window will pop up allowing you to compose one. This action
+    will also apply the comment you just wrote for the current student. Now,
+    you can use the same keyboard combination,
+    <code>b&lt;register-name&gt;</code>, to apply that comment to a future
+    student.
+  </p>
+  <p class="m-2">
+    You can imagine that you might start a grading session by populating the
+    comment bank with a few comments, then you can very quickly move between
+    scholars, grade and apply comments without evet taking your hands off the
+    keyboard.
+  </p>
+  <p class="m-2">
+    Also, if you need to revise a comment in the comment bank, you can do that
+    by using the uppercase "B", and then the register name just like before.
+    This will cause the edit dialog box to come up, even if a comment is
+    already in the comment bank. This action will update the comment bank and
+    also apply the new comment to the current student, but will not
+    retroactively update comments where they were used before.
+  </p>
+  <p class="m-2">
+    Note that in the current comment bank, you cannot save comments across
+    grading sessions, but this feature is on the feature roadmap for this
+    project!
+  </p>
+  <p class="m-2">
+    If you have any feedback on the comment bank, please let me know by opening
+    a GitHub issue or sending me an email (see below).
+  </p>
+  <h3 class="mb-4">What is the feature roadmap?</h3>
+  <p class="m-2">
+    This website is currently in pre-release. There are many more features that
+    we plan to implement ASAP!
+  </p>
+  <h4 class="m-2 text-lg text-bold">Before Initial Release</h4>
+  <ul class="ml-8 list-disc">
+    <li>Sync grades with google classroom</li>
+    <li>Sync comments with google classroom</li>
+  </ul>
+  <h4 class="m-2 text-lg text-bold">After Initial Release</h4>
+  <ul class="ml-8 list-disc">
+    <li>Improve differences view in grading tool to be more concise and intuitive</li>
+    <li>Optimize performance and page load time, especially when starting a grading session</li>
+    <li>Comment bank persistence: ability to save the comment bank across grading sessions</li>
+    <li>Widgets to select assignments to grades, instead of the current dropdown list form</li>
+    <li>Queue up multiple assignments to grade at the same time</li>
+    <li>Save comment bank across grading sessions</li>
+  </ul>
   <h3 class="mt-4 mb-4">How do I report a bug?</h3>
     <a href="https://github.com/jdevries3133/fast_grader/issues/new">
       <button class="block">Submit Bug Report</button>
