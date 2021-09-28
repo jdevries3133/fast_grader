@@ -378,20 +378,6 @@ def get_assignment_data(
                     # list of submissions to ultimately return
                     student_id = submission_from_google['userId']
                     submission_from_database.api_student_profile_id = student_id
-                    try:
-                        submission_from_database.student_name = (
-                            student_id_to_name[student_id]
-                        )
-                    except KeyError:
-                        raise NotImplementedError(
-                            'TODO: handle case where there is a new student, '
-                            'and the new ID may not be present in our mapping.'
-                            'In this rare situation, we probably need to make '
-                            'a fresh API call to get this data. This can be '
-                            'avoided in all cases by ensuring that the mapping '
-                            'passed in by the caller is good, but it is probably '
-                            'still worthwhile to have fallback code in here.'
-                        )
                     attachments = [
                         DriveAttachment(
                             id_=i['driveFile']['id'],
