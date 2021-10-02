@@ -1,0 +1,63 @@
+
+  <div class="max-w-xs p-2 m-2 rounded lg:max-w-md"> {% comment %}  Outer Wrapper  {% endcomment %}
+    <div class="shadow">                           {% comment %}  Inner Wrapper  {% endcomment %}
+
+      {% comment %}  Assignment Name: Top card section  {% endcomment %}
+      <div class="p-2 bg-green-200 rounded-t col-span-3">
+        <h4 class="text-gray-700 text-md">Assignment Name</h4>
+        <p class="text-lg">{{ sub.assignment_name }}</p>
+      </div>
+
+      {% comment %}  Details: middle card section  {% endcomment %}
+      <div class="items-center justify-start p-2 bg-gray-100 sm:flex sm:flex-wrap gap-4 grid grid-rows-2 grid-cols-2 sm:max-flex-row">
+        <div class="row-start-2 col-start-1">
+          <h4 class="text-sm text-gray-700">Course Name</h4>
+          <p>{{ sub.course.name }}</p>
+        </div>
+        <div class="row-start-1 col-start-1">
+          <h4 class="text-sm text-gray-700">Graded On</h4>
+          <p>{{ sub.created|date }}</p>
+        </div>
+        <div class="row-start-1 col-start-2">
+          <h4 class="text-sm text-gray-700">
+            <span class="hidden xs:inline">Average</span>
+            <span class="xs:hidden">Avg.</span>
+            Grade
+          </h4>
+          {% if sub.average_grade %}
+            <p>{{ sub.average_grade }}</p>
+          {% else %}
+            <p>Ungraded</p>
+          {% endif %}
+        </div>
+        <div class="row-start-2 col-start-2">
+          <h4 class="text-sm text-gray-700">Max Grade</h4>
+          <p>{{ sub.max_grade }}</p>
+        </div>
+      </div>
+
+      {% comment %}  Actions: bottom card section {% endcomment %}
+      <div id="cardContainer__{{ sub.pk }}" class="flex flex-row p-2 bg-yellow-300 rounded-b">
+        {% comment %}  Resume Grading  {% endcomment %}
+        <a href="{% url 'resume_grading' sub.pk %}"> 
+          <button class="p-2 bg-green-100 rounded shadow md:m-2 text-grey-800 hover:bg-green-200 focus:ring-green-400">
+            Resume Grading
+          </button>
+        </a>
+        {% comment %}  View Details  {% endcomment %}
+        <a href="{% url 'session_detail' sub.pk %}"> 
+          <button class="p-2 bg-yellow-100 rounded shadow md:m-2 text-grey-800 hover:bg-yellow-200 focus:ring-yellow-400">
+            View Details
+          </button>
+        </a>
+        {% comment %}  Delete Session  {% endcomment %}
+        <button
+          hx-get="{% url 'delete_session_modal_form' sub.pk %}"
+          hx-swap="outerHTML"
+          hx-target="#cardContainer__{{ sub.pk }}"
+          class="p-2 bg-red-100 rounded shadow md:m-2 text-grey-800 hover:bg-red-200 active:ring-red-400 focus:ring-red-400">
+          Delete Session
+        </button>
+      </div>
+    </div>
+  </div>
