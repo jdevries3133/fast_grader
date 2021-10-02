@@ -3,22 +3,46 @@
 {% block title %}Privacy Policy{% endblock %}
 
 {% block content %}
-<div class="container pt-8 bg-gray-100 rounded lg:m-4 lg:p-4 max-w-prose">
+<div class="container p-2 pt-8 bg-gray-100 rounded lg:rounded lg:m-4 lg:p-4 max-w-prose">
   <h1>Terms of Service</h1>
 
   <p class="m-2">
-    Fast Grader is currently in an early stage of development. Do not use this
-    website if you are not at least 18 years of age.
+  <span>
+    Fast Grader is currently in an early, pre-release stage of development. We
+    can not and do not guarantee a bug-free platform, but you can expect the
+    stability of the project to improve, and the amount of features to grow at
+    a steady cadence. Please see our
+  </span>
+   <a class="text-blue-700 underline visited:text-purple-700" href="{% url 'help' %}">
+     help page
+   </a>
+   <span>
+    for details on how to submit a bug report or request a new feature
+   </span>
   </p>
+
   <p class="m-2">
-    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-    FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-    DEALINGS IN THE SOFTWARE.
+    Likewise, please be patient through any service interruptions or changes
+    to available features as the platform continues to grow, and always feel
+    free to reach out to 
   </p>
+
+  <p class="m-2">
+    <span>
+      Do not use this website if you are not 13 years of age or older. However,
+      this website is COPPA compliant usage by teachers. Please see our
+    </span>
+    <a class="text-blue-700 underline visited:text-purple-700" href="{% url 'privacy' %}">
+      privacy policy
+    </a>
+    <span>
+      for details.
+    </span>
+  </p>
+
+  <p class="m-2"></p>
+  <p class="m-2"></p>
+
 </div>
 
 {% endblock %}
