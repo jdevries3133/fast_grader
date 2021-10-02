@@ -12,7 +12,7 @@ if os.getenv('DJANGO_DEBUG'):
         create_secrets()
         from . import secrets  # type: ignore
 else:
-    # in CI/CD or production, just let exceptions bubble up
+    # in CI/CD or production, just let exceptions bubble up.
     from . import secrets
 
 SECRET_KEY = secrets.SECRET_KEY
@@ -23,6 +23,9 @@ SOCIALACCOUNT_PROVIDERS = {
             'client_id': secrets.GOOGLE_CLIENT_ID,
             'secret': secrets.GOOGLE_CLIENT_SECRET,
             'key': ''
+        },
+        'AUTH_PARAMS': {
+            'access_type': 'online',
         },
         'SCOPE': [
             'email',
