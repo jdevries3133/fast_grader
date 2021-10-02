@@ -24,6 +24,6 @@ def profile(request):
     """This is where the user will be able to view and export previous grading
     sessions."""
     qs = GradingSession.objects.filter(owner=request.user).prefetch_related('submissions')  # type: ignore
-    return render(request, 'accounts/profile.html', context={
+    return render(request, 'account/profile.html', context={
         'sessions': qs
     })

@@ -68,6 +68,8 @@ module.exports = {
         "Segoe UI Emoji",
         "Segoe UI Symbol",
       ],
+      mono: ["Inconsolata", "Consolas", "monospace"],
+      serif: ["Roboto Slab", "Georgia", "serif"],
     },
     screens: {
       xs: "450px",

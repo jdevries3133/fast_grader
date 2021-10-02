@@ -6,6 +6,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
 
+    {# fonts #}
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inconsolata:wght@200&family=Roboto+Slab:wght@100;200;300;400;500;600;700;800;900&display=swap"
+      rel="stylesheet">
+
     {% if enable_logrocket %}
       <script src="https://cdn.lr-in.com/LogRocket.min.js" crossorigin="anonymous"></script>
       <script>window.LogRocket && window.LogRocket.init('gbwkwf/fast-grader');</script>
@@ -27,19 +34,27 @@
       })
     </script>
 
-    <title>{% block title %}Fast GC Grader{% endblock %}</title>
+    <title>{% block title %}fast grader{% endblock %}</title>
     {% block head %}{% endblock %}
 
     {% tailwind_css %}
   </head>
 
-  <body>
+  <body class="bg-gray-100">
 
     {% include 'core/navigation.html' %}
+    {% include 'core/partials/logo.html' %}
 
-    {% block content %}{% endblock %}
+    <div class="flex flex-col min-h-screen">
+      <div class="flex-grow">
+        {% block content %}{% endblock %}
+      </div>
 
-    {% include 'core/footer.html' %}
+      <div class="flex-shrink">
+        {% include 'core/footer.html' %}
+      </div>
+    </div>
+
 
   </body>
 

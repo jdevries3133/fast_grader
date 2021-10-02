@@ -50,6 +50,10 @@ INSTALLED_APPS = [
     'django.contrib.sitemaps',
     'django.contrib.sites',
 
+    # this is our accounts app. Putting it before allauth allows the templates
+    # in it to override allauth templates
+    'accounts',
+
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
@@ -58,7 +62,6 @@ INSTALLED_APPS = [
     'rest_framework',
     'tailwind',
 
-    'accounts',
     'theme',
     'grader',
 
