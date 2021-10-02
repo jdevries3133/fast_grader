@@ -8,24 +8,20 @@
 {% block content %}
 
 
-{% comment %}
-  Random status messages get injected into here at the top
-{% endcomment %}
+{# Random status messages get injected into here at the top #}
 <div id="status" class="pt-4 lg:pt-12"></div>
 
 
 
 
 
-{% comment %} Main grading tool {% endcomment %}
-
-
+{# Main grading tool #}
 
 <div class="w-full h-full p-1 m-1 lg:p-4 lg:m-4 lg:grid lg:gap-1 lg:grid-cols-3">
 
-  <div class="container flex flex-col gap-1">{% comment %} begin side panel {% endcomment %}
+  <div class="container flex flex-col gap-1">{# begin side panel #}
 
-    {% comment %} header and cls / assgt selection {% endcomment %}
+    {# header and cls / assgt selection #}
     <div class="lg:bg-gray-300 lg:rounded-xl lg:mb-4 lg:mr-4 lg:p-3">
       <div class="container">
         <h1>Fast Grader <span class="md:text-5xl">⚡️</span></h1>
@@ -55,7 +51,7 @@
     </div>
 
 
-    {% comment %}Interaction Feedback Panel{% endcomment %}
+    {# Interaction Feedback Panel #}
     <div class="w-full h-full p-1 border-2 border-gray-200 overflow-clip bg-gradient-to-tr from-gray-100 via-green-100 to-white col-auto">
       <div class="sticky top-0">
         <div>
@@ -107,27 +103,27 @@
 
       </div>
     </div>
-  </div> {% comment %} end side panel {% endcomment %}
+  </div> {# end side panel #}
 
 
-  {% comment %}Student Content Panel{% endcomment %}
+  {# Student Content Panel #}
   <div id="toolContainer" class="p-1 border-2 border-gray-200 lg:col-span-2 blur-sm text-code bg-gradient-to-br from-white via-yellow-100 to-gray-200">
     <h1>Submission Content</h1>
     <div class="flex flex-row items-center">
       <p class="pr-2" for="diffSelectSlider">
         View Differences Only
 
-        {% comment %} Info icon {% endcomment %}
+        {# Info icon #}
         <a class="text-blue-700 visited:text-purple-700 hover:shadow-md"
 
-          {% comment %} !!! What the info icon will link to !!! {% endcomment %}
-          href="{% url 'help' %}#diffing"
+         {# !!! What the info icon will link to !!! #}
+         href="{% url 'help' %}#diffing"
 
         >
           <svg class="inline w-6 h-6" xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
-        </a> {% comment %} End info icon {% endcomment %}
+        </a> {# End info icon #}
 
       </p>
       <div class="switch">
