@@ -372,7 +372,7 @@ function handleGradeInput(char) {
     }
   } else {
     // "backspace" the last number from the grade field
-    if (curGradeStr.length === 1) {
+    if (curGradeStr.length <= 1) {
       current.grade = 0;
     } else {
       current.grade = parseInt(curGradeStr.slice(0, -1));
