@@ -394,7 +394,9 @@ def get_assignment_data(
                                     diff = list(unified_diff(
                                         te.content,
                                         st.content,
-                                        n=1
+                                        n=1,
+                                        fromfile='teacher original',
+                                        tofile='student submission'
                                     ))
                                     output.data[i_st].content = diff
 
