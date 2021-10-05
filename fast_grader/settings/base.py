@@ -124,6 +124,9 @@ DATABASES = {
 }
 
 
+ACCOUNT_LOGOUT_REDIRECT_URL = '/accounts/login'
+
+
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
     'allauth.account.auth_backends.AuthenticationBackend',

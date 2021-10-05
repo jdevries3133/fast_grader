@@ -10,8 +10,8 @@
 
 <div id="navContainer" class="fixed z-10 hidden w-full h-full">
   <nav class="fixed top-0 right-0 z-20 flex justify-end h-full pt-12 pl-4 bg-purple-100 border border-t-0 border-b-0 border-l-8 border-r-0 border-yellow-200 rounded shadow-2xl opacity-95">
-    <div class="max-w-md pr-24 md:grid md:grid-flow-col">
-      <div class="block pb-3 border-b-2 border-gray-400 row-start-2">
+    <div class="max-w-md pr-24">
+      <div class="block pb-3 border-b-2 border-gray-400">
         {% if request.user.is_authenticated %}
           <p class="ml-3">Logged in as {{ user.username }}</p>
           <form method="post" action="{% url 'account_logout' %}">
@@ -28,7 +28,7 @@
           </a>
         {% endif %}
       </div>
-      <div class="flex flex-col md:row-start-1">
+      <div class="flex flex-col">
         <a href="{% url 'home' %}"><h3 class="inline-block p-4 text-gray-800 rounded-lg hover:text-black hover:shadow-lg transition">Home</h3></a>
         <a href="{% url 'profile' %}"><h3 class="inline-block p-4 text-gray-800 rounded-lg hover:text-black hover:shadow-lg transition">Profile</h3></a>
         <a href="{% url 'grader' %}"><h3 class="inline-block p-4 text-gray-800 rounded-lg hover:text-black hover:shadow-lg transition">Grader</h3></a>

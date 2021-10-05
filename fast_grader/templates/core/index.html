@@ -1,7 +1,99 @@
 {% extends 'base.html' %}
 
-{% block content %}
+{% load static %}
 
-<h1>Home</h1>
+{% block body %}
 
+
+{# main landing section with video #}
+<div class="flex flex-col items-center justify-center h-screen">
+
+  {% include 'core/partials/logo.html' %}
+  {% include 'core/navigation.html' %}
+
+  <div class="flex flex-col items-center justify-center gap-2">
+    <h1 class="text-3xl serif">give more feedback</h1>
+    <h1 class="text-3xl serif">be data driven</h1>
+    <h2 class="serif">do more grading</h1>
+    <h2 class="serif">in less time</h1>
+  </div>
+
+  <video muted controls loop autoplay class="w-full max-w-md p-2">
+    <source src="{% static 'demo.mp4' %}" type="video/mp4"></source>
+  </video>
+
+  <div class="flex flex-col items-center justify-center gap-2">
+    <a href="{% url 'grader' %}">
+      <button class="p-4 text-xl shadow-md md:p-8 md:text-4xl transition bg-gradient-to-r from-purple-300 to-green-300 hover:shadow-2xl hover:text-white">
+        Start Grading
+      </button>
+    </a>
+  </div>
+
+</div>
+
+
+{# features spec #}
+<div class="flex flex-col items-center h-screen justiry-center">
+  <h1 class="text-center">Grade Like Lightning</h1>
+
+
+  <div class="max-w-md p-2 m-2 shadow-md bg-gradient-to-tr from-green-100 via-gray-200 to-green-200 rounded-md">
+    <h3>Go Faster</h3>
+    <p>Keyboard shortcuts change grading from a slog to a dance</p>
+  </div>
+
+  <div class="max-w-md p-2 m-2 shadow-md bg-gradient-to-tr from-yellow-100 via-gray-200 to-yellow-200 rounded-md">
+    <h3>Cut to the Chase</h3>
+    <p>
+      Docs and slides are exported to plain text, so you can see more at a
+      glance and spend less time waiting for loading
+    </p>
+  </div>
+
+  <div class="max-w-md p-2 m-2 shadow-md bg-gradient-to-tr from-purple-100 via-gray-200 to-purple-200 rounded-md">
+    <h3>Differences Only</h3>
+    <img
+      src={% static 'diff_view.png' %}
+      class="w-4/5 m-auto border-2 border-gray-400 shadow"
+      />
+    <p>
+      With our diff view feature, see only the most relevant information:
+      exactly what the student deleted and added, color coded in red and
+      green.
+    </p>
+  </div>
+
+</div>
+
+<div class="flex flex-col items-center justify-center">
+  <h3>What Next?</h3>
+  <p>
+  <a href="{% url 'grader' %}">
+    <button class="p-4 hover:bg-green-200">
+      <span>Start Grading</span>
+      <svg xmlns="http://www.w3.org/2000/svg" class="inline w-5 h-5" viewBox="0 0 20 20" fill="currentColor">
+        <path fill-rule="evenodd" d="M10.293 15.707a1 1 0 010-1.414L14.586 10l-4.293-4.293a1 1 0 111.414-1.414l5 5a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+        <path fill-rule="evenodd" d="M4.293 15.707a1 1 0 010-1.414L8.586 10 4.293 5.707a1 1 0 011.414-1.414l5 5a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+      </svg>
+    </button>
+  </a>
+  <a href="{% url 'profile' %}">
+    <button class="p-4 bg-purple-100 hover:bg-purple-200">
+      <span>Sign In with Google</span>
+      <svg xmlns="http://www.w3.org/2000/svg" class="inline w-5 h-5" viewBox="0 0 20 20" fill="currentColor">
+        <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
+      </svg>
+    </button>
+  </a>
+</div>
+
+
+{# TODO: paid services overview #}
+<!-- <div class="h-full"> -->
+<!-- </div> -->
+
+{# TODO: development roadmap #}
+<!-- <div class="h-full"> -->
+<!-- </div> -->
 {% endblock %}

@@ -21,8 +21,10 @@
     @apply shadow;
     @apply bg-green-100;
     @apply p-1;
+    @apply transition;
     @apply m-1;
     @apply focus:ring-green-300 focus:ring;
+    @apply hover:shadow-xl;
   }
 }
 
