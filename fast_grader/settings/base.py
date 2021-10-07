@@ -62,6 +62,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'tailwind',
 
+    'continuous_deployment',
     'theme',
     'grader',
 

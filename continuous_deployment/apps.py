@@ -14,23 +14,9 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-from django.contrib import admin
-from django.urls import path, include
-
-from . import views as generic_pages
+from django.apps import AppConfig
 
 
-urlpatterns = [
-    path('accounts/', include('accounts.urls')),
-    path('accounts/', include('allauth.urls')),
-    path('grader/', include('grader.urls')),
-    path('ci_cd/', include('continuous_deployment.urls')),
-    path('admin/', admin.site.urls),
-
-    # generic pages
-    path('', generic_pages.home, name='home'),
-    path('help/', generic_pages.help, name='help'),
-    path('about/', generic_pages.about, name='about'),
-    path('privacy/', generic_pages.privacy, name='privacy'),
-    path('tos/', generic_pages.tos, name='tos'),
-]
+class ContinuousDeploymentConfig(AppConfig):
+    default_auto_field = 'django.db.models.BigAutoField'
+    name = 'continuous_deployment'

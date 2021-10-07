@@ -14,23 +14,10 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-from django.contrib import admin
-from django.urls import path, include
+from django.urls import path
 
-from . import views as generic_pages
-
+from .views import deploy
 
 urlpatterns = [
-    path('accounts/', include('accounts.urls')),
-    path('accounts/', include('allauth.urls')),
-    path('grader/', include('grader.urls')),
-    path('ci_cd/', include('continuous_deployment.urls')),
-    path('admin/', admin.site.urls),
-
-    # generic pages
-    path('', generic_pages.home, name='home'),
-    path('help/', generic_pages.help, name='help'),
-    path('about/', generic_pages.about, name='about'),
-    path('privacy/', generic_pages.privacy, name='privacy'),
-    path('tos/', generic_pages.tos, name='tos'),
+    path('do_deploy/', deploy, name='deploy')
 ]

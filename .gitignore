@@ -16,6 +16,7 @@ Session.vim
 
 # django
 db.sqlite3
+static_root
 
 # keep big demo video out of version control
 fast_grader/static/demo.mp4

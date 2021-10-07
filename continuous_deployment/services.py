@@ -14,23 +14,15 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-from django.contrib import admin
-from django.urls import path, include
+from pathlib import Path
+from subprocess import Popen
 
-from . import views as generic_pages
+from django.conf import settings
 
 
-urlpatterns = [
-    path('accounts/', include('accounts.urls')),
-    path('accounts/', include('allauth.urls')),
-    path('grader/', include('grader.urls')),
-    path('ci_cd/', include('continuous_deployment.urls')),
-    path('admin/', admin.site.urls),
-
-    # generic pages
-    path('', generic_pages.home, name='home'),
-    path('help/', generic_pages.help, name='help'),
-    path('about/', generic_pages.about, name='about'),
-    path('privacy/', generic_pages.privacy, name='privacy'),
-    path('tos/', generic_pages.tos, name='tos'),
-]
+def redeploy():
+    """Trigger the shell script that shuts down django and redeploys code."""
+    # The redeploy script is going to kill Django. Since we are killing
+    # ourselves, we just Popen with no follow-through. Goodbye world! Let's
+    # hope the redeploy script is robust :)
+    Popen(['/bin/bash', Path(Path(__file__).parent, 'deploy.sh').resolve()], cwd=settings.BASE_DIR)

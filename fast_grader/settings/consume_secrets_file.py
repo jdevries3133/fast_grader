@@ -1,8 +1,27 @@
+# Copyright (C) 2021 John DeVries
+
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+
+"""
+This is a "user-friendly" adapter to the raw secrets file. It will try to
+import the secrets file, or generate the secrets file with interactive
+prompt if the secrets file does not exist.
+"""
 import os
 
 
-# this is the "user-friendly" import that will try to recover and provide
-# CLI prompts for the secrets file if it does not exist.
 if os.getenv('DJANGO_DEBUG'):
     try:
         from . import secrets  # type: ignore
@@ -41,3 +60,5 @@ SOCIALACCOUNT_PROVIDERS = {
         ]
     }
 }
+
+GITHUB_AUTOMATED_CD_SECRET = secrets.GITHUB_AUTOMATED_CD_SECRET
