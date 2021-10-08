@@ -16,6 +16,8 @@
 from .base import *
 from .consume_secrets_file import *
 
+NPM_BIN_PATH = '/usr/local/bin/npm'
+
 
 LOGGING = {
     'version': 1,

@@ -4,9 +4,9 @@
 
 sudo systemctl stop gunicorn.service
 git checkout main
-git pull origin main
+git pull https main
 rm -rf venv
-python3 -m venv venv
+python3.9 -m venv venv
 source venv/bin/activate
 pip install --upgrade pip
 pip install -r requirements.txt

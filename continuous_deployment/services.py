@@ -25,4 +25,10 @@ def redeploy():
     # The redeploy script is going to kill Django. Since we are killing
     # ourselves, we just Popen with no follow-through. Goodbye world! Let's
     # hope the redeploy script is robust :)
-    Popen(['/bin/bash', Path(Path(__file__).parent, 'deploy.sh').resolve()], cwd=settings.BASE_DIR)
+    log = open(Path(settings.BASE_DIR, 'automated_deployment.log'))
+    Popen(
+        ['/bin/bash', Path(Path(__file__).parent, 'deploy.sh').resolve()],
+        stdout=log,
+        stderr=log,
+        cwd=settings.BASE_DIR
+    )
