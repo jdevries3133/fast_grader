@@ -2,6 +2,8 @@
 
 [![Test Suites](https://github.com/jdevries3133/fast_grader/actions/workflows/tests.yml/badge.svg)](https://github.com/jdevries3133/fast_grader/actions/workflows/tests.yml)
 
+![Fast Grader Logo](./fast_grader/static/logo.png)
+
 **Grading in Google Classroom _really_ stinks.**
 
 Let's say you are grading a google docs/slides assignment. The grading page
