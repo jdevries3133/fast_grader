@@ -1,7 +1,5 @@
 # Help
 
-temp
-
 I am chunking the project into issues on the [issues tab
 ](https://github.com/jdevries3133/fast_grader/issues). Start there if you
 want to help. Find something you can do, leave a comment on the issue, and
