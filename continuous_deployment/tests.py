@@ -37,18 +37,18 @@ class TestDeployView(TestCase):
     def setUp(self):
         self.factory = RequestFactory()
 
-    def create_request(self, data: dict, signature: bytes):
+    def create_request(self, data: dict, signature):
         return self.factory.post(
             '/ci_cd/do_deploy/',
             data,
             content_type='application/json',
-            HTTP_X_Hub_Signature_256=signature
+            HTTP_X_HUB_SIGNATURE_256=signature
         )
 
-    def create_valid_signature(self, data) -> bytes:
+    def create_valid_signature(self, data):
         dummy = self.create_request(data, b'foo signature')
         signature = hmac.new(b'foo', dummy.body, hashlib.sha256)  # type: ignore
-        return signature.digest()
+        return f'sha256={signature.hexdigest()}'
 
     def create_valid_request(self, data):
         sig = self.create_valid_signature(data)
@@ -61,10 +61,18 @@ class TestDeployView(TestCase):
         self.assertEqual(response.data, 'missing signature')
 
     def test_400_on_invalid_header(self, _):
-        request = self.create_request({'foo': 'bar'}, b'foo')
+        request = self.create_request({'foo': 'bar'}, 'hash=foo')
+        # there is an assertion error if the hash type is not correct
+        with self.assertRaises(AssertionError):
+            response = deploy(request)
+            self.assertEqual(response.status_code, 400)
+            self.assertEqual(response.data, 'invalid signature')
+
+        request = self.create_request({'foo': 'bar'}, 'sha256=foo')
         response = deploy(request)
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.data, 'invalid signature')
+
 
     def test_200_on_valid_header(self, _):
         for data in self.EXAMPLES:
@@ -103,11 +111,11 @@ class TestDeployView(TestCase):
         # equality comparison evaluate to True
         mock_digest = MagicMock()
         mock.new.return_value = mock_digest
-        mock_digest.digest.return_value = b'signature'
+        mock_digest.digest.return_value = 'signature'
 
         # see what happens: if we are using the safe hmac comparison, the
         # requests will fail because of the way the mocks were set up
         for data in self.EXAMPLES:
-            request = self.create_request(data, b'signature')
+            request = self.create_request(data, 'sha256=signature')
             response = deploy(request)
             self.assertEqual(response.status_code, 400)

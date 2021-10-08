@@ -32,15 +32,19 @@ logger = logging.getLogger(__name__)
 def deploy(request):
     """Check for proper authentication, then trigger an automated deployment."""
 
-    logger.debug(f'Redeploy request recieved with data: {request.data}')
-
-    if not (sig := request.META.get('HTTP_X_Hub_Signature_256')):
+    if not (sig_parts := request.META.get('HTTP_X_HUB_SIGNATURE_256')):
         return Response('missing signature', status=status.HTTP_400_BAD_REQUEST)
 
-    secret = settings.GITHUB_AUTOMATED_CD_SECRET
-    digest = hmac.new(secret, request.body, hashlib.sha256)  # type: ignore
+    hash_type, sig = sig_parts.split('=')
+    assert hash_type == 'sha256'
 
-    if not hmac.compare_digest(sig, digest.digest()):
+    secret = settings.GITHUB_AUTOMATED_CD_SECRET
+    digest = hmac.new(secret, request.body, hashlib.sha256).hexdigest()  # type: ignore
+
+    logger.debug('GitHub signature: %s', sig)
+    logger.debug('Our digest: %s', digest)
+
+    if not hmac.compare_digest(sig, digest):
         return Response('invalid signature', status=status.HTTP_400_BAD_REQUEST)
 
     logger.info('Redeploy request was valid. Proceeding with automatic deployment.')

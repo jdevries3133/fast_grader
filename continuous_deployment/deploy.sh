@@ -2,7 +2,7 @@
 
 # script for automated deployments
 
-systemctl stop fastgrader.service
+sudo systemctl stop gunicorn.service
 git checkout main
 git pull origin main
 rm -rf venv
@@ -16,4 +16,4 @@ python3 manage.py collectstatic --noinput
 python3 manage.py makemigrations --noinput
 python3 manage.py migrate --noinput
 python3 manage.py test
-systemctl start fastgrader.service
+sudo systemctl start gunicorn.service
