@@ -7,26 +7,26 @@
 {% include 'core/navigation.html' %}
 
 {# main landing section with video #}
-<div class="flex flex-col items-center justify-center min-h-screen m-auto md:pt-8 md:px-4 landing-page-grid">
+<div class="flex flex-col items-center justify-center h-screen m-auto md:pt-8 md:px-4 landing-page-grid">
 
-  <div class="xl:justify-self-center">
+  <div class="2xl:justify-self-center">
     {% include 'core/partials/logo.html' %}
   </div>
 
-  <div class="flex flex-col items-center justify-center lg:pr-12 lg:items-start md:justify-self-start xl:justify-self-center xl:items-center gap-2 xl:row-start-2 xl:col-span-1 md:col-span-2">
-    <h1 class="font-serif text-2xl lg:text-4xl xl:text-5xl">give more feedback</h1>
+  <div class="flex flex-col items-center justify-center lg:pr-12 lg:items-start md:justify-self-start 2xl:justify-self-center 2xl:items-center gap-2 2xl:row-start-2 2xl:col-span-1 md:col-span-2">
+    <h1 class="font-serif text-2xl lg:text-4xl 2xl:text-5xl">give more feedback</h1>
     <h1 class="font-serif text-2xl lg:text-4xl">be data driven</h1>
     <h2 class="font-serif text-lg lg:text-2xl">do more grading</h1>
     <h2 class="font-serif text-lg lg:text-2xl">in less time</h1>
   </div>
 
-  <video muted controls loop autoplay class="p-2 md:col-span-2 xl:col-span-2 xl:row-span-3">
+  <video muted controls loop autoplay class="max-h-screen p-2 md:col-span-2 2xl:col-span-2 2xl:row-span-3">
     <source src="{% static 'landing_page/demo.mp4' %}" type="video/mp4"></source>
   </video>
 
-  <div class="justify-self-center xl:row-start-3">
+  <div class="justify-self-center 2xl:row-start-3">
     <a href="{% url 'grader' %}">
-      <button class="p-4 text-xl shadow-md lg:text-3xl lg:p-6 xl:p-10 md:p-4 md:text-2xl transition bg-gradient-to-r align-self-center from-purple-300 to-green-300 hover:shadow-2xl hover:text-white">
+      <button class="p-4 text-xl shadow-md lg:text-3xl lg:p-6 2xl:p-10 md:p-4 md:text-2xl transition bg-gradient-to-r align-self-center from-purple-300 to-green-300 hover:shadow-none hover:text-white">
         Start Grading
       </button>
     </a>
