@@ -22,7 +22,7 @@ from django.conf import settings
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
-from .services import redeploy
+from .services import autodeploy
 
 
 logger = logging.getLogger(__name__)
@@ -48,7 +48,7 @@ def deploy(request):
         return Response('invalid signature', status=status.HTTP_400_BAD_REQUEST)
 
     logger.info('Redeploy request was valid. Proceeding with automatic deployment.')
-    redeploy()
+    autodeploy()
 
     return Response('ok')
 

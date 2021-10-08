@@ -14,21 +14,121 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
+import logging
+import subprocess
 from pathlib import Path
-from subprocess import Popen
-
-from django.conf import settings
 
 
-def redeploy():
-    """Trigger the shell script that shuts down django and redeploys code."""
-    # The redeploy script is going to kill Django. Since we are killing
-    # ourselves, we just Popen with no follow-through. Goodbye world! Let's
-    # hope the redeploy script is robust :)
-    log = open(Path(settings.BASE_DIR, 'automated_deployment.log'), 'a+')
-    Popen(
-        ['/bin/bash', Path(Path(__file__).parent, 'deploy.sh').resolve()],
-        stdout=log,
-        stderr=log,
-        cwd=settings.BASE_DIR
+
+base_dir = Path(__file__).parents[1]
+logger = logging.getLogger(__name__)
+
+
+def _run_and_log(cmd, *, cwd: Path=None, check: bool=False):
+    result = subprocess.run(
+        cmd,
+        cwd=cwd,
+        check=check,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT
     )
+    logger.info('Command %s had exit code %d', cmd, result.returncode)
+    logger.debug('Output: %s', result.stdout)
+
+
+def update_source() -> bool:
+    """Returns a boolean indicating whether the action was successful."""
+    try:
+        _run_and_log(['git', 'checkout', 'main'], cwd=base_dir, check=True)
+        _run_and_log(
+            ['git', 'pull', 'https', 'main'],
+           cwd=base_dir,
+           check=True
+        )
+        _run_and_log(
+            ['./venv/bin/python3', 'manage.py', 'makemigrations', '--noinput'],
+           cwd=base_dir,
+           check=True
+        )
+        _run_and_log(
+            ['./venv/bin/python3', 'manage.py', 'test'],
+           cwd=base_dir,
+           check=True
+        )
+        return True
+    except subprocess.CalledProcessError:
+        logger.exception('failed to update source code')
+        return False
+
+
+def migrate_database() -> bool:
+    try:
+        _run_and_log(
+            ['./venv/bin/python3', 'manage.py', 'migrate', '--noinput'],
+           cwd=base_dir,
+           check=True
+        )
+        return True
+    except subprocess.CalledProcessError:
+        logger.exception('failed to perform database migration')
+        return False
+
+
+def generate_staticfiles() -> bool:
+    logger.debug('making staticfiles')
+    try:
+        _run_and_log(
+            ['./venv/bin/python3', 'manage.py', 'tailwind', 'build'],
+           cwd=base_dir,
+           check=True
+        )
+        logger.debug('did tailwind build')
+        _run_and_log(
+            ['./venv/bin/python3', 'manage.py', 'collectstatic', '--noinput'],
+           cwd=base_dir,
+           check=True
+        )
+        logger.debug('collected')
+        return True
+    except subprocess.CalledProcessError:
+        logger.exception('failed to generate staticfiles')
+        return False
+
+
+def rollback_source(commit_hash) -> bool:
+    try:
+        _run_and_log(
+            ['git', 'reset', '--hard', commit_hash],
+            cwd=base_dir, check=True
+        )
+        return True
+    except subprocess.CalledProcessError:
+        logger.exception('failed to rollback source code')
+        return False
+
+
+def restart_gunicorn():
+    # it is impossible to check if this succeeds because it kills our current
+    # process, but if the service is configured correctly, systemd will make
+    # sure that the service eventually does get restarted.
+    _run_and_log(['sudo', 'systemctl', 'restart', 'gunicorn.service'])
+
+
+def autodeploy():
+    proc = subprocess.run(
+        ['git', 'rev-parse', 'HEAD'],
+        stdout=subprocess.PIPE,
+        cwd=base_dir
+    )
+    current_head = str(proc.stdout, 'utf8').strip()
+    if not (update_source() and migrate_database() and generate_staticfiles()):
+        logger.info('Redeploy failed. Rolling back source')
+        if not rollback_source(current_head) and generate_staticfiles():
+            logger.critical('invalid state after bad redeployment')
+    else:
+        logger.info('Redeploy successful. Restarting gunicorn')
+        restart_gunicorn()
+
+
+if __name__ == '__main__':
+    autodeploy()

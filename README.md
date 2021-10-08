@@ -1,5 +1,7 @@
 # ⚡️ Grade Like Lightning 🌩
 
+test ci/cd
+
 [![Test Suites](https://github.com/jdevries3133/fast_grader/actions/workflows/tests.yml/badge.svg)](https://github.com/jdevries3133/fast_grader/actions/workflows/tests.yml)
 
 ![Fast Grader Logo](./fast_grader/static/logo.png)

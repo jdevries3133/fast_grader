@@ -26,7 +26,7 @@ from .views import deploy
 
 
 @ override_settings(GITHUB_AUTOMATED_CD_SECRET=b'foo')
-@ patch('continuous_deployment.views.redeploy')
+@ patch('continuous_deployment.views.autodeploy')
 class TestDeployView(TestCase):
 
     EXAMPLES = (
