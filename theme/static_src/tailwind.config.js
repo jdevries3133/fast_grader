@@ -6,6 +6,7 @@
  */
 
 const defaultTheme = require("tailwindcss/defaultTheme");
+const colors = require("tailwindcss/colors");
 
 module.exports = {
   mode: "jit",
@@ -52,8 +53,9 @@ module.exports = {
        */
       green: "hsl(152, 71%, 38%)",
       yellow: "hsl(45, 93%, 50%)",
+      orange: colors.orange,
       purple: "hsl(271, 16%, 50%)",
-      ...defaultTheme.colors,
+      ...colors,
     },
     fontFamily: {
       sans: [

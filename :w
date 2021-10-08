@@ -36,8 +36,8 @@
 
 
 {# features spec #}
-<div class="flex flex-col items-center justify-center rounded-lg sm:p-4 md:p-8 lg:p-12 xl:p-20 md:m-8 lg:m-12 xl:m-20 sm:m-4 backdrop-filter backdrop-blur-xl bg-gradient-to-br from-orange-100 via-yellow-100 to-orange-100">
-  <h1 class="flex-shrink font-serif text-center lg:text-5xl xl:text-8xl lg:mb-8 xl:mb-12">⚡️ Grade Like Lightning 🌩</h1>
+<div class="flex flex-col items-center justify-center min-h-screen rounded-lg sm:p-4 md:p-8 lg:p-12 xl:p-20 md:m-8 lg:m-12 xl:m-20 sm:m-4 backdrop-filter backdrop-blur-xl bg-gradient-to-br from-orange-100 via-yellow-100 to-orange-100">
+  <h1 class="flex-shrink text-center lg:text-5xl xl:text-8xl lg:mb-8 xl:mb-12 text-serif">Grade Like Lightning</h1>
 
   <div class="flex-grow lg:grid lg:grid-cols-3 grid-rows-7">
 
