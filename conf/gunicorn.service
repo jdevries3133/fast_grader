@@ -1,0 +1,12 @@
+[Unit]
+Description=gunicorn daemon
+After=network.target
+
+[Service]
+User=www-data
+Group=www-data
+WorkingDirectory=/home/jack/fast_grader
+ExecStart=/home/jack/fast_grader/venv/bin/gunicorn --access-logfile - --workers 3 --bind unix:/home/jack/fast_grader/gunicorn.sock fast_grader.wsgi:application
+
+[Install]
+WantedBy=multi-user.target

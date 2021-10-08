@@ -15,3 +15,35 @@
 
 from .base import *
 from .consume_secrets_file import *
+
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {module} {process:d} {thread:d} {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'file_logger': {
+            'level': 0,
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(BASE_DIR, 'main.log'),
+            'formatter': 'verbose',
+        },
+    },
+    'root': {
+        'handlers': ['file_logger'],
+        'level': 'DEBUG',
+        'propagate': True,
+    },
+    'loggers': {
+        'file': {
+            'handlers': ['file_logger'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+    }
+}

@@ -13,10 +13,11 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import logging
 import hmac
 import hashlib
-from rest_framework import status
 
+from rest_framework import status
 from django.conf import settings
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -24,9 +25,14 @@ from rest_framework.response import Response
 from .services import redeploy
 
 
+logger = logging.getLogger(__name__)
+
+
 @ api_view(['POST'])
 def deploy(request):
     """Check for proper authentication, then trigger an automated deployment."""
+
+    logger.debug(f'Redeploy request recieved with data: {request.data}')
 
     if not (sig := request.META.get('HTTP_X_Hub_Signature_256')):
         return Response('missing signature', status=status.HTTP_400_BAD_REQUEST)
@@ -37,6 +43,7 @@ def deploy(request):
     if not hmac.compare_digest(sig, digest.digest()):
         return Response('invalid signature', status=status.HTTP_400_BAD_REQUEST)
 
+    logger.info('Redeploy request was valid. Proceeding with automatic deployment.')
     redeploy()
 
     return Response('ok')

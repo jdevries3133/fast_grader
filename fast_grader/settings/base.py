@@ -35,7 +35,7 @@ BASE_DIR = Path(__file__).resolve().parents[2]
 
 DEBUG = bool(os.getenv('DJANGO_DEBUG'))
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['classfast.app']
 
 
 # Application definition
