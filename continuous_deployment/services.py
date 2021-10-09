@@ -46,11 +46,6 @@ def update_source() -> bool:
            check=True
         )
         _run_and_log(
-            ['./venv/bin/python3', 'manage.py', 'makemigrations', '--noinput'],
-           cwd=base_dir,
-           check=True
-        )
-        _run_and_log(
             ['./venv/bin/python3', 'manage.py', 'test'],
            cwd=base_dir,
            check=True
