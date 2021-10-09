@@ -5,6 +5,11 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <meta name="robots" content="index, follow">
+    <meta property="og:image" content="{% static 'logo' %}" />
+    <meta property="og:title" content="fast grader for Google Classroom" />
+    <meta name="description" content="The fastest tool for Google Classroom grading" />
+    <title>{% block title %}Fast Grader{% endblock %}</title>
 
     {# fonts #}
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -26,7 +31,7 @@
       <script src="https://unpkg.com/htmx.org@1.5.0"></script>
     {% endif %}
     <script>
-      // htmx init script
+      // htmx init script for CORS
       document.addEventListener('DOMContentLoaded', () => {
         document.body.addEventListener('htmx:configRequest', (event) => {
           event.detail.headers['X-CSRFToken'] = '{{ csrf_token }}';
@@ -34,8 +39,6 @@
       })
     </script>
 
-    <title>{% block title %}fast grader{% endblock %}</title>
-    {% block head %}{% endblock %}
 
     {% tailwind_css %}
   </head>
