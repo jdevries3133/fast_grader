@@ -145,7 +145,9 @@ async function fetchData() {
     indicateSuccess("Your assignment data was loaded.");
   } catch (e) {
     indicateFailure(
-      "Your assignment data failed to load. Please refresh the page"
+      "Your assignment data failed to load. If you have been logged in for a " +
+        "while, this is probably because of a nasty bug that I am aware of " +
+        "and working on. Please log out and log back in again!"
     );
     console.error("Failed due to error: ", e);
   }
