@@ -109,13 +109,17 @@ def restart_gunicorn():
     _run_and_log(['sudo', 'systemctl', 'restart', 'gunicorn.service'])
 
 
-def autodeploy():
+def get_current_head():
     proc = subprocess.run(
         ['git', 'rev-parse', 'HEAD'],
         stdout=subprocess.PIPE,
         cwd=base_dir
     )
-    current_head = str(proc.stdout, 'utf8').strip()
+    return str(proc.stdout, 'utf8').strip()
+
+
+def autodeploy():
+    current_head = get_current_head()
     if not (update_source() and migrate_database() and generate_staticfiles()):
         logger.info('Redeploy failed. Rolling back source')
         if not rollback_source(current_head) and generate_staticfiles():
