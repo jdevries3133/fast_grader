@@ -209,15 +209,29 @@ async function syncData() {
  */
 async function updateView() {
   const current = state.assignmentData.submissions[state.currentlyViewingIndex];
+  const progressEl = document.getElementById("grProgress");
   const nameEl = document.getElementById("grName");
   const gradeEl = document.getElementById("grGrade");
   const maxGradeEl = document.getElementById("grMaxGrade");
   const commentEl = document.getElementById("grComment");
   const pagerEl = document.getElementById("studentContent");
 
+  // if the assignment is ungraded, we will transform the whole grading
+  // information container
+  if (state.assignmentData.max_grade) {
+    maxGradeEl.innerText = state.assignmentData.max_grade || "??";
+    gradeEl.innerHTML = current?.grade?.toString() || "<i>No Grade</i>";
+  } else {
+    const gradeContainer = document.getElementById("gradeInfoContainer");
+    gradeContainer.innerHTML = `
+      <p class="italic text-gray-700">Ungraded Assignment</p>
+    `;
+  }
+
+  progressEl.innerText = `${state.currentlyViewingIndex + 1}/${
+    state.assignmentData.submissions.length
+  }`;
   nameEl.innerText = current.student_name;
-  gradeEl.innerHTML = current?.grade?.toString() || "<i>No Grade</i>";
-  maxGradeEl.innerText = state.assignmentData.max_grade || "??";
   commentEl.innerHTML = current.comment || "<i>No Comment</i>";
   pagerEl.innerHTML = current.submission
     .map(

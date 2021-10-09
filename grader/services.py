@@ -1,5 +1,6 @@
 # Copyright (C) 2021 John DeVries
 
+
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
@@ -352,14 +353,18 @@ def get_assignment_data(
 
         # update the top-level session object if there are new values in the
         # fields.
-        if existing.max_grade != assignment['maxPoints']:
-            existing.max_grade = assignment['maxPoints']
-            existing.save()
+        if existing.is_graded and (
+                existing.max_grade !=
+                assignment.get('maxPoints')
+        ):
+                existing.max_grade = assignment.get('maxPoints')
+
         if existing.assignment_name != assignment['title']:
             existing.assignment_name = assignment['title']
+
         if (
             existing.assignment_name != assignment['title'] or
-            existing.max_grade != assignment['maxPoints']
+            existing.max_grade != assignment.get('maxPoints')
         ):
             existing.save()
 
@@ -444,7 +449,7 @@ def get_assignment_data(
         owner=user,
         assignment_name=assignment['title'],
         api_assignment_id=assignment_id,
-        max_grade=assignment['maxPoints'],
+        max_grade=assignment.get('maxPoints'),
         course=course
     )
 

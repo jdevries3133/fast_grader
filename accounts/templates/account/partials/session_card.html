@@ -24,7 +24,7 @@
             <span class="xs:hidden">Avg.</span>
             Grade
           </h4>
-          {% if sub.average_grade %}
+          {% if sub.is_graded %}
             <p>{{ sub.average_grade }}</p>
           {% else %}
             <p>Ungraded</p>

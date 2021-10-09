@@ -42,11 +42,17 @@ class GradingSession(models.Model):
     # previous sessions, and submission data may need to be updated when
     # it is out of sync
     api_assignment_id = models.CharField(max_length=50, unique=True)
-    max_grade = models.IntegerField()
+    max_grade = models.IntegerField(null=True)
     teacher_template = models.TextField(blank=True)
 
     @ property
+    def is_graded(self) -> bool:
+        return bool(self.max_grade)
+
+    @ property
     def average_grade(self):
+        if not self.is_graded:
+            raise ValueError('cannot get average grade from ungraded assignment')
         return list(self.submissions.aggregate(models.Avg('grade')).values())[0]  # type: ignore
 
     def __str__(self):
