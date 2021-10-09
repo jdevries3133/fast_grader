@@ -40,7 +40,6 @@ urlpatterns = [
     path('privacy/', TemplateView.as_view(template_name='core/privacy_policy.html'), name='privacy_policy'),
     path('tos/', TemplateView.as_view(template_name='core/terms_of_service.html', content_type='text/plain'), name='terms_of_service'),
 
-    path('robots.txt/', TemplateView.as_view(template_name='core/robots.txt'), name='robots'),
     path(
         'sitemap.xml',
         sitemap,
