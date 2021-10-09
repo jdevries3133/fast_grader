@@ -21,6 +21,9 @@ import logging
 logging.disable()
 
 
+ENABLE_LOGROCKET = False
+
+
 # --- OPTIMIZATIONS
 
 # debug adds overhead without changing test output
