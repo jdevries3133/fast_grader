@@ -42,6 +42,14 @@
   }
 }
 
+.link {
+  @apply text-blue-700 underline;
+}
+
+.link:visited {
+  @apply text-purple-700;
+}
+
 .switch {
   position: relative;
   display: inline-block;
