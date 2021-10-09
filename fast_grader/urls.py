@@ -38,7 +38,7 @@ urlpatterns = [
     path('help/', TemplateView.as_view(template_name='core/help.html'), name='help'),
     path('about/', TemplateView.as_view(template_name='core/about.html'), name='about'),
     path('privacy/', TemplateView.as_view(template_name='core/privacy_policy.html'), name='privacy_policy'),
-    path('tos/', TemplateView.as_view(template_name='core/terms_of_service.html', content_type='text/plain'), name='terms_of_service'),
+    path('tos/', TemplateView.as_view(template_name='core/terms_of_service.html'), name='terms_of_service'),
 
     path(
         'sitemap.xml',
