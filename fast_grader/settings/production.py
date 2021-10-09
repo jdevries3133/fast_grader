@@ -19,6 +19,9 @@ from .consume_secrets_file import *
 NPM_BIN_PATH = '/usr/local/bin/npm'
 
 
+ENABLE_LOGROCKET = True
+
+
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,

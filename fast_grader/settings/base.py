@@ -86,7 +86,6 @@ MIDDLEWARE = [
 ROOT_URLCONF = 'fast_grader.urls'
 
 
-ENABLE_LOGROCKET = False
 
 
 def debug_context(_): return {'debug': DEBUG}

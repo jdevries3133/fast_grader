@@ -37,6 +37,9 @@ LOG_LEVEL = 'DEBUG'
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 
+ENABLE_LOGROCKET = False
+
+
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
