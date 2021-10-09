@@ -78,9 +78,8 @@
 
 </div>
 
-<div class="flex flex-col items-center justify-center">
+<div class="text-center">
   <h3>What Next?</h3>
-  <p>
   <a href="{% url 'grader' %}">
     <button class="p-4 hover:bg-green-200">
       <span>Start Grading</span>
@@ -110,7 +109,5 @@
 <!-- </div> -->
 
 
-<div class="pt-8">
-  {% include 'core/footer.html' %}
-</div>
+{% include 'core/footer.html' %}
 {% endblock %}
