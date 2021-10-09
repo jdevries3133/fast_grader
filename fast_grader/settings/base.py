@@ -35,6 +35,7 @@ BASE_DIR = Path(__file__).resolve().parents[2]
 
 DEBUG = bool(os.getenv('DJANGO_DEBUG'))
 
+
 ALLOWED_HOSTS = ['classfast.app']
 
 
@@ -68,7 +69,9 @@ INSTALLED_APPS = [
 
 ]
 
+
 SITE_ID = 1
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -129,7 +132,7 @@ AUTHENTICATION_BACKENDS = [
 ]
 
 
-SOCIALACCOUNT_ADAPTER = 'fast_grader.socialaccount_adapter.FastGraderSocialAccountAdapter'
+SOCIALACCOUNT_ADAPTER = 'accounts.socialaccount_adapter.FastGraderSocialAccountAdapter'
 
 
 # Password validation

@@ -16,8 +16,15 @@
 
 from django.contrib import admin
 from django.urls import path, include
+from django.views.generic import TemplateView
+from django.contrib.sitemaps.views import sitemap
 
-from . import views as generic_pages
+from .sitemaps import StaticViewSitemap
+
+
+sitemaps = {
+    'static': StaticViewSitemap
+}
 
 
 urlpatterns = [
@@ -27,10 +34,17 @@ urlpatterns = [
     path('ci_cd/', include('continuous_deployment.urls')),
     path('admin/', admin.site.urls),
 
-    # generic pages
-    path('', generic_pages.home, name='home'),
-    path('help/', generic_pages.help, name='help'),
-    path('about/', generic_pages.about, name='about'),
-    path('privacy/', generic_pages.privacy, name='privacy'),
-    path('tos/', generic_pages.tos, name='tos'),
+    path('', TemplateView.as_view(template_name='core/index.html'), name='home'),
+    path('help/', TemplateView.as_view(template_name='core/help.html'), name='help'),
+    path('about/', TemplateView.as_view(template_name='core/about.html'), name='about'),
+    path('privacy/', TemplateView.as_view(template_name='core/privacy_policy.html'), name='privacy_policy'),
+    path('tos/', TemplateView.as_view(template_name='core/terms_of_service.html'), name='terms_of_service'),
+
+    path(
+        'sitemap.xml',
+        sitemap,
+        {'sitemaps': sitemaps},
+        name='django.contrib.sitemaps.views.sitemap'
+    )
+
 ]
