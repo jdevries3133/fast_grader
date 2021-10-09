@@ -9,7 +9,7 @@
 {% block content %}
 
 <div class="flex flex-col items-center justify-center w-full pt-16 h-5/6">
-  <div class="p-2 m-2 text-center bg-red-100 rounded-lg md:p-4">
+  <div class="max-w-md p-2 m-2 text-center bg-red-100 rounded-lg md:p-4">
     <h1>Warning!</h1>
     <p>
       fast grader is still in early development. Please see our
@@ -18,8 +18,9 @@
       </a>
       and
       <a class="link" href="{% url 'terms_of_service' %}">
-        terms of service
-      </a>
+        terms of service.</a>
+      Note that basic features, like syncing grades and comments with Google
+      Classroom, are still yet to be released!
     </p>
   </div>
   <h1>Sign in with Google</h1>

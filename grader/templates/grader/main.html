@@ -82,9 +82,9 @@
     <div class="w-full h-full p-1 border-2 border-gray-200 overflow-clip bg-gradient-to-tr from-gray-100 via-green-100 to-white col-auto">
       <div class="sticky top-0">
         <div>
-          <h3 class="text-black">Student Name</h3>
+          <h3 class="text-black">Student <span class="font-mono" id="grProgress"></span></h3>
           <p id="grName" data-private class="text-grey-800">...</p>
-          <div class="mb-6">
+          <div id="gradeInfoContainer" class="my-6">
             <h3 class="text-black">Grade</h3>
             <p class="text-sm text-gray-500">
               Just start typing to enter a grade.
@@ -151,7 +151,7 @@
         View Differences Only
 
         {# Info icon #}
-        <a class="text-blue-700 visited:text-purple-700 hover:shadow-md"
+        <a class="text-blue-700 visited:text-purple-700 hover:shadow-none"
 
          {# !!! What the info icon will link to !!! #}
          href="{% url 'help' %}#diffing"
