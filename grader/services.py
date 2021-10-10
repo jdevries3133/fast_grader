@@ -474,7 +474,7 @@ def get_assignment_data(
                 assignment=assignment,
                 api_student_submission_id=sub['id'],
                 api_student_profile_id=sub['userId'],
-                student_name=student_id_to_name[sub['userId']],
+                student_name=student_id_to_name.get(sub['userId'], 'unknown'),
                 submission=submission_string
             )
         )

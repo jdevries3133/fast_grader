@@ -34,6 +34,7 @@ else:
     # in CI/CD or production, just let exceptions bubble up.
     from . import secrets
 
+
 SECRET_KEY = secrets.SECRET_KEY
 
 SOCIALACCOUNT_PROVIDERS = {
