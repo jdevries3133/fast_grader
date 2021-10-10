@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
     <meta name="robots" content="index, follow">
-    <meta property="og:image" content="{% static 'logo.png' %}" />
+    <meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{% static 'logo.png' %}" />
     <meta property="og:title" content="fast grader for Google Classroom" />
     <meta name="description" content="The fastest tool for Google Classroom grading" />
     <title>{% block title %}Fast Grader{% endblock %}</title>
