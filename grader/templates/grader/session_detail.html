@@ -35,7 +35,7 @@
           {% endcomment %}
           <td class="p-2 bg-gray-100 border border-gray-400">{{ submission.student_name }}</td>
           <td class="p-2 bg-gray-100 border border-gray-400">{{ submission.grade }}</td>
-          <td class="p-2 bg-gray-100 border border-gray-400">{{ submission.comment }}</td>
+          <td class="p-2 bg-gray-100 border border-gray-400">{{ submission.comment|default:'None' }}</td>
         </tr>
       {% endfor %}
     </tbody>
