@@ -16,10 +16,10 @@
 
 from django.contrib import admin
 from django.urls import path, include
-from django.views.generic import TemplateView
 from django.contrib.sitemaps.views import sitemap
 
 from .sitemaps import StaticViewSitemap
+from .views import StaticPageView
 
 
 sitemaps = {
@@ -34,11 +34,11 @@ urlpatterns = [
     path('ci_cd/', include('continuous_deployment.urls')),
     path('admin/', admin.site.urls),
 
-    path('', TemplateView.as_view(template_name='core/index.html'), name='home'),
-    path('help/', TemplateView.as_view(template_name='core/help.html'), name='help'),
-    path('about/', TemplateView.as_view(template_name='core/about.html'), name='about'),
-    path('privacy/', TemplateView.as_view(template_name='core/privacy_policy.html'), name='privacy_policy'),
-    path('tos/', TemplateView.as_view(template_name='core/terms_of_service.html'), name='terms_of_service'),
+    path('', StaticPageView.as_view(template_name='core/index.html'), name='home'),
+    path('help/', StaticPageView.as_view(template_name='core/help.html'), name='help'),
+    path('about/', StaticPageView.as_view(template_name='core/about.html'), name='about'),
+    path('privacy/', StaticPageView.as_view(template_name='core/privacy_policy.html'), name='privacy_policy'),
+    path('tos/', StaticPageView.as_view(template_name='core/terms_of_service.html'), name='terms_of_service'),
 
     path(
         'sitemap.xml',
