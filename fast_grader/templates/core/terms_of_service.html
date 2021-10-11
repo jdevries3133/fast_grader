@@ -3,52 +3,55 @@
 {% block title %}Terms of Service{% endblock %}
 
 {% block content %}
-<div class="container p-2 pt-8 bg-gray-100 rounded lg:rounded lg:m-4 lg:p-4 max-w-prose">
+<div class="container p-2 pt-8 text-justify bg-gray-100 rounded lg:rounded lg:m-4 lg:p-4 max-w-prose">
   <h1>Terms of Service</h1>
 
-  <p class="m-2">
+  <p class="my-2">
+    Please also see our
+    <a
+      class="link"
+      href="{% url 'privacy_policy' %}">Privacy Policy.</a>
+  </p>
+
+  <p class="my-2">
     The Google Classroom Fast Grader is propery of ClassFast LLC.
   </p>
 
-  <p class="m-2">
-  <span>
+  <p class="my-2">
+    "Google", "Google Classroom", and "Google Drive" are trademarks of Google.
+    This product is not owned, operated, or affiliated with Google.
+  </p>
+
+  <p class="my-2">
     Fast Grader is currently in an early, pre-release stage of development. We
     can not and do not guarantee a bug-free platform, but you can expect the
     stability of the project to improve, and the amount of features to grow at
     a steady cadence. Please see our
-  </span>
-   <a class="link" href="{% url 'help' %}">
-     help page
-   </a>
-   <span>
+    <a class="link" href="{% url 'help' %}">
+      help page
+    </a>
     for details on how to submit a bug report or request a new feature.
-   </span>
   </p>
 
-  <p class="m-2">
+  <p class="my-2">
     We reserve the right to change the availability or cost of the services
     associated with this website at any time.
   </p>
 
-  <p class="m-2">
-    <span>
-      Do not use this website if you are not 13 years of age or older. However,
-      this website is COPPA compliant for usage by teachers. Please see our
-    </span>
+  <p class="my-2">
+    <b>This is not a child-directed app.</b> Do not use this website if you are
+    not 13 years of age or older.  Please see our
     <a class="link" href="{% url 'privacy_policy' %}">
       privacy policy
     </a>
-    <span>
-      for details.
-    </span>
-  </p>
-
-  <p class="m-2">
+    for details about our use of student data and compliance with COPPA when
+    this website is used by teachers.  </p>
+  <p class="my-2">
     For now, we do not have mass-emailing infrastructure. As such, changes to
     this website, these terms, or the privacy policy will occur without notice.
     We expect to build out these capabilities in the near future.
   </p>
-  <p class="m-2"></p>
+  <p class="my-2"></p>
 
 </div>
 

@@ -4,15 +4,22 @@
 
 {% block content %}
 
-<div class="container p-2 pt-8 bg-gray-100 rounded lg:rounded lg:m-4 lg:p-4 max-w-prose">
+<div class="container p-2 pt-8 text-justify bg-gray-100 rounded lg:rounded lg:m-4 lg:p-4 max-w-prose">
   <h1>Privacy Policy</h1>
 
-  <p class="m-2">
+  <p class="my-2">
+    Please also see our
+    <a
+      class="link"
+      href="{% url 'terms_of_service' %}">Terms of Service.</a>
+  </p>
+
+  <p class="my-2">
     Fast Grader is currently in an early stage of development. As such,
     analytics tools will be incorporated into the platform, and your use of the
     site will be analyzed in detail for the development of the project.
   </p>
-  <p class="m-2">
+  <p class="my-2">
     Fast Grader will not sell your data, including your personally
     identifiable information or email address to third parties.
     {% comment %}
@@ -20,7 +27,7 @@
     support free use of our platform with advertisements. Please note the
     following regarding Google AdSense:
   </p>
-  <h4 class="m-2 text-lg text-bold">Google AdSense</h4>
+  <h4 class="my-2 mt-6 text-lg text-bold">Google AdSense</h4>
   <ul class="ml-8 list-disc">
     <li>
       Third party vendors, including Google, use cookies to serve ads based on
@@ -40,8 +47,47 @@
 
   </ul>
   {% endcomment %}
-  <h4 class="m-2 text-lg text-bold">LogRocket</h4>
-  <p class="m-2">
+  <h4 class="my-2 mt-6 text-lg text-bold">Use of your Google Data</h4>
+  <p class="my-2">
+    This application integrates with Google Classroom and Google Drive. By
+    logging in and creating an account, you grant us permission to access data
+    associated with your google account.
+  </p>
+  <p class="my-2">
+    Your own personal information associated with your Google Account, like
+    your name and email address, are stored in our secure database, and are
+    never shared with third parties. Your username may be shared with third
+    parties like LogRocket and similar analytics platforms for the sake of
+    providing us knowledge about your use of the website and improving our
+    platform.
+  </p>
+  <p class="my-2">
+    The functionality of this application requires us to consume data from
+    Google Classroom and Google Drive. In these cases, we only save the data
+    that is necessary to the functionality of this website, like course names,
+    assignment names, student names, your grades, and your comments. This data
+    is stored in our database, but it always belongs to you. You have the right
+    to delete this data at any time, and upon deleting the grading session from
+    your profile home page, it is immediately, permanently, and irreversibly
+    deleted from our database as well. Security and privacy when dealing with
+    Classroom and Drive data, in particular, is of the utmost importance to us.
+    Student names are protected by COPPA, and will always be securely stored
+    and never shared.
+  </p>
+  <p class="my-2">
+    Our use of LogRocket to analyze your usage of the grading tool is the only
+    exception to this rule, but we use a find grain of detail in specifying
+    exact which content on the page is removed from LogRocket's view.
+  <a
+    href="https://github.com/jdevries3133/fast_grader/blob/9d4f328680591047e7caf48501014faab9bcbdba/grader/templates/grader/main.html#L86"
+    class="link">For example, (click to see source),</a>
+    inside the grading tool, we apply the <code>data-private</code> attribute
+    to the student name on the page, which tells LogRocket to not record the
+    content of this field, and therefore LogRocket cannot see the student names
+    despite recording the remainder of the page.
+  </p>
+  <h4 class="my-2 mt-6 text-lg text-bold">LogRocket</h4>
+  <p class="my-2">
     LogRocket will be used to analyze your usage of the grading app and
     continuously improve it. Most of the content on the page, including grades,
     comments, and student submission content is captured by this tool. However,
@@ -54,7 +100,7 @@
       Click here to view LogRocket's privacy policy.
     </a>
   </p>
-  <p class="m-2">
+  <p class="my-2">
     Additionally, we will likely utilize these third party services on our site
     in the near future, although they are not implemented presently.
   </p>
@@ -62,10 +108,10 @@
     <li>Google AdSense</li>
     <li>Google Analytics</li> 
   </ul>
-<h4 class="m-2 text-lg text-bold">
-  Children's Online Privacy Protection Rule ("COPPA")
-</h4>
-  <p class="m-2">
+  <h4 class="my-2 mt-6 text-lg text-bold">
+    Children's Online Privacy Protection Rule ("COPPA")
+  </h4>
+  <p class="my-2">
     This website is COPPA compliant, because any personal information about
     individuals under 13 years of age is provided by an adult who has the
     permission to do so. Any student information in our database (as defined
@@ -74,14 +120,21 @@
     industry standard security practices, including Transport Layer Security
     (TLS), and user authentication via Google.
   </p>
-  <h3>Account Deletion</h3>
-  <p class="m-2">
+  <h2 class="mt-6">Account Deletion</h2>
+  <p class="my-2">
     Because this site is in an early stage of development, if you would like
     delete your account, please send me a personal email at
     <a 
       class="link"
       href="mailto:jackdevriesmusic@gmail.com">jackdevriesmusic@gmail.com</a>
     so I can accommodate that request.
+  <p class="my-2">
+    Note that if you can delete grading sessions in your
+    <a
+      class="link"
+      href="{% url 'profile' %}">profile home page</a>
+    without deleting your account if you wish. This data will also be
+    immediately, permanently, and irreversibly deleted from our database.
 </div>
 
 {% endblock %}
