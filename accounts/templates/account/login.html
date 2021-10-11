@@ -8,11 +8,12 @@
 
 {% block content %}
 
-<div class="flex flex-col items-center justify-center w-full pt-16 h-5/6">
-  <div class="max-w-md p-2 m-2 text-center bg-red-100 rounded-lg md:p-4">
-    <h1>Warning!</h1>
-    <p>
-      fast grader is still in early development. Please see our
+<div class="flex flex-col items-center justify-center w-full pt-16 gap-6 md:flex-row h-5/6">
+  <div class="max-w-md p-2 m-2 text-center bg-yellow-100 rounded-lg md:p-4">
+    <h1>Please Note!</h1>
+    <p class="my-2 text-justify">
+      fast grader is still in the testing phase. You have been invited to try
+      the product before it's release! Please see our
       <a class="link" href="{% url 'privacy_policy' %}">
         privacy policy
       </a>
@@ -20,13 +21,24 @@
       <a class="link" href="{% url 'terms_of_service' %}">
         terms of service.</a>
       Note that basic features, like syncing grades and comments with Google
-      Classroom, are still yet to be released!
+      Classroom, are still in the works!
+    </p>
+    <p class="my-2 text-justify">
+      Also, the app is currently going through a 4-6 week verification process
+      with Google. Until then, Google will show you a very freaky warning
+      screen, which you can click past if you wish. If you have any specific
+      concerns, please email me at
+      <a
+        class="link"
+        href="mailto:jackdevriesmusic@gmail.com">jackdevriesmusic@gmail.com!</a>
     </p>
   </div>
-  <h1>Sign in with Google</h1>
-  <a href="{% provider_login_url "google" %}">
-    <img class="w-40" src="{% static 'account/google_signin/vector/btn_google_light_normal_ios.svg' %}" />
-  </a>
+  <div class="text-center">
+    <h1>Sign in with Google</h1>
+    <a href="{% provider_login_url "google" %}">
+      <img class="w-40 m-auto" src="{% static 'account/google_signin/vector/btn_google_light_normal_ios.svg' %}" />
+    </a>
+  </div>
 </div>
 
 
