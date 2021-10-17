@@ -1,0 +1,44 @@
+{
+  "studentSubmissions": [
+    {
+      "courseId": "381532007859",
+      "courseWorkId": "346395143412",
+      "id": "Cg0IlcG081QQ9NmJtooK",
+      "userId": "104478187393448600976",
+      "creationTime": "2021-10-09T21:23:05.887Z",
+      "updateTime": "2021-10-09T21:23:34.684Z",
+      "state": "TURNED_IN",
+      "alternateLink": "https://classroom.google.com/c/MzgxNTMyMDA3ODU5/a/MzQ2Mzk1MTQzNDEy/submissions/by-status/and-sort-last-name/student/MjI3OTA2MTEwOTNa",
+      "courseWorkType": "ASSIGNMENT",
+      "assignmentSubmission": {
+        "attachments": [
+          {
+            "driveFile": {
+              "id": "1rwWdNFPJHw2knsVXIY9w2nhdcb3HCg9R_y52mZnzDD8",
+              "title": "Jack DeVries - Essay",
+              "alternateLink": "https://docs.google.com/document/d/1rwWdNFPJHw2knsVXIY9w2nhdcb3HCg9R_y52mZnzDD8/edit?usp=drive_web",
+              "thumbnailUrl": "https://lh3.google.com/qRoL-FHslIbo2anuwvMwNifhbl4fVbOUxI_HShPhCNwMivJH9yUeEqNMVy6dl7mjZsUMg9L0gO5Vc86Gnmyal_a-kAB6tL-yBaMT=s200"
+            }
+          }
+        ]
+      },
+      "submissionHistory": [
+        {
+          "stateHistory": {
+            "state": "CREATED",
+            "stateTimestamp": "2021-10-09T21:23:01.797Z",
+            "actorUserId": "104478187393448600976"
+          }
+        },
+        {
+          "stateHistory": {
+            "state": "TURNED_IN",
+            "stateTimestamp": "2021-10-09T21:23:34.684Z",
+            "actorUserId": "104478187393448600976"
+          }
+        }
+      ]
+    }
+  ]
+}
+

@@ -437,6 +437,7 @@ def get_assignment_data(
     # ----
 
     course_resource = get_course(user=user, course_id=assignment['courseId'])
+
     try:
         course = CourseModel.objects.get(api_course_id=course_id)       # type: ignore
     except CourseModel.DoesNotExist:                                    # type: ignore

@@ -1,0 +1,180 @@
+{
+  "studentSubmissions": [
+    {
+      "courseId": "381532007859",
+      "courseWorkId": "319837130648",
+      "id": "Cg0IlcG081QQmJ-dvqcJ",
+      "userId": "104478187393448600976",
+      "creationTime": "2021-08-24T18:58:04.004Z",
+      "updateTime": "2021-09-27T00:39:57.983Z",
+      "state": "TURNED_IN",
+      "alternateLink": "https://classroom.google.com/c/MzgxNTMyMDA3ODU5/a/MzE5ODM3MTMwNjQ4/submissions/by-status/and-sort-last-name/student/MjI3OTA2MTEwOTNa",
+      "courseWorkType": "ASSIGNMENT",
+      "assignmentSubmission": {
+        "attachments": [
+          {
+            "driveFile": {
+              "id": "1ZNhCUI9-0CWjZtHcSGkkNHDoJF7KOZKqN3ypVOfR9ko",
+              "title": "Jack DeVries - This is attachment three",
+              "alternateLink": "https://docs.google.com/presentation/d/1ZNhCUI9-0CWjZtHcSGkkNHDoJF7KOZKqN3ypVOfR9ko/edit?usp=drive_web",
+              "thumbnailUrl": "https://lh3.google.com/gJ_0HPFPBgHAxjbNcd_V8NRt33IvhJDSi8wZ1EWC_9MCxn5gXxN56QMjd3FWLQ1CJSsKeWseuyeB5vcoSgDeXHgSRtNbxMxrD4SO=s200"
+            }
+          },
+          {
+            "driveFile": {
+              "id": "1qtna8YvW4V0SBSd2-4gNpX5uvYyQ8EbMYSq0K0V2U74",
+              "title": "Jack DeVries - Attachment One",
+              "alternateLink": "https://docs.google.com/document/d/1qtna8YvW4V0SBSd2-4gNpX5uvYyQ8EbMYSq0K0V2U74/edit?usp=drive_web",
+              "thumbnailUrl": "https://lh3.google.com/L-jHcCHAqtoq5FyVLHnvLtAIKgL-kdcMosvAEWUeXCMeCjxpRpS4I7rJjW7WcpOh2y-JW6y-TKRvj5DsRD7cu0vXreFQNkZOqxs7=s200"
+            }
+          },
+          {
+            "driveFile": {
+              "id": "1OV06pxNBh8vBf3v6WMys3fces_9TaYkJko2cUBeQ2Yk",
+              "title": "Jack DeVries - Attachment Two",
+              "alternateLink": "https://docs.google.com/document/d/1OV06pxNBh8vBf3v6WMys3fces_9TaYkJko2cUBeQ2Yk/edit?usp=drive_web",
+              "thumbnailUrl": "https://lh3.google.com/hjmXfQ3MrfDEkUmTh1HcgBekk84joMtkNqsypdndA64EWt70Jifw2p5nX1atemvAi0O0iYi7x9J9imG2dEAPEOt36ygSEwnqZSra=s200"
+            }
+          },
+          {
+            "driveFile": {
+              "id": "1rbZQNZI8QW9I2crBjVh5cTX6JsVH_bfS",
+              "title": "1800x1200_is_my_cat_normal_slideshow.jpg",
+              "alternateLink": "https://drive.google.com/file/d/1rbZQNZI8QW9I2crBjVh5cTX6JsVH_bfS/view?usp=drive_web",
+              "thumbnailUrl": "https://lh3.googleusercontent.com/Vhjv6BFnFJy9yaa137KBCB7sMkv8hc8EKNV0F7zyGFZE2YCPiolFm5tHz75owB6qzqI5mhVN61ajb9A=s200"
+            }
+          }
+        ]
+      },
+      "submissionHistory": [
+        {
+          "stateHistory": {
+            "state": "CREATED",
+            "stateTimestamp": "2021-08-24T18:57:55.929Z",
+            "actorUserId": "104478187393448600976"
+          }
+        },
+        {
+          "stateHistory": {
+            "state": "TURNED_IN",
+            "stateTimestamp": "2021-08-24T18:59:04.625Z",
+            "actorUserId": "104478187393448600976"
+          }
+        },
+        {
+          "stateHistory": {
+            "state": "RECLAIMED_BY_STUDENT",
+            "stateTimestamp": "2021-08-25T00:55:08.638Z",
+            "actorUserId": "104478187393448600976"
+          }
+        },
+        {
+          "stateHistory": {
+            "state": "TURNED_IN",
+            "stateTimestamp": "2021-08-25T00:55:48.117Z",
+            "actorUserId": "104478187393448600976"
+          }
+        },
+        {
+          "gradeHistory": {
+            "pointsEarned": 38,
+            "maxPoints": 75,
+            "gradeTimestamp": "2021-09-17T10:17:00.609Z",
+            "actorUserId": "111766353578764262092",
+            "gradeChangeType": "DRAFT_GRADE_POINTS_EARNED_CHANGE"
+          }
+        },
+        {
+          "gradeHistory": {
+            "pointsEarned": 56,
+            "maxPoints": 75,
+            "gradeTimestamp": "2021-09-27T00:39:50.547Z",
+            "actorUserId": "111766353578764262092",
+            "gradeChangeType": "DRAFT_GRADE_POINTS_EARNED_CHANGE"
+          }
+        },
+        {
+          "gradeHistory": {
+            "maxPoints": 75,
+            "gradeTimestamp": "2021-09-27T00:39:57.983Z",
+            "actorUserId": "111766353578764262092",
+            "gradeChangeType": "DRAFT_GRADE_POINTS_EARNED_CHANGE"
+          }
+        }
+      ]
+    },
+    {
+      "courseId": "381532007859",
+      "courseWorkId": "319837130648",
+      "id": "Cg4IzILhqI0LEJifnb6nCQ",
+      "userId": "100316609354151322799",
+      "creationTime": "2021-08-24T18:58:12.029Z",
+      "updateTime": "2021-09-27T00:39:54.332Z",
+      "state": "TURNED_IN",
+      "alternateLink": "https://classroom.google.com/c/MzgxNTMyMDA3ODU5/a/MzE5ODM3MTMwNjQ4/submissions/by-status/and-sort-last-name/student/MzgxNTMyMjU4NjM2",
+      "courseWorkType": "ASSIGNMENT",
+      "assignmentSubmission": {
+        "attachments": [
+          {
+            "driveFile": {
+              "id": "1zRfoutkgH0zflv1MkBwxvXPIrHO0WRv-pyNS5873vQA",
+              "title": "Jack DeVries - This is attachment three",
+              "alternateLink": "https://docs.google.com/presentation/d/1zRfoutkgH0zflv1MkBwxvXPIrHO0WRv-pyNS5873vQA/edit?usp=drive_web",
+              "thumbnailUrl": "https://lh3.google.com/swZNx6EgnKCxSJOh3rMxaglSmMjFQsc6cqKOBbM0FahoDCZtBKgMZBhVEwDdRVbKQa9KpQ4FH7dHFFA2e6v_2RmYeMHy8RC3KBCJ=s200"
+            }
+          },
+          {
+            "driveFile": {
+              "id": "1tea-NEWxfOYr45too6Ul4ZRTQ5He1uu2dKSF1FXMSZc",
+              "title": "Jack DeVries - Attachment One",
+              "alternateLink": "https://docs.google.com/document/d/1tea-NEWxfOYr45too6Ul4ZRTQ5He1uu2dKSF1FXMSZc/edit?usp=drive_web",
+              "thumbnailUrl": "https://lh3.google.com/FsRIFqcLA8yiX6iB9EsTtVcQNtxH5OoBnK3cWcTx0B_k_tZuMJ-ggaGup0ttqvBQZ81ThbwDmtizeZr0CCa-wC5Jo8VcUH_n2rtN=s200"
+            }
+          },
+          {
+            "driveFile": {
+              "id": "182Ep_EV5sMjELGqtnW5RGl7QiEkiSdZADxcRaQq2-HE",
+              "title": "Jack DeVries - Attachment Two",
+              "alternateLink": "https://docs.google.com/document/d/182Ep_EV5sMjELGqtnW5RGl7QiEkiSdZADxcRaQq2-HE/edit?usp=drive_web",
+              "thumbnailUrl": "https://lh3.google.com/WpMuT4zJtKVGodc7CKZftG5Xwb4sXPbxjJVy2bztO6zYpYJyso2afvWFYpkD9ZAIZ-gbi34zsDvKGF6BE9dBBPpL7GVA8Q1-6HAA=s200"
+            }
+          }
+        ]
+      },
+      "submissionHistory": [
+        {
+          "stateHistory": {
+            "state": "CREATED",
+            "stateTimestamp": "2021-08-24T18:58:02.339Z",
+            "actorUserId": "100316609354151322799"
+          }
+        },
+        {
+          "stateHistory": {
+            "state": "TURNED_IN",
+            "stateTimestamp": "2021-08-24T19:00:09.967Z",
+            "actorUserId": "100316609354151322799"
+          }
+        },
+        {
+          "gradeHistory": {
+            "pointsEarned": 45,
+            "maxPoints": 75,
+            "gradeTimestamp": "2021-09-27T00:39:52.294Z",
+            "actorUserId": "111766353578764262092",
+            "gradeChangeType": "DRAFT_GRADE_POINTS_EARNED_CHANGE"
+          }
+        },
+        {
+          "gradeHistory": {
+            "maxPoints": 75,
+            "gradeTimestamp": "2021-09-27T00:39:54.332Z",
+            "actorUserId": "111766353578764262092",
+            "gradeChangeType": "DRAFT_GRADE_POINTS_EARNED_CHANGE"
+          }
+        }
+      ]
+    }
+  ]
+}
+

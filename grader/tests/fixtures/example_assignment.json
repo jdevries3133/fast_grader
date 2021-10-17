@@ -1,0 +1,57 @@
+{
+  "courseId": "381532007859",
+  "id": "319837130648",
+  "title": "Demo Assignment",
+  "materials": [
+    {
+      "driveFile": {
+        "driveFile": {
+          "id": "1SrP_ChZFjkfG5wO70q27mGZrxxeb7SDBW65Q831q3cg",
+          "title": "Attachment One",
+          "alternateLink": "https://docs.google.com/document/d/1SrP_ChZFjkfG5wO70q27mGZrxxeb7SDBW65Q831q3cg/edit?usp=drive_web",
+          "thumbnailUrl": "https://lh3.google.com/Grql07ziGX0nHtK8Tt36usdAu3jJgHnUY_HNPhBXjrq7OUcWjyd1_9K3UAf79rnoJL-HFEDQiljx0VAvyS3hajdeKKQP7xlot3rp=s200"
+        },
+        "shareMode": "STUDENT_COPY"
+      }
+    },
+    {
+      "driveFile": {
+        "driveFile": {
+          "id": "13WPBbU7tkfnUQEY-LBz8QiBMAMaw0X_lhB8NNwg0hv4",
+          "title": "Attachment Two",
+          "alternateLink": "https://docs.google.com/document/d/13WPBbU7tkfnUQEY-LBz8QiBMAMaw0X_lhB8NNwg0hv4/edit?usp=drive_web",
+          "thumbnailUrl": "https://lh3.google.com/3KaHKij3Z49DDR2I8i_GDzl_dx5uskR5EAwzYFwI6GpNGkD3dnDBoWFeZwbUUHZjo3P1XGql_DMg6cwhq6VOe-WSe4ZTZy7dDJw9=s200"
+        },
+        "shareMode": "STUDENT_COPY"
+      }
+    },
+    {
+      "driveFile": {
+        "driveFile": {
+          "id": "1W102vJ9vVBXTmGV15XBS74WLyXx9Ff6Nl6SQPdAd6eo",
+          "title": "This is attachment three",
+          "alternateLink": "https://docs.google.com/presentation/d/1W102vJ9vVBXTmGV15XBS74WLyXx9Ff6Nl6SQPdAd6eo/edit?usp=drive_web",
+          "thumbnailUrl": "https://lh3.google.com/JdHzevZbuzrv8hU8WMgh4RaigDmF-JGK-w-eCJXMGMXtmohdbvzZ1CdIfoSOxFYA9iaCGeNrrSBlAOuZNpuly_oM0-FKISkUFmVf=s200"
+        },
+        "shareMode": "STUDENT_COPY"
+      }
+    }
+  ],
+  "state": "PUBLISHED",
+  "alternateLink": "https://classroom.google.com/c/MzgxNTMyMDA3ODU5/a/MzE5ODM3MTMwNjQ4/details",
+  "creationTime": "2021-08-24T18:57:40.893Z",
+  "updateTime": "2021-10-03T00:03:34.524Z",
+  "maxPoints": 75,
+  "workType": "ASSIGNMENT",
+  "submissionModificationMode": "MODIFIABLE_UNTIL_TURNED_IN",
+  "assignment": {
+    "studentWorkFolder": {
+      "id": "1yMlQn4fcSfClCEWhCpgdG5efaMKjWpBXhccSydBlkiE3aPEi8d2KWUvC45Sbki0mt729C1pC",
+      "title": "two attachment",
+      "alternateLink": "https://drive.google.com/drive/folders/1yMlQn4fcSfClCEWhCpgdG5efaMKjWpBXhccSydBlkiE3aPEi8d2KWUvC45Sbki0mt729C1pC"
+    }
+  },
+  "assigneeMode": "ALL_STUDENTS",
+  "creatorUserId": "111766353578764262092"
+}
+
