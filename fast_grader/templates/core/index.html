@@ -20,7 +20,7 @@
     <h2 class="font-serif text-lg lg:text-2xl">in less time</h1>
   </div>
 
-  <video muted controls loop autoplay class="max-h-screen p-2 md:col-span-2 2xl:col-span-2 2xl:row-span-3">
+  <video muted controls loop aria-label="demo video" autoplay class="max-h-screen p-2 md:col-span-2 2xl:col-span-2 2xl:row-span-3">
     <source src="{% static 'landing_page/demo.mp4' %}" type="video/mp4"></source>
   </video>
 
@@ -45,6 +45,7 @@
       <h3 class="text-center">Go Faster</h3>
       <p>Keyboard shortcuts change grading from a slog to a dance!</p>
       <img
+        alt="image of keyboard and other items on desk"
         src={% static 'landing_page/keyboard.jpg' %}
         class="w-4/5 m-auto border-2 border-gray-400 rounded shadow"
         />
@@ -58,6 +59,7 @@
         submissions.
       </p>
       <img
+        alt="screenshot of the grading tool, showing that it uses plain text"
         src={% static 'landing_page/plain_text.png' %}
         class="w-4/5 m-auto mt-4 border-2 border-gray-400 rounded shadow"
         />
@@ -70,6 +72,7 @@
         in green, and what they deleted in red.
       </p>
       <img
+        alt="image of the grading tool, showing that you can view differences only"
         src={% static 'landing_page/diff_view.png' %}
         class="w-4/5 m-auto mt-4 border-2 border-gray-400 rounded shadow"
         />
@@ -79,11 +82,11 @@
 </div>
 
 <div class="text-center">
-  <h3>What Next?</h3>
+  <h3 class="text-black">What Next?</h3>
   <a href="{% url 'grader' %}">
     <button class="p-4 hover:bg-green-200">
-      <span>Start Grading</span>
-      <svg xmlns="http://www.w3.org/2000/svg" class="inline w-5 h-5" viewBox="0 0 20 20" fill="currentColor">
+      <span id="fdsafwea__startGrading">Start Grading</span>
+      <svg aria-labelledby="fdsafwea__startGrading" xmlns="http://www.w3.org/2000/svg" class="inline w-5 h-5" viewBox="0 0 20 20" fill="currentColor">
         <path fill-rule="evenodd" d="M10.293 15.707a1 1 0 010-1.414L14.586 10l-4.293-4.293a1 1 0 111.414-1.414l5 5a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0z" clip-rule="evenodd" />
         <path fill-rule="evenodd" d="M4.293 15.707a1 1 0 010-1.414L8.586 10 4.293 5.707a1 1 0 011.414-1.414l5 5a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0z" clip-rule="evenodd" />
       </svg>
@@ -91,8 +94,8 @@
   </a>
   <a href="{% url 'profile' %}">
     <button class="p-4 bg-purple-100 hover:bg-purple-200">
-      <span>Sign In with Google</span>
-      <svg xmlns="http://www.w3.org/2000/svg" class="inline w-5 h-5" viewBox="0 0 20 20" fill="currentColor">
+      <span id="feaw__signIn">Sign In with Google</span>
+      <svg aria-labelledby="feaw__signIn" xmlns="http://www.w3.org/2000/svg" class="inline w-5 h-5" viewBox="0 0 20 20" fill="currentColor">
         <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
       </svg>
     </button>
