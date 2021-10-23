@@ -22,8 +22,8 @@ from django.test import TestCase
 from django.contrib.auth.models import User
 from googleapiclient.errors import HttpError as GoogClientHttpError
 
-from ..models import GradingSession, AssignmentSubmission, CourseModel
-from ..services import ConcatOutput, StringifiedAttachment, concatenate_attachments, DriveAttachment, get_assignment_data
+from ..models import GradingSession, CourseModel
+from ..services import StudentResource, concatenate_attachments, DriveAttachment, get_assignment_data
 from .fixtures import concatenate_attachments_output
 
 
@@ -127,11 +127,18 @@ class TestGetAssignmentData(TestCase):
             api_assignment_id='2',
             teacher_template='',
         )
-        self.student_id_to_name = {
-            '1': 'joe',
-            '2': 'tom',
-            '3': 'tim',
-        }
+        self.student_data = [
+            StudentResource(
+                id_='1',
+                name='joe',
+                photo_url='/foo/bar'
+            ),
+            StudentResource(
+                id_='2',
+                name='tom',
+                photo_url='/foo/bar'
+            )
+        ]
 
         fixtures = {
             'assgt_data': 'example_assignment.json',
@@ -164,13 +171,13 @@ class TestGetAssignmentData(TestCase):
             course_id='4',
             assignment_id='5',
             user=self.user,
-            student_id_to_name=self.student_id_to_name,
+            student_data=self.student_data,
         )
         self.assertEqual(result.assignment_name, 'Demo Assignment')
         self.assertEqual(result.course.name, 'Demo Classroom')
         self.assertEqual(result.is_graded, True)
         self.assertEqual(result.average_grade, None)
-        self.assertEqual(result.submissions.count(), 2)
+        self.assertEqual(result.submissions.count(), 2)  # type: ignore
 
     @ patch('grader.services.get_course')
     @ patch('grader.services.concatenate_attachments')
@@ -189,6 +196,6 @@ class TestGetAssignmentData(TestCase):
                 course_id='4',
                 assignment_id='5',
                 user=self.user,
-                student_id_to_name=self.student_id_to_name,
+                student_data=self.student_data,
                 diff_only=True
             )

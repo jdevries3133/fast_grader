@@ -12,9 +12,10 @@
 
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 import json
 import logging
-from typing import Protocol
+import dataclasses
 
 from django.http.response import Http404, HttpResponse
 from grader.models import AssignmentSubmission, GradingSession
@@ -32,6 +33,7 @@ from rest_framework.permissions import IsAuthenticated
 
 from .services import (
     CourseResource,
+    StudentResource,
     list_all_class_names,
     list_all_assignment_names,
     get_student_data,
@@ -75,6 +77,7 @@ def resume_grading(request, pk):
 def flush_selections(request):
     for session_mutating_class in (ChooseCourseView, ChooseAssignmentView):
         session_mutating_class.flush_session(request)
+    request.session.save()
     return redirect(reverse('grader'))
 
 
@@ -179,8 +182,8 @@ class ChooseCourseView(View):
             '_id_to_course_name_mapping',
             'course'
         ):
-            request.session.pop(key, None)
-
+            if key in request.session:
+                del request.session[key]
 
 @ method_decorator(login_required, name='dispatch')
 class ChooseAssignmentView(View):
@@ -200,11 +203,7 @@ class ChooseAssignmentView(View):
             - the purpose of this view is to define this value
             - keys are `id` and `name`
 
-        student_id_to_name_mapping: dict
-            - responses later in the process only return student ids
-            - if we want the user to be able to see the name, we need to
-              make sure that the mapping is saved after this class's flow
-              has completed.
+        student_data: list[StudentResource]
 
         _id_to_assignment_name_mapping: dict
             - private mapping used by this view only and discarded when view
@@ -288,7 +287,7 @@ class ChooseAssignmentView(View):
 
         return result.next_page_token
 
-    def map_student_ids_to_names(self):
+    def save_student_data_to_session(self):
         """There comes a point in all of this where we get student ids with
         their coursework, but the names are not included. When that happens,
         we need to be able to lookup the names by id."""
@@ -296,14 +295,14 @@ class ChooseAssignmentView(View):
             user=self.request.user,
             course_id=self.request.session['course']['id']
         )
-        self.request.session['student_id_to_name_mapping'] = {
-            n.id_ : n.name for n in names
-        }
+        self.request.session['student_data'] = [
+            dataclasses.asdict(n) for n in names
+        ]
 
     def _choice_made(self):
         # after the choice is made, we can get the students' names
-        if self.request.session.get('student_id_to_name_mapping') is None:
-            self.map_student_ids_to_names()
+        if self.request.session.get('student_data') is None:
+            self.save_student_data_to_session()
         response =  render(
             self.request,
             'grader/partials/assignment_choice_made.html',
@@ -321,9 +320,10 @@ class ChooseAssignmentView(View):
         for key in (
             '_id_to_assignment_name_mapping',
             'assignment',
-            'student_id_to_name_mapping'
+            'student_data'
         ):
-            request.session.pop(key, None)
+            if key in request.session:
+                del request.session[key]
 
 
 class AssessmentDataView(APIView):
@@ -347,12 +347,14 @@ class AssessmentDataView(APIView):
         return super().dispatch(request, *a, **kw)
 
     def get(self, request):
+        raw_students = request.session['student_data']
+        student_data = [StudentResource(**i) for i in raw_students]
         assignment = get_assignment_data(
             course_id=request.session['course']['id'],
             assignment_id=request.session['assignment']['id'],
             user=request.user,
             page_token=request.query_params.get('next_page'),
-            student_id_to_name=request.session['student_id_to_name_mapping'],
+            student_data=student_data,
             diff_only=request.GET.get('diff') or False
         )
         return Response(GradingSessionSerializer(assignment).data)

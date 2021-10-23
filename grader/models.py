@@ -16,6 +16,7 @@
 from django.contrib.auth.models import User
 from django.db import models
 
+from .utils import normalize_protocol_url
 
 class CourseModel(models.Model):
     name = models.CharField(max_length=255)
@@ -71,6 +72,7 @@ class AssignmentSubmission(models.Model):
 
     # information about this assignment
     student_name = models.CharField(max_length=200)
+    _profile_photo_url = models.CharField(max_length=200, null=True)
     grade = models.IntegerField(blank=True, null=True)
 
     # TODO: rename to `content`?
@@ -79,3 +81,7 @@ class AssignmentSubmission(models.Model):
 
     def __str__(self):
         return self.student_name
+
+    @ property
+    def profile_photo_url(self):
+        return normalize_protocol_url(url=self._profile_photo_url)

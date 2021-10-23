@@ -33,7 +33,12 @@
           the cell when the cell is clicked on so that the user can edit the
           grades or comments in place if they wish
           {% endcomment %}
-          <td class="p-2 bg-gray-100 border border-gray-400">{{ submission.student_name }}</td>
+          <td class="p-2 bg-gray-100 border border-gray-400">
+            <img
+              class="inline w-10 h-10 border-2 border-green-100 rounded-full"
+              src="{{ submission.profile_photo_url }}" />
+            {{ submission.student_name }}
+          </td>
           <td class="p-2 bg-gray-100 border border-gray-400">{{ submission.grade }}</td>
           <td class="p-2 bg-gray-100 border border-gray-400">{{ submission.comment|default:'None' }}</td>
         </tr>
