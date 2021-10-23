@@ -441,7 +441,7 @@ def get_assignment_data(
                 # fields to update
                 'api_student_profile_id',
                 'student_name',
-                'profile_photo_url',
+                '_profile_photo_url',
                 'submission',
             )
         )
