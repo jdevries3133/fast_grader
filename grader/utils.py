@@ -13,17 +13,15 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+from typing import Union
 
-def normalize_protocol_url(*, url: str, protocol: str='https') -> str:
+
+def normalize_protocol_url(*, url: Union[None, str], protocol: str='https') -> str:
     """Protocol urls are urls that do not have the protocol at the beginning;
     i.e. `//foo.com/bar/baz`
 
     This function mormalizes these to use https by default, or whatever
     protocol is passed in."""
-
-    def is_protocol_url(url):
-        return url.startswith('//')
-
-    if is_protocol_url(url):
+    if url and url.startswith('//'):
         return f'{protocol}:{url}'
-    return url
+    return url or ''
