@@ -22,7 +22,6 @@ from django.test import TestCase
 from django.urls.base import reverse
 
 from ..services import CourseResource, CourseList
-from ..models import GradingSession
 
 
 class TestChooseCourseView(TestCase):

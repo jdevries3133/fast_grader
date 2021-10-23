@@ -23,7 +23,7 @@ from grader.models import GradingSession
 def profile(request):
     """This is where the user will be able to view and export previous grading
     sessions."""
-    qs = GradingSession.objects.filter(owner=request.user).prefetch_related('submissions')  # type: ignore
+    qs = GradingSession.objects.filter(course__owner=request.user).prefetch_related('submissions')  # type: ignore
     return render(request, 'account/profile.html', context={
         'sessions': qs
     })
