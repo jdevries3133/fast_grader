@@ -498,7 +498,7 @@ def get_assignment_data(
                 api_student_submission_id=sub['id'],
                 api_student_profile_id=sub['userId'],
                 student_name=name,
-                profile_photo_url=photo_url,
+                _profile_photo_url=photo_url,
                 submission=submission_string
             )
         )
