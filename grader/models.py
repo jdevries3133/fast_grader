@@ -18,7 +18,9 @@ from django.db import models
 
 from .utils import normalize_protocol_url
 
+
 class CourseModel(models.Model):
+    owner = models.ForeignKey(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=255)
     api_course_id = models.CharField(max_length=50, unique=True)
 
@@ -27,14 +29,13 @@ class CourseModel(models.Model):
 
 
 class GradingSession(models.Model):
-    owner = models.ForeignKey(User, on_delete=models.CASCADE)
     created = models.DateTimeField(auto_now_add=True)
 
     assignment_name = models.CharField(max_length=255)
     course = models.ForeignKey(
         CourseModel,
         related_name='grading_sessions',
-        on_delete=models.SET_NULL,
+        on_delete=models.CASCADE,
         null=True
     )
 
@@ -84,4 +85,4 @@ class AssignmentSubmission(models.Model):
 
     @ property
     def profile_photo_url(self):
-        return normalize_protocol_url(url=self._profile_photo_url)
+        return normalize_protocol_url(url=self._profile_photo_url)  # type: ignore

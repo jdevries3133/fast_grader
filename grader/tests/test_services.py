@@ -109,11 +109,11 @@ class TestGetAssignmentData(TestCase):
             password=self.password
         )
         self._course = CourseModel.objects.create(  # type: ignore
+            owner=self.user,
             name='foo course',
             api_course_id='1'
         )
         self.existing = GradingSession.objects.create(  # type: ignore
-            owner=self.user,
             assignment_name='foo assignment',
             course=self._course,
             api_assignment_id='1',
@@ -121,7 +121,6 @@ class TestGetAssignmentData(TestCase):
             teacher_template='',
         )
         self.existing__no_grade = GradingSession.objects.create(  # type: ignore
-            owner=self.user,
             assignment_name='foo assignment',
             course=self._course,
             api_assignment_id='2',
