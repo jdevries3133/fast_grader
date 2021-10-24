@@ -16,6 +16,20 @@
 from .base import *
 from .consume_secrets_file import *
 
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'fast_grader',
+        'USER': POSTGRESQL_USERNAME,
+        'PASSWORD': POSTGRESQL_PASSWORD,
+        'HOST': 'localhost',
+        'PORT': '5432',
+
+    }
+}
+
+
 NPM_BIN_PATH = '/usr/local/bin/npm'
 
 

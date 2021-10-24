@@ -38,7 +38,9 @@ def main():
     fields = (
         {'name': 'GOOGLE_CLIENT_ID', 'type': 'str'},
         {'name': 'GOOGLE_CLIENT_SECRET', 'type': 'str'},
-        {'name': 'GITHUB_AUTOMATED_CD_SECRET', 'type': 'bytes'}
+        {'name': 'GITHUB_AUTOMATED_CD_SECRET', 'type': 'bytes'},
+        {'name': 'POSTGRESQL_USERNAME', 'type': 'str'},
+        {'name': 'POSTGRESQL_PASSWORD', 'type': 'str'}
     )
     values = {
        f : {
