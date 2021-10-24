@@ -52,7 +52,7 @@
         </a>
         {% comment %}  Delete Session  {% endcomment %}
         <button
-          hx-get="{% url 'delete_session_modal_form' sub.pk %}"
+          hx-get="{% url 'delete_session' sub.pk %}"
           hx-swap="outerHTML"
           hx-target="#cardContainer__{{ sub.pk }}"
           class="p-2 bg-red-100 rounded shadow md:m-2 text-grey-800 hover:bg-red-200 active:ring-red-400 focus:ring-red-400">

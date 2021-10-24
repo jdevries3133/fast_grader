@@ -16,10 +16,9 @@
 from django.urls import path
 
 from .views import (
-    delete_session,
+    DeleteSession,
     flush_selections,
     grader,
-    get_delete_session_form,
     grading_tool,
     resume_grading,
     session_detail,
@@ -37,6 +36,5 @@ urlpatterns = [
     path('choose_course/', ChooseCourseView.as_view(), name='choose_course'),
     path('choose_assignment/', ChooseAssignmentView.as_view(), name='choose_assignment'),
     path('session/<int:pk>/', session_detail, name='session_detail'),
-    path('session/<int:pk>/delete/', delete_session, name='delete_session'),
-    path('session/<int:pk>/delete_form/', get_delete_session_form, name='delete_session_modal_form'),
+    path('session/<int:pk>/delete/', DeleteSession.as_view(), name='delete_session'),
 ]

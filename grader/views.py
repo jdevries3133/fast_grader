@@ -26,6 +26,7 @@ from django.urls import reverse
 from django.views import View
 from django.views.defaults import bad_request, page_not_found
 
+from rest_framework.decorators import api_view
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -184,6 +185,7 @@ class ChooseCourseView(View):
         ):
             if key in request.session:
                 del request.session[key]
+
 
 @ method_decorator(login_required, name='dispatch')
 class ChooseAssignmentView(View):
@@ -397,11 +399,16 @@ class AssessmentDataView(APIView):
         return Response(status=status.HTTP_200_OK)
 
 
+@ api_view(['GET'])
 def session_detail(request, pk):
     try:
         obj = GradingSession.objects.get(pk=pk)             # type: ignore
     except GradingSession.DoesNotExist:                     # type: ignore
         raise Http404('session does not exist') from None
+
+    if request.content_type == 'application/json':
+        serializer = GradingSessionSerializer(obj)
+        return Response({'session': serializer.data})
 
     return render(
         request,
@@ -410,29 +417,32 @@ def session_detail(request, pk):
     )
 
 
-def get_delete_session_form(request, pk):
-    try:
-        obj = GradingSession.objects.get(pk=pk)  # type: ignore
-    except GradingSession.DoesNotExist:  # type: ignore
-        raise Http404('session does not exist') from None
+class DeleteSession(View):
 
-    return render(
-        request,
-        'grader/partials/delete_session_form.html',
-        context={'session': obj}
-    )
+    def get(self, request, pk):
+        """Serve the modal form to confirm session deletion."""
+        try:
+            obj = GradingSession.objects.get(pk=pk)     # type: ignore
+        except GradingSession.DoesNotExist:             # type: ignore
+            raise Http404('session does not exist') from None
 
+        return render(
+            request,
+            'grader/partials/delete_session_form.html',
+            context={'session': obj}
+        )
 
-def delete_session(request, pk):
-    try:
-        obj = GradingSession.objects.get(pk=pk)  # type: ignore
-    except GradingSession.DoesNotExist:  # type: ignore
-        raise Http404('session does not exist') from None
+    def delete(self, request, pk):
+        """Posted upon reciept of the modal form."""
+        try:
+            obj = GradingSession.objects.get(pk=pk)  # type: ignore
+        except GradingSession.DoesNotExist:  # type: ignore
+            raise Http404('session does not exist') from None
 
-    context = {'assignment_name': obj.assignment_name}
-    obj.delete()
-    return render(
-        request,
-        'grader/partials/session_deleted.html',
-        context=context
-    )
+        context = {'assignment_name': obj.assignment_name}
+        obj.delete()
+        return render(
+            request,
+            'grader/partials/session_deleted.html',
+            context=context
+        )
