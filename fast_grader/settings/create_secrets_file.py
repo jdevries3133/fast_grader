@@ -43,7 +43,7 @@ def main():
         {'name': 'POSTGRESQL_PASSWORD', 'type': 'str'}
     )
     values = {
-       f : {
+       f['name'] : {
             'value': input(f'{f["name"]}: '),
             'type': f["type"]
        }
