@@ -32,6 +32,7 @@ urlpatterns = [
     path('accounts/', include('allauth.urls')),
     path('grader/', include('grader.urls')),
     path('ci_cd/', include('continuous_deployment.urls')),
+    path('ext/', include('extension_support.urls')),
     path('admin/', admin.site.urls),
 
     path('', StaticPageView.as_view(template_name='core/index.html'), name='home'),

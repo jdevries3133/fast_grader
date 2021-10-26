@@ -39,13 +39,15 @@ class GradingSession(models.Model):
         null=True
     )
 
-
     # only one session can exist for a given assignment. Users can resume
     # previous sessions, and submission data may need to be updated when
     # it is out of sync
     api_assignment_id = models.CharField(max_length=50, unique=True)
     max_grade = models.IntegerField(null=True)
     teacher_template = models.TextField(blank=True)
+
+    # sync information is consumed by the browser extension
+    last_synced = models.DateTimeField(null=True)
 
     @ property
     def is_graded(self) -> bool:

@@ -39,6 +39,23 @@ DEBUG = bool(os.getenv('DJANGO_DEBUG'))
 ALLOWED_HOSTS = ['classfast.app']
 
 
+CORS_ALLOW_ALL_ORIGINS = True
+
+CORS_ALLOW_HEADERS = [
+    "accept",
+    "accept-encoding",
+    "authorization",
+    "content-type",
+    "dnt",
+    "origin",
+    "user-agent",
+    "x-csrftoken",
+    "x-requested-with",
+    "hx-request",
+    "hx-current-url"
+]
+
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -64,6 +81,7 @@ INSTALLED_APPS = [
     'tailwind',
 
     'continuous_deployment',
+    'extension_support',
     'theme',
     'grader',
 
@@ -74,6 +92,7 @@ SITE_ID = 1
 
 
 MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware",
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',

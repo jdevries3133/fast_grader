@@ -1,0 +1,58 @@
+<html hx-ext="debug">
+  <head>
+  <script src="https://unpkg.com/htmx.org@1.5.0/dist/htmx.js"></script>
+  </head>
+  <body>
+<div>
+  <h3>Unsynced Grading Sessions</h3>
+  {% for session in unsynced_sessions %}
+    <div>
+      <div class="inline-flex flex-col">
+        <p class="text-sm text-gray-700">Assignment Name</p>
+        <p>{{ session.assignment_name }}</p>
+      </div>
+      <div class="inline">
+        <button
+          hx-target="body"
+          hx-get="{% url 'ext_session_detail' session.pk %}"
+          class="inline p-2 m-1 bg-yellow-100">
+            Details
+        </button>
+        <button
+          class="inline p-2 m-1 bg-green-100"
+          onclick="performSync({{ session.pk }})">
+            Sync Now
+        </button>
+      </div>
+    </div>
+  {% endfor %}
+</div>
+
+<div>
+  <h3>Synced Grading Sessions</h3>
+  {% for session in synced_sessions %}
+    <div class="inline-flex flex-col">
+      <p class="text-sm text-gray-700">Assignment Name</p>
+      <p>{{ session.assignment_name }}</p>
+    </div>
+    <div class="inline-flex flex-col">
+      <p class="text-sm text-gray-700">Last Synced Time</p>
+      <p>{{ session.last_synced }}</p>
+    </div>
+    <div class="inline">
+      <button
+        hx-target="#body"
+        hx-get="{% url 'ext_session_detail' session.pk %}"
+        class="inline p-2 m-1 bg-yellow-100">
+          Details
+      </button>
+      <button
+        class="inline p-2 m-1 bg-green-100"
+        onclick="performSync({{ session.pk }})">
+          Re-Sync Now
+      </button>
+    </div>
+  {% endfor %}
+</div>
+  </body>
+</html>
