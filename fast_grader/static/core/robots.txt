@@ -1,5 +1,6 @@
 User-agent: *
 
 Disallow: /admin
+Disallow: /accounts
 
 Sitemap: https://classfast.app/sitemap.xml

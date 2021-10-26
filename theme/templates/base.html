@@ -5,7 +5,17 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+
+    <link rel="apple-touch-icon" sizes="180x180" href="{% static 'core/apple-touch-icon.png' %}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{% static 'core/favicon-32x32.png' %}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{% static 'core/favicon-16x16.png' %}">
+    <link rel="icon" href="{% static 'core/favicon.ico' %}" type="image/x-icon" />
+
+    <link rel="manifest" href="{% static 'core/web.manifest' %}">
+    <meta name="theme-color" content="#ffffff">
+
     <meta name="robots" content="index, follow">
+
     <meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{% static 'landing_page/diff_view.png' %}" />
     <meta property="og:title" content="fast grader for Google Classroom" />
     <meta name="description" content="The fastest tool for Google Classroom grading" />
