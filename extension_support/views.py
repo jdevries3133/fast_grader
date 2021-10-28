@@ -23,7 +23,8 @@ from grader.models import GradingSession
 def home(request):
     if request.user.is_authenticated:
         return redirect('ext_sessions_list')
-    return render(request, 'ext/home.html')
+    response = render(request, 'ext/home.html')
+    return response
 
 
 @ login_required

@@ -28,13 +28,24 @@ sitemaps = {
 
 
 urlpatterns = [
+    # putting our accounts first causes it to override the default allauth
+    # views where needed
     path('accounts/', include('accounts.urls')),
+
+    # third party views
     path('accounts/', include('allauth.urls')),
+    path('dj-rest-auth/', include('dj_rest_auth.urls')),
+    path(
+        'dj-rest-auth/registration/',
+        include('dj_rest_auth.registration.urls')
+    ),
+
     path('grader/', include('grader.urls')),
     path('ci_cd/', include('continuous_deployment.urls')),
     path('ext/', include('extension_support.urls')),
     path('admin/', admin.site.urls),
 
+    # static-ish pages that are core to this site
     path('', StaticPageView.as_view(template_name='core/index.html'), name='home'),
     path('help/', StaticPageView.as_view(template_name='core/help.html'), name='help'),
     path('about/', StaticPageView.as_view(template_name='core/about.html'), name='about'),

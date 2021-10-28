@@ -52,7 +52,25 @@ CORS_ALLOW_HEADERS = [
     "x-csrftoken",
     "x-requested-with",
     "hx-request",
-    "hx-current-url"
+    "hx-current-url",
+    "hx-trigger",
+    'hx-boosted',
+    'hx-current-url',
+    'hx-history-restore-request',
+    'hx-prompt',
+    'hx-request',
+    'hx-target',
+    'hx-trigger-name',
+    'hx-trigger',
+]
+
+CORS_EXPOSE_HEADERS = [
+    'hx-push',
+    'hx-redirect',
+    'hx-refresh',
+    'hx-trigger',
+    'hx-trigger-after-settle',
+    'hx-trigger-after-swap',
 ]
 
 
@@ -77,7 +95,10 @@ INSTALLED_APPS = [
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
     'corsheaders',
+    'dj_rest_auth',
+    'dj_rest_auth.registration',
     'rest_framework',
+    'rest_framework.authtoken',
     'tailwind',
 
     'continuous_deployment',
@@ -122,6 +143,9 @@ TEMPLATES = [
                 'fast_grader.template_context.debug_context',
                 'fast_grader.template_context.logrocket_context',
             ],
+            'libraries': {
+                'abs_url': 'extension_support.templatetags'
+            }
         },
     },
 ]

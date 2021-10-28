@@ -1,11 +1,13 @@
 {% load account socialaccount %}
 {% load static %}
+{% load abs_url %}
 
 <h1>Welcome!</h1>
 
-<div hx-get="{% provider_login_url 'google' %}">
+<div>
   <h3>Login with Google</h3>
   <img
+    id="loginButton"
     class="w-40 m-auto"
-    src="{% static 'account/google_signin/vector/btn_google_light_normal_ios.svg' %}" />
+    src="{{request.scheme}}://{{request.META.HTTP_HOST}}{% static 'account/google_signin/vector/btn_google_light_normal_ios.svg' %}" />
 </div>

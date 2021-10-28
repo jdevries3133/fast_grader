@@ -15,9 +15,10 @@
 
 from django.urls import path
 
-from .views import profile
+from .views import profile, GoogleLogin
 
 
 urlpatterns = [
-    path('profile/', profile, name='profile')
+    path('profile/', profile, name='profile'),
+    path('dj_rest_auth/google/', GoogleLogin.as_view(), name='google_api_login')
 ]

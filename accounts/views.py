@@ -15,6 +15,8 @@
 
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
+from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
+from dj_rest_auth.registration.views import SocialLoginView
 
 from grader.models import GradingSession
 
@@ -27,3 +29,7 @@ def profile(request):
     return render(request, 'account/profile.html', context={
         'sessions': qs
     })
+
+
+class GoogleLogin(SocialLoginView):
+    adapter_class = GoogleOAuth2Adapter

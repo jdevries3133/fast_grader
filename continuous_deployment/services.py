@@ -73,6 +73,11 @@ def generate_staticfiles() -> bool:
     logger.debug('making staticfiles')
     try:
         _run_and_log(
+            ['./venv/bin/python3', 'manage.py', 'tailwind', 'install'],
+           cwd=base_dir,
+           check=True
+        )
+        _run_and_log(
             ['./venv/bin/python3', 'manage.py', 'tailwind', 'build'],
            cwd=base_dir,
            check=True
