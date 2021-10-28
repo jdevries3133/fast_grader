@@ -16,15 +16,17 @@
 from django.http.response import Http404
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
 
 from grader.models import GradingSession
 
 
+@ api_view(['GET'])
 def home(request):
     if request.user.is_authenticated:
-        return redirect('ext_sessions_list')
-    response = render(request, 'ext/home.html')
-    return response
+        return redirect('ext_list_sessions')
+    return Response({}, template_name='ext/home.html')
 
 
 @ login_required
