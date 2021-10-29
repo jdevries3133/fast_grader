@@ -20,24 +20,16 @@ from ..utils import normalize_protocol_url
 
 
 class TestNormalizeProtocolUrl(TestCase):
-
     def test_normalize_protocol_url(self):
         for input_, output in (
             # normalizes None to an empty string
-            ({'url': None}, ''),
+            ({"url": None}, ""),
             # typical usage
-            ({'url': '//foo.com/bar'}, 'https://foo.com/bar'),
-            ({'url': '//foo.com/bar/', 'protocol': 'ftp'}, 'ftp://foo.com/bar/'),
-
+            ({"url": "//foo.com/bar"}, "https://foo.com/bar"),
+            ({"url": "//foo.com/bar/", "protocol": "ftp"}, "ftp://foo.com/bar/"),
             # does not validate domain or protocol
-            ({'url': '//foo/bar/baz', 'protocol': 'hello' },
-             'hello://foo/bar/baz'),
-
+            ({"url": "//foo/bar/baz", "protocol": "hello"}, "hello://foo/bar/baz"),
             # does not touch protocol if there already is one
-                ({'url': 'ftp://foo.com/bar', 'protocol': 'https' },
-                 'ftp://foo.com/bar')
+            ({"url": "ftp://foo.com/bar", "protocol": "https"}, "ftp://foo.com/bar"),
         ):
-            self.assertEqual(
-                normalize_protocol_url(**input_),  # type: ignore
-                output
-            )
+            self.assertEqual(normalize_protocol_url(**input_), output)  # type: ignore

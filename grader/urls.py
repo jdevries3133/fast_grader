@@ -28,13 +28,15 @@ from .views import (
 )
 
 urlpatterns = [
-    path('', grader, name='grader'),
-    path('<int:pk>/', resume_grading, name='resume_grading'),
-    path('flush_selections/', flush_selections, name='flush_selections'),
-    path('tool/', grading_tool, name='grading_tool'),
-    path('assignment_data/', AssessmentDataView.as_view(), name='assignment_data'),
-    path('choose_course/', ChooseCourseView.as_view(), name='choose_course'),
-    path('choose_assignment/', ChooseAssignmentView.as_view(), name='choose_assignment'),
-    path('session/<int:pk>/', session_detail, name='session_detail'),
-    path('session/<int:pk>/delete/', DeleteSession.as_view(), name='delete_session'),
+    path("", grader, name="grader"),
+    path("<int:pk>/", resume_grading, name="resume_grading"),
+    path("flush_selections/", flush_selections, name="flush_selections"),
+    path("tool/", grading_tool, name="grading_tool"),
+    path("assignment_data/", AssessmentDataView.as_view(), name="assignment_data"),
+    path("choose_course/", ChooseCourseView.as_view(), name="choose_course"),
+    path(
+        "choose_assignment/", ChooseAssignmentView.as_view(), name="choose_assignment"
+    ),
+    path("session/<int:pk>/", session_detail, name="session_detail"),
+    path("session/<int:pk>/delete/", DeleteSession.as_view(), name="delete_session"),
 ]

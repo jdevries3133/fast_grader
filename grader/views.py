@@ -50,54 +50,53 @@ from .serializers import AssignmentSubmissionSerializer, GradingSessionSerialize
 logger = logging.getLogger(__name__)
 
 
-@ login_required
+@login_required
 def grader(request):
     """This template is basically just a wireframe that includes a bunch
     of dynamic htmx components, defined in the views below."""
-    return render(request, 'grader/main.html')
+    return render(request, "grader/main.html")
 
 
-@ login_required
+@login_required
 def resume_grading(request, pk):
     """Setup the request session so that we can resume a previous grading
     session."""
     try:
         obj = GradingSession.objects.get(pk=pk)  # type: ignore
     except GradingSession.DoesNotExist:  # type: ignore
-        raise Http404('grading session does not exist')
+        raise Http404("grading session does not exist")
 
-    request.session['course'] = {'id': obj.course.api_course_id, 'name': obj.course.name}  # type: ignore
-    request.session['assignment'] = {
-        'id': obj.api_assignment_id,
-        'name': obj.assignment_name
+    request.session["course"] = {"id": obj.course.api_course_id, "name": obj.course.name}  # type: ignore
+    request.session["assignment"] = {
+        "id": obj.api_assignment_id,
+        "name": obj.assignment_name,
     }
     return grader(request)
 
 
-@ login_required
+@login_required
 def flush_selections(request):
     for session_mutating_class in (ChooseCourseView, ChooseAssignmentView):
         session_mutating_class.flush_session(request)
     request.session.save()
-    return redirect(reverse('grader'))
+    return redirect(reverse("grader"))
 
 
-@ login_required
+@login_required
 def grading_tool(request):
     """The main grading tool, which will be fetched after the two setup flows
     below have been completed."""
     return render(
         request,
-        'grader/partials/tool.html',
+        "grader/partials/tool.html",
         context={
-            'course': request.session['course'],
-            'assignment': request.session['assignment'],
-        }
+            "course": request.session["course"],
+            "assignment": request.session["assignment"],
+        },
     )
 
 
-
-@ method_decorator(login_required, name='dispatch')
+@method_decorator(login_required, name="dispatch")
 class ChooseCourseView(View):
     """Flow of htmx partials that leads to request.session['course'] being set.
 
@@ -133,61 +132,58 @@ class ChooseCourseView(View):
 
     def dispatch(self, request, *a, **kw):
         """Early exit if the course choice was already made."""
-        if request.session.get('course') is not None:
+        if request.session.get("course") is not None:
             return self._course_choice_made(request)
         return super().dispatch(request, *a, **kw)
 
     def get(self, request):
         """Return the form to set the course if it is not already set.
         Otherwise, return the _course_choice_made view."""
-        page_token = request.GET.get('next')
+        page_token = request.GET.get("next")
         classes = list_all_class_names(user=request.user, page_token=page_token)
 
-        request.session['_id_to_course_name_mapping'] = {
-            c.id_ : c.name for c in classes.classes
+        request.session["_id_to_course_name_mapping"] = {
+            c.id_: c.name for c in classes.classes
         }
-        context = {'classes': classes}
+        context = {"classes": classes}
 
-        return render(request, 'grader/partials/choose_course.html', context=context)
+        return render(request, "grader/partials/choose_course.html", context=context)
 
     def post(self, request):
         """Recieve user selection from post request data, and then return the
         _course_choice_made view."""
-        choice_id = request.POST.get('choice')
+        choice_id = request.POST.get("choice")
 
-        if not (mapping := request.session.get('_id_to_course_name_mapping')):
-            msg =  'Post request sent before form was acquired via get request'
+        if not (mapping := request.session.get("_id_to_course_name_mapping")):
+            msg = "Post request sent before form was acquired via get request"
             return bad_request(request, msg)
 
         choice_name = mapping.get(choice_id)
         if not choice_name:
-            return page_not_found(request, 'Course does not exist in course names')
+            return page_not_found(request, "Course does not exist in course names")
 
-        request.session['course'] = {'id': choice_id, 'name': choice_name}
+        request.session["course"] = {"id": choice_id, "name": choice_name}
 
         return self._course_choice_made(request)
 
-    @ staticmethod
+    @staticmethod
     def _course_choice_made(request):
         """Simple view of the already-made choice of course."""
         return render(
             request,
-            'grader/partials/course_choice_made.html',
-            context={'course': request.session['course']}
+            "grader/partials/course_choice_made.html",
+            context={"course": request.session["course"]},
         )
 
-    @ staticmethod
+    @staticmethod
     def flush_session(request):
         """Restore the request session state."""
-        for key in (
-            '_id_to_course_name_mapping',
-            'course'
-        ):
+        for key in ("_id_to_course_name_mapping", "course"):
             if key in request.session:
                 del request.session[key]
 
 
-@ method_decorator(login_required, name='dispatch')
+@method_decorator(login_required, name="dispatch")
 class ChooseAssignmentView(View):
     """Flow of htmx partials that leads to request.session['assignment']
     being set.
@@ -219,71 +215,67 @@ class ChooseAssignmentView(View):
         request.
     """
 
-
     def dispatch(self, *a, **kw):
 
         # 1. We make sure that session['course'] is already set, because the
         #    flow through the above view should be complete
-        if self.request.session.get('course') is None:
-            msg = (
-                'Cannot attempt to choose assignment before course choice '
-                'is made.'
-            )
+        if self.request.session.get("course") is None:
+            msg = "Cannot attempt to choose assignment before course choice " "is made."
             logger.error(msg)
             return bad_request(self.request, msg)
 
         # 2. quick exit if the assgt is already chosen
-        if self.request.session.get('assignment') is not None:
+        if self.request.session.get("assignment") is not None:
             return self._choice_made()
 
         return super().dispatch(*a, **kw)
 
     def get(self, request):
         # fetch data and update _id_to_assignment_name_mapping
-        page_token = request.GET.get('next')
+        page_token = request.GET.get("next")
         next_page_token = self.update_mapping(page_token)
 
         # assemble context
         context = {
-            'assignments': self.request.session['_id_to_assignment_name_mapping']
+            "assignments": self.request.session["_id_to_assignment_name_mapping"]
         }
         if next_page_token is not None:
-            context['next_page_token'] = next_page_token
+            context["next_page_token"] = next_page_token
 
         # return the assignment choice form
         return render(
-            request,
-            'grader/partials/choose_assignment.html',
-            context=context
+            request, "grader/partials/choose_assignment.html", context=context
         )
 
     def post(self, request):
-        if not (mapping := request.session.get('_id_to_assignment_name_mapping')):
+        if not (mapping := request.session.get("_id_to_assignment_name_mapping")):
             self.update_mapping()
 
         assignment_choice = {
-            'id':   (_id := request.POST.get('choice')),
-            'name': mapping[_id]
+            "id": (_id := request.POST.get("choice")),
+            "name": mapping[_id],
         }
 
-        request.session['assignment'] = assignment_choice
+        request.session["assignment"] = assignment_choice
         return self._choice_made()
 
     def update_mapping(self, page_token=None):
         """Mapping of the course's assignment names to their ids.
 
         Returns the next page token to allow for further updates"""
-        self.request.session.setdefault('_id_to_assignment_name_mapping', {})
+        self.request.session.setdefault("_id_to_assignment_name_mapping", {})
         result = list_all_assignment_names(
             user=self.request.user,
             course=CourseResource(
-                self.request.session['course']['id'],
-                self.request.session['course']['name'],
+                self.request.session["course"]["id"],
+                self.request.session["course"]["name"],
             ),
-            page_token=page_token
+            page_token=page_token,
         )
         for a in result.assignments:
-            self.request.session['_id_to_assignment_name_mapping'].setdefault(a.id_, a.name)
+            self.request.session["_id_to_assignment_name_mapping"].setdefault(
+                a.id_, a.name
+            )
         # see "gotcha" condition: https://docs.djangoproject.com/en/3.2/topics/http/sessions/#when-sessions-are-saved
         self.request.session.modified = True
 
@@ -294,36 +286,29 @@ class ChooseAssignmentView(View):
         their coursework, but the names are not included. When that happens,
         we need to be able to lookup the names by id."""
         names = get_student_data(
-            user=self.request.user,
-            course_id=self.request.session['course']['id']
+            user=self.request.user, course_id=self.request.session["course"]["id"]
         )
-        self.request.session['student_data'] = [
-            dataclasses.asdict(n) for n in names
-        ]
+        self.request.session["student_data"] = [dataclasses.asdict(n) for n in names]
 
     def _choice_made(self):
         # after the choice is made, we can get the students' names
-        if self.request.session.get('student_data') is None:
+        if self.request.session.get("student_data") is None:
             self.save_student_data_to_session()
-        response =  render(
+        response = render(
             self.request,
-            'grader/partials/assignment_choice_made.html',
-            context=self.request.session['assignment'],
+            "grader/partials/assignment_choice_made.html",
+            context=self.request.session["assignment"],
         )
         # after the choice is made, we can send a signal to the frontend to
         # initialize the grading tool
-        response['Hx-Trigger'] = 'startGrader'
+        response["Hx-Trigger"] = "startGrader"
         return response
 
-    @ staticmethod
+    @staticmethod
     def flush_session(request):
         """Restore request session to the initial state before interacting
         with this."""
-        for key in (
-            '_id_to_assignment_name_mapping',
-            'assignment',
-            'student_data'
-        ):
+        for key in ("_id_to_assignment_name_mapping", "assignment", "student_data"):
             if key in request.session:
                 del request.session[key]
 
@@ -336,62 +321,58 @@ class AssessmentDataView(APIView):
 
     def dispatch(self, request, *a, **kw):
         if (
-            request.session.get('course') is None
-            or request.session.get('assignment') is None
+            request.session.get("course") is None
+            or request.session.get("assignment") is None
         ):
             data = {
-                'msg': ('Course and assignment must be selected before '
-                        'assignment data can be manipulated.')
+                "msg": (
+                    "Course and assignment must be selected before "
+                    "assignment data can be manipulated."
+                )
             }
-            res = HttpResponse(json.dumps(data), content_type='application/json')
+            res = HttpResponse(json.dumps(data), content_type="application/json")
             res.status_code = 400
             return res
         return super().dispatch(request, *a, **kw)
 
     def get(self, request):
-        raw_students = request.session['student_data']
+        raw_students = request.session["student_data"]
         student_data = [StudentResource(**i) for i in raw_students]
         assignment = get_assignment_data(
-            course_id=request.session['course']['id'],
-            assignment_id=request.session['assignment']['id'],
+            course_id=request.session["course"]["id"],
+            assignment_id=request.session["assignment"]["id"],
             user=request.user,
-            page_token=request.query_params.get('next_page'),
+            page_token=request.query_params.get("next_page"),
             student_data=student_data,
-            diff_only=request.GET.get('diff') or False
+            diff_only=request.GET.get("diff") or False,
         )
         return Response(GradingSessionSerializer(assignment).data)
 
     def patch(self, request):
         """This is just hacked together rather than a proper nested serializer
         or viewset. Rewrite after deployment of an MVP."""
-        pk = request.data.get('pk', '')
-        submissions = request.data.pop('submissions', [])
+        pk = request.data.get("pk", "")
+        submissions = request.data.pop("submissions", [])
         # update session
         try:
             update = GradingSession.objects.get(pk=pk)  # type: ignore
         except GradingSession.DoesNotExist:  # type: ignore
             return Response(
-                {'message': f'assignment with id of {pk} not found'},
-                status=status.HTTP_404_NOT_FOUND
+                {"message": f"assignment with id of {pk} not found"},
+                status=status.HTTP_404_NOT_FOUND,
             )
         serializer = GradingSessionSerializer(update, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
         serializer.save()
         for s in submissions:
             try:
-                update = AssignmentSubmission.objects.get(pk=s['pk'])  # type: ignore
+                update = AssignmentSubmission.objects.get(pk=s["pk"])  # type: ignore
             except AssignmentSubmission.DoesNotExist:  # type: ignore
                 return Response(
-                    {'message': (
-                        f'student submission with id of {pk} not found'
-                    )},
-                    status=status.HTTP_404_NOT_FOUND
+                    {"message": (f"student submission with id of {pk} not found")},
+                    status=status.HTTP_404_NOT_FOUND,
                 )
-            cereal = AssignmentSubmissionSerializer(
-                update,
-                data=s,
-                partial=True
-            )
+            cereal = AssignmentSubmissionSerializer(update, data=s, partial=True)
             cereal.is_valid(raise_exception=True)
             cereal.save()
 
@@ -399,37 +380,32 @@ class AssessmentDataView(APIView):
         return Response(status=status.HTTP_200_OK)
 
 
-@ api_view(['GET'])
+@api_view(["GET"])
 def session_detail(request, pk):
     try:
-        obj = GradingSession.objects.get(pk=pk)             # type: ignore
-    except GradingSession.DoesNotExist:                     # type: ignore
-        raise Http404('session does not exist') from None
+        obj = GradingSession.objects.get(pk=pk)  # type: ignore
+    except GradingSession.DoesNotExist:  # type: ignore
+        raise Http404("session does not exist") from None
 
-    if request.content_type == 'application/json':
+    if request.content_type == "application/json":
         serializer = GradingSessionSerializer(obj)
-        return Response({'session': serializer.data})
+        return Response({"session": serializer.data})
 
-    return render(
-        request,
-        'grader/session_detail.html',
-        context={'session': obj}
-    )
+    return render(request, "grader/session_detail.html", context={"session": obj})
 
 
 class DeleteSession(View):
-
     def get(self, request, pk):
         """Serve the modal form to confirm session deletion."""
         try:
-            obj = GradingSession.objects.get(pk=pk)     # type: ignore
-        except GradingSession.DoesNotExist:             # type: ignore
-            raise Http404('session does not exist') from None
+            obj = GradingSession.objects.get(pk=pk)  # type: ignore
+        except GradingSession.DoesNotExist:  # type: ignore
+            raise Http404("session does not exist") from None
 
         return render(
             request,
-            'grader/partials/delete_session_form.html',
-            context={'session': obj}
+            "grader/partials/delete_session_form.html",
+            context={"session": obj},
         )
 
     def delete(self, request, pk):
@@ -437,12 +413,8 @@ class DeleteSession(View):
         try:
             obj = GradingSession.objects.get(pk=pk)  # type: ignore
         except GradingSession.DoesNotExist:  # type: ignore
-            raise Http404('session does not exist') from None
+            raise Http404("session does not exist") from None
 
-        context = {'assignment_name': obj.assignment_name}
+        context = {"assignment_name": obj.assignment_name}
         obj.delete()
-        return render(
-            request,
-            'grader/partials/session_deleted.html',
-            context=context
-        )
+        return render(request, "grader/partials/session_deleted.html", context=context)

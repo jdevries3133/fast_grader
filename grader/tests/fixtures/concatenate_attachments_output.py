@@ -34,4 +34,3 @@ OUTPUT = ConcatOutput(
         ),
     ]
 )
-

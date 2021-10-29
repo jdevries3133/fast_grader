@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('grader', '0005_auto_20211023_2210'),
+        ("grader", "0005_auto_20211023_2210"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='gradingsession',
-            name='last_synced',
+            model_name="gradingsession",
+            name="last_synced",
             field=models.DateTimeField(null=True),
         ),
     ]

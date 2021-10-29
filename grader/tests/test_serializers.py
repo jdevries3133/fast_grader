@@ -22,7 +22,6 @@ from grader.serializers import AssignmentSubmissionSerializer, GradingSessionSer
 
 
 class TestAssignmentSubmissionSerializer(TestCase):
-
     def setUp(self):
         self.mock = MagicMock()
         self.instance = AssignmentSubmissionSerializer()
@@ -30,24 +29,23 @@ class TestAssignmentSubmissionSerializer(TestCase):
     def test_to_representation(self):
         """Submission should be represented as a list of strings"""
         # setup
-        self.mock.submission.__str__.return_value = 'foo\nbar'
+        self.mock.submission.__str__.return_value = "foo\nbar"
         # action
         result = self.instance.to_representation(self.mock)
         # assertion
-        self.assertEqual(result['submission'], ['foo', 'bar'])
+        self.assertEqual(result["submission"], ["foo", "bar"])
 
     def test_validate_submission_joins_lists(self):
-        result = self.instance.validate_submission(['join', 'lists'])
-        self.assertEqual(result, 'join\nlists')
+        result = self.instance.validate_submission(["join", "lists"])
+        self.assertEqual(result, "join\nlists")
 
     def test_validate_submission_passes_through_strings(self):
-        result = self.instance.validate_submission('passthrough\nstring')
-        self.assertEqual(result, 'passthrough\nstring')
+        result = self.instance.validate_submission("passthrough\nstring")
+        self.assertEqual(result, "passthrough\nstring")
 
     def test_validate_submission_validates_type_and_handles_TypeError(self):
         # validate type
         with self.assertRaisesMessage(  # type: ignore
-            ValidationError,
-            'sequence item 1: expected str instance, int found'
+            ValidationError, "sequence item 1: expected str instance, int found"
         ):
-            self.instance.validate_submission(['foo', 1])
+            self.instance.validate_submission(["foo", 1])

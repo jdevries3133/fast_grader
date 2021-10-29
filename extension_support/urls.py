@@ -18,8 +18,7 @@ from django.urls import path
 from .views import sessions_list, session_detail, home
 
 urlpatterns = [
-    path('', home, name="ext_home"),
-    path('session/', sessions_list, name='ext_list_sessions'),
-    path('session/<int:pk>/', session_detail, name='ext_session_detail')
+    path("", home, name="ext_home"),
+    path("session/", sessions_list, name="ext_list_sessions"),
+    path("session/<int:pk>/", session_detail, name="ext_session_detail"),
 ]
-

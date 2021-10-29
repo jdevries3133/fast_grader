@@ -21,12 +21,14 @@ from django.urls import reverse
 
 
 class SmokeTest(LiveServerTestCase):
-
     def test_smoke(self):
         for route in (
-            'home', 'help', 'about', 'privacy_policy', 'terms_of_service',
-            'django.contrib.sitemaps.views.sitemap'
+            "home",
+            "help",
+            "about",
+            "privacy_policy",
+            "terms_of_service",
+            "django.contrib.sitemaps.views.sitemap",
         ):
             response = self.client.get(reverse(route))
             self.assertEqual(response.status_code, 200)  # type: ignore
-

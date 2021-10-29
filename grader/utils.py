@@ -16,12 +16,12 @@
 from typing import Union
 
 
-def normalize_protocol_url(*, url: Union[None, str], protocol: str='https') -> str:
+def normalize_protocol_url(*, url: Union[None, str], protocol: str = "https") -> str:
     """Protocol urls are urls that do not have the protocol at the beginning;
     i.e. `//foo.com/bar/baz`
 
     This function mormalizes these to use https by default, or whatever
     protocol is passed in."""
-    if url and url.startswith('//'):
-        return f'{protocol}:{url}'
-    return url or ''
+    if url and url.startswith("//"):
+        return f"{protocol}:{url}"
+    return url or ""

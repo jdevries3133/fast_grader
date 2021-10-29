@@ -19,6 +19,6 @@ from .views import profile, GoogleLogin
 
 
 urlpatterns = [
-    path('profile/', profile, name='profile'),
-    path('dj_rest_auth/google/', GoogleLogin.as_view(), name='google_api_login')
+    path("profile/", profile, name="profile"),
+    path("dj_rest_auth/google/", GoogleLogin.as_view(), name="google_api_login"),
 ]

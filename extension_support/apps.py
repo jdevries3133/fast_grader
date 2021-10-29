@@ -17,5 +17,5 @@ from django.apps import AppConfig
 
 
 class ExtensionSupportConfig(AppConfig):
-    default_auto_field = 'django.db.models.BigAutoField'
-    name = 'extension_support'
+    default_auto_field = "django.db.models.BigAutoField"
+    name = "extension_support"

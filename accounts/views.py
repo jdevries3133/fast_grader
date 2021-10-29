@@ -21,14 +21,12 @@ from dj_rest_auth.registration.views import SocialLoginView
 from grader.models import GradingSession
 
 
-@ login_required
+@login_required
 def profile(request):
     """This is where the user will be able to view and export previous grading
     sessions."""
-    qs = GradingSession.objects.filter(course__owner=request.user).prefetch_related('submissions')  # type: ignore
-    return render(request, 'account/profile.html', context={
-        'sessions': qs
-    })
+    qs = GradingSession.objects.filter(course__owner=request.user).prefetch_related("submissions")  # type: ignore
+    return render(request, "account/profile.html", context={"sessions": qs})
 
 
 class GoogleLogin(SocialLoginView):

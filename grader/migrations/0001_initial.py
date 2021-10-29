@@ -15,37 +15,82 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
-            name='CourseModel',
+            name="CourseModel",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=255)),
-                ('api_course_id', models.CharField(max_length=50, unique=True)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=255)),
+                ("api_course_id", models.CharField(max_length=50, unique=True)),
             ],
         ),
         migrations.CreateModel(
-            name='GradingSession',
+            name="GradingSession",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('created', models.DateTimeField(auto_now_add=True)),
-                ('assignment_name', models.CharField(max_length=255)),
-                ('api_assignment_id', models.CharField(max_length=50, unique=True)),
-                ('max_grade', models.IntegerField()),
-                ('teacher_template', models.TextField(blank=True)),
-                ('course', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='grading_sessions', to='grader.coursemodel')),
-                ('owner', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("created", models.DateTimeField(auto_now_add=True)),
+                ("assignment_name", models.CharField(max_length=255)),
+                ("api_assignment_id", models.CharField(max_length=50, unique=True)),
+                ("max_grade", models.IntegerField()),
+                ("teacher_template", models.TextField(blank=True)),
+                (
+                    "course",
+                    models.ForeignKey(
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="grading_sessions",
+                        to="grader.coursemodel",
+                    ),
+                ),
+                (
+                    "owner",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='AssignmentSubmission',
+            name="AssignmentSubmission",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('api_student_profile_id', models.CharField(max_length=50)),
-                ('api_student_submission_id', models.CharField(max_length=50)),
-                ('student_name', models.CharField(max_length=200)),
-                ('grade', models.IntegerField(blank=True, null=True)),
-                ('submission', models.TextField(blank=True)),
-                ('comment', models.TextField(blank=True)),
-                ('assignment', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='submissions', to='grader.gradingsession')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("api_student_profile_id", models.CharField(max_length=50)),
+                ("api_student_submission_id", models.CharField(max_length=50)),
+                ("student_name", models.CharField(max_length=200)),
+                ("grade", models.IntegerField(blank=True, null=True)),
+                ("submission", models.TextField(blank=True)),
+                ("comment", models.TextField(blank=True)),
+                (
+                    "assignment",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="submissions",
+                        to="grader.gradingsession",
+                    ),
+                ),
             ],
         ),
     ]

@@ -26,8 +26,8 @@ class StaticPageView(TemplateView):
         """Set `enable_logrocket` to True in template context."""
 
         if isinstance(self.extra_context, dict):
-            self.extra_context['enable_logrocket'] = False
+            self.extra_context["enable_logrocket"] = False
         else:
-            self.extra_context = {'enable_logrocket': False}
+            self.extra_context = {"enable_logrocket": False}
 
         return super().get_context_data(*a, **kw)

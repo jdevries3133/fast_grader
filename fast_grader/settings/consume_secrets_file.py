@@ -22,11 +22,12 @@ prompt if the secrets file does not exist.
 import os
 
 
-if os.getenv('DJANGO_DEBUG'):
+if os.getenv("DJANGO_DEBUG"):
     try:
         from . import secrets  # type: ignore
     except ImportError:
         from .create_secrets_file import main as create_secrets
+
         print("Your secrets file does not exist yet. Let's set it up now.")
         create_secrets()
         from . import secrets  # type: ignore
@@ -38,26 +39,26 @@ else:
 SECRET_KEY = secrets.SECRET_KEY
 
 SOCIALACCOUNT_PROVIDERS = {
-    'google': {
-        'APP': {
-            'client_id': secrets.GOOGLE_CLIENT_ID,
-            'secret': secrets.GOOGLE_CLIENT_SECRET,
-            'key': ''
+    "google": {
+        "APP": {
+            "client_id": secrets.GOOGLE_CLIENT_ID,
+            "secret": secrets.GOOGLE_CLIENT_SECRET,
+            "key": "",
         },
-        'AUTH_PARAMS': {
-            'access_type': 'offline',
+        "AUTH_PARAMS": {
+            "access_type": "offline",
         },
-        'SCOPE': [
-            'email',
-            'profile',
-            'https://www.googleapis.com/auth/classroom.coursework.students.readonly',
-            'https://www.googleapis.com/auth/classroom.courses.readonly',
-            'https://www.googleapis.com/auth/classroom.courseworkmaterials.readonly',
-            'https://www.googleapis.com/auth/classroom.student-submissions.students.readonly',
-            'https://www.googleapis.com/auth/classroom.rosters.readonly',
-            'https://www.googleapis.com/auth/classroom.profile.photos',
-            'https://www.googleapis.com/auth/drive.readonly'
-        ]
+        "SCOPE": [
+            "email",
+            "profile",
+            "https://www.googleapis.com/auth/classroom.coursework.students.readonly",
+            "https://www.googleapis.com/auth/classroom.courses.readonly",
+            "https://www.googleapis.com/auth/classroom.courseworkmaterials.readonly",
+            "https://www.googleapis.com/auth/classroom.student-submissions.students.readonly",
+            "https://www.googleapis.com/auth/classroom.rosters.readonly",
+            "https://www.googleapis.com/auth/classroom.profile.photos",
+            "https://www.googleapis.com/auth/drive.readonly",
+        ],
     }
 }
 

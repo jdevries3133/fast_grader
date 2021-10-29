@@ -23,34 +23,30 @@ from django.core.management.utils import get_random_secret_key
 
 
 def create_secrets_file(values: dict):
-    with open(Path(Path(__file__).parent, 'secrets.py'), 'w') as f:
+    with open(Path(Path(__file__).parent, "secrets.py"), "w") as f:
         f.write(f"SECRET_KEY = '{get_random_secret_key()}'\n")
         for field_name, field_content in values.items():
-            value = field_content['value']
-            type_ = field_content['type']
-            if type_ == 'str':
+            value = field_content["value"]
+            type_ = field_content["type"]
+            if type_ == "str":
                 f.write(f"{field_name} = '{value}'\n")
-            elif type_ == 'bytes':
+            elif type_ == "bytes":
                 f.write(f"{field_name} = b'{value}'\n")
 
 
 def main():
     fields = (
-        {'name': 'GOOGLE_CLIENT_ID', 'type': 'str'},
-        {'name': 'GOOGLE_CLIENT_SECRET', 'type': 'str'},
-        {'name': 'GITHUB_AUTOMATED_CD_SECRET', 'type': 'bytes'},
-        {'name': 'POSTGRESQL_USERNAME', 'type': 'str'},
-        {'name': 'POSTGRESQL_PASSWORD', 'type': 'str'}
+        {"name": "GOOGLE_CLIENT_ID", "type": "str"},
+        {"name": "GOOGLE_CLIENT_SECRET", "type": "str"},
+        {"name": "GITHUB_AUTOMATED_CD_SECRET", "type": "bytes"},
+        {"name": "POSTGRESQL_USERNAME", "type": "str"},
+        {"name": "POSTGRESQL_PASSWORD", "type": "str"},
     )
     values = {
-       f['name'] : {
-            'value': input(f'{f["name"]}: '),
-            'type': f["type"]
-       }
-       for f in fields
+        f["name"]: {"value": input(f'{f["name"]}: '), "type": f["type"]} for f in fields
     }
     create_secrets_file(values)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

@@ -28,38 +28,38 @@ class AssignmentSubmissionSerializer(serializers.ModelSerializer):
     class Meta:
         model = AssignmentSubmission
         fields = (
-            'pk',
-            'api_student_profile_id',
-            'api_student_submission_id',
-            'submission',
-            'student_name',
-            'grade',
-            'comment'
+            "pk",
+            "api_student_profile_id",
+            "api_student_submission_id",
+            "submission",
+            "student_name",
+            "grade",
+            "comment",
         )
 
     def validate_submission(self, data):
         if isinstance(data, list):
             try:
-                data = '\n'.join(data)
+                data = "\n".join(data)
             except TypeError as e:
                 raise ValidationError(e)
         return data
 
     def to_representation(self, instance):
         repr_ = super().to_representation(instance)
-        repr_['submission'] = repr_['submission'].split('\n')
+        repr_["submission"] = repr_["submission"].split("\n")
         return repr_
-
 
 
 class GradingSessionSerializer(serializers.ModelSerializer):
     submissions = AssignmentSubmissionSerializer(many=True)
+
     class Meta:
         model = GradingSession
         fields = (
-            'pk',
-            'api_assignment_id',
-            'max_grade',
-            'teacher_template',
-            'submissions'
+            "pk",
+            "api_assignment_id",
+            "max_grade",
+            "teacher_template",
+            "submissions",
         )

@@ -18,51 +18,50 @@ from .consume_secrets_file import *
 
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'fast_grader',
-        'USER': POSTGRESQL_USERNAME,
-        'PASSWORD': POSTGRESQL_PASSWORD,
-        'HOST': 'localhost',
-        'PORT': '5432',
-
+    "default": {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": "fast_grader",
+        "USER": POSTGRESQL_USERNAME,
+        "PASSWORD": POSTGRESQL_PASSWORD,
+        "HOST": "localhost",
+        "PORT": "5432",
     }
 }
 
 
-NPM_BIN_PATH = '/usr/local/bin/npm'
+NPM_BIN_PATH = "/usr/local/bin/npm"
 
 
 ENABLE_LOGROCKET = True
 
 
 LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'formatters': {
-        'verbose': {
-            'format': '{levelname} {asctime} {module} {process:d} {thread:d} {message}',
-            'style': '{',
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "verbose": {
+            "format": "{levelname} {asctime} {module} {process:d} {thread:d} {message}",
+            "style": "{",
         },
     },
-    'handlers': {
-        'file_logger': {
-            'level': 0,
-            'class': 'logging.FileHandler',
-            'filename': os.path.join(BASE_DIR, 'main.log'),
-            'formatter': 'verbose',
+    "handlers": {
+        "file_logger": {
+            "level": 0,
+            "class": "logging.FileHandler",
+            "filename": os.path.join(BASE_DIR, "main.log"),
+            "formatter": "verbose",
         },
     },
-    'root': {
-        'handlers': ['file_logger'],
-        'level': 'DEBUG',
-        'propagate': True,
+    "root": {
+        "handlers": ["file_logger"],
+        "level": "DEBUG",
+        "propagate": True,
     },
-    'loggers': {
-        'file': {
-            'handlers': ['file_logger'],
-            'level': 'DEBUG',
-            'propagate': True,
+    "loggers": {
+        "file": {
+            "handlers": ["file_logger"],
+            "level": "DEBUG",
+            "propagate": True,
         },
-    }
+    },
 }

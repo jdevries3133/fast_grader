@@ -18,5 +18,5 @@ from django.apps import AppConfig
 
 
 class ContinuousDeploymentConfig(AppConfig):
-    default_auto_field = 'django.db.models.BigAutoField'
-    name = 'continuous_deployment'
+    default_auto_field = "django.db.models.BigAutoField"
+    name = "continuous_deployment"

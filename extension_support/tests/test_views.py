@@ -65,7 +65,6 @@ def mocked_queryset():
 
 
 class TestViews(TestCase):
-
     def setUp(self):
         self.user = User.objects.create_user(username="foo", password="bar")
         self.client = APIClient()
@@ -112,15 +111,15 @@ class TestViews(TestCase):
         self.login()
 
         # after login, 404 response when the session does not exist
-        res = self.client.get(reverse('ext_session_detail', kwargs={'pk': 1}))
+        res = self.client.get(reverse("ext_session_detail", kwargs={"pk": 1}))
         self.assertTrue(res.status_code, 404)  # type: ignore
 
-        with patch('extension_support.views.GradingSession') as mock:
+        with patch("extension_support.views.GradingSession") as mock:
             mock_session = {
-                'assignment_name': 'foo assignment',
-                'average_grade': 13,
+                "assignment_name": "foo assignment",
+                "average_grade": 13,
             }
             mock.objects.get.return_value = mock_session
-            res = self.client.get(reverse('ext_session_detail', kwargs={'pk': 1}))
+            res = self.client.get(reverse("ext_session_detail", kwargs={"pk": 1}))
             # the full session object is passed into the template context
             self.assertEqual(res.data["session"], mock_session)  # type: ignore

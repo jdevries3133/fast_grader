@@ -28,27 +28,26 @@ from .services import autodeploy
 logger = logging.getLogger(__name__)
 
 
-@ api_view(['POST'])
+@api_view(["POST"])
 def deploy(request):
     """Check for proper authentication, then trigger an automated deployment."""
 
-    if not (sig_parts := request.META.get('HTTP_X_HUB_SIGNATURE_256')):
-        return Response('missing signature', status=status.HTTP_400_BAD_REQUEST)
+    if not (sig_parts := request.META.get("HTTP_X_HUB_SIGNATURE_256")):
+        return Response("missing signature", status=status.HTTP_400_BAD_REQUEST)
 
-    hash_type, sig = sig_parts.split('=')
-    assert hash_type == 'sha256'
+    hash_type, sig = sig_parts.split("=")
+    assert hash_type == "sha256"
 
     secret = settings.GITHUB_AUTOMATED_CD_SECRET
     digest = hmac.new(secret, request.body, hashlib.sha256).hexdigest()  # type: ignore
 
-    logger.debug('GitHub signature: %s', sig)
-    logger.debug('Our digest: %s', digest)
+    logger.debug("GitHub signature: %s", sig)
+    logger.debug("Our digest: %s", digest)
 
     if not hmac.compare_digest(sig, digest):
-        return Response('invalid signature', status=status.HTTP_400_BAD_REQUEST)
+        return Response("invalid signature", status=status.HTTP_400_BAD_REQUEST)
 
-    logger.info('Redeploy request was valid. Proceeding with automatic deployment.')
+    logger.info("Redeploy request was valid. Proceeding with automatic deployment.")
     autodeploy()
 
-    return Response('ok')
-
+    return Response("ok")

@@ -18,6 +18,7 @@
 from .base import *
 
 import logging
+
 logging.disable()
 
 
@@ -32,11 +33,11 @@ DEBUG = False
 
 # fast but insecure hashing algorithm
 PASSWORD_HASHERS = [
-    'django.contrib.auth.hashers.MD5PasswordHasher',
+    "django.contrib.auth.hashers.MD5PasswordHasher",
 ]
 
 
 # --- SECRET VALUES PLACEHOLDERS
 
 # provide defaults for secure settings that are not included
-SECRET_KEY = 'foo'
+SECRET_KEY = "foo"

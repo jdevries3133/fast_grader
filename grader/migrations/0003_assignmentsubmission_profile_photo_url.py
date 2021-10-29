@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('grader', '0002_alter_gradingsession_max_grade'),
+        ("grader", "0002_alter_gradingsession_max_grade"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='assignmentsubmission',
-            name='profile_photo_url',
+            model_name="assignmentsubmission",
+            name="profile_photo_url",
             field=models.CharField(max_length=200, null=True),
         ),
     ]

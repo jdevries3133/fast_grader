@@ -34,9 +34,9 @@ class GradingSession(models.Model):
     assignment_name = models.CharField(max_length=255)
     course = models.ForeignKey(
         CourseModel,
-        related_name='grading_sessions',
+        related_name="grading_sessions",
         on_delete=models.CASCADE,
-        null=True
+        null=True,
     )
 
     # only one session can exist for a given assignment. Users can resume
@@ -49,15 +49,15 @@ class GradingSession(models.Model):
     # sync information is consumed by the browser extension
     last_synced = models.DateTimeField(null=True)
 
-    @ property
+    @property
     def is_graded(self) -> bool:
         return bool(self.max_grade)
 
-    @ property
+    @property
     def average_grade(self):
         if not self.is_graded:
-            raise ValueError('cannot get average grade from ungraded assignment')
-        return list(self.submissions.aggregate(models.Avg('grade')).values())[0]  # type: ignore
+            raise ValueError("cannot get average grade from ungraded assignment")
+        return list(self.submissions.aggregate(models.Avg("grade")).values())[0]  # type: ignore
 
     def __str__(self):
         return self.assignment_name
@@ -66,9 +66,7 @@ class GradingSession(models.Model):
 class AssignmentSubmission(models.Model):
     # id's needed to fetch more data at different levels
     assignment = models.ForeignKey(
-        GradingSession,
-        related_name='submissions',
-        on_delete=models.CASCADE
+        GradingSession, related_name="submissions", on_delete=models.CASCADE
     )
     api_student_profile_id = models.CharField(max_length=50)
     api_student_submission_id = models.CharField(max_length=50)
@@ -85,6 +83,6 @@ class AssignmentSubmission(models.Model):
     def __str__(self):
         return self.student_name
 
-    @ property
+    @property
     def profile_photo_url(self):
         return normalize_protocol_url(url=self._profile_photo_url)  # type: ignore

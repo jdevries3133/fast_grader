@@ -9,23 +9,33 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('grader', '0004_rename_profile_photo_url_assignmentsubmission__profile_photo_url'),
+        (
+            "grader",
+            "0004_rename_profile_photo_url_assignmentsubmission__profile_photo_url",
+        ),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='gradingsession',
-            name='owner',
+            model_name="gradingsession",
+            name="owner",
         ),
         migrations.AddField(
-            model_name='coursemodel',
-            name='owner',
-            field=models.ForeignKey(default=1, on_delete=django.db.models.deletion.CASCADE, to='auth.user'),
+            model_name="coursemodel",
+            name="owner",
+            field=models.ForeignKey(
+                default=1, on_delete=django.db.models.deletion.CASCADE, to="auth.user"
+            ),
             preserve_default=False,
         ),
         migrations.AlterField(
-            model_name='gradingsession',
-            name='course',
-            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, related_name='grading_sessions', to='grader.coursemodel'),
+            model_name="gradingsession",
+            name="course",
+            field=models.ForeignKey(
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="grading_sessions",
+                to="grader.coursemodel",
+            ),
         ),
     ]

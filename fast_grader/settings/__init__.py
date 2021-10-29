@@ -16,7 +16,7 @@
 import os
 
 try:
-    if os.getenv('DJANGO_DEBUG'):
+    if os.getenv("DJANGO_DEBUG"):
         from .development import *
     else:
         from .production import *

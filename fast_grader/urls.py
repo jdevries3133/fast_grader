@@ -22,41 +22,41 @@ from .sitemaps import StaticViewSitemap
 from .views import StaticPageView
 
 
-sitemaps = {
-    'static': StaticViewSitemap
-}
+sitemaps = {"static": StaticViewSitemap}
 
 
 urlpatterns = [
     # putting our accounts first causes it to override the default allauth
     # views where needed
-    path('accounts/', include('accounts.urls')),
-
+    path("accounts/", include("accounts.urls")),
     # third party views
-    path('accounts/', include('allauth.urls')),
-    path('dj-rest-auth/', include('dj_rest_auth.urls')),
-    path(
-        'dj-rest-auth/registration/',
-        include('dj_rest_auth.registration.urls')
-    ),
-
-    path('grader/', include('grader.urls')),
-    path('ci_cd/', include('continuous_deployment.urls')),
-    path('ext/', include('extension_support.urls')),
-    path('admin/', admin.site.urls),
-
+    path("accounts/", include("allauth.urls")),
+    path("dj_rest_auth/", include("dj_rest_auth.urls")),
+    path("dj_rest_auth/registration/", include("dj_rest_auth.registration.urls")),
+    path("grader/", include("grader.urls")),
+    path("ci_cd/", include("continuous_deployment.urls")),
+    path("ext/", include("extension_support.urls")),
+    path("admin/", admin.site.urls),
     # static-ish pages that are core to this site
-    path('', StaticPageView.as_view(template_name='core/index.html'), name='home'),
-    path('help/', StaticPageView.as_view(template_name='core/help.html'), name='help'),
-    path('about/', StaticPageView.as_view(template_name='core/about.html'), name='about'),
-    path('privacy/', StaticPageView.as_view(template_name='core/privacy_policy.html'), name='privacy_policy'),
-    path('tos/', StaticPageView.as_view(template_name='core/terms_of_service.html'), name='terms_of_service'),
-
+    path("", StaticPageView.as_view(template_name="core/index.html"), name="home"),
+    path("help/", StaticPageView.as_view(template_name="core/help.html"), name="help"),
     path(
-        'sitemap.xml',
+        "about/", StaticPageView.as_view(template_name="core/about.html"), name="about"
+    ),
+    path(
+        "privacy/",
+        StaticPageView.as_view(template_name="core/privacy_policy.html"),
+        name="privacy_policy",
+    ),
+    path(
+        "tos/",
+        StaticPageView.as_view(template_name="core/terms_of_service.html"),
+        name="terms_of_service",
+    ),
+    path(
+        "sitemap.xml",
         sitemap,
-        {'sitemaps': sitemaps},
-        name='django.contrib.sitemaps.views.sitemap'
-    )
-
+        {"sitemaps": sitemaps},
+        name="django.contrib.sitemaps.views.sitemap",
+    ),
 ]

@@ -19,91 +19,77 @@ import subprocess
 from pathlib import Path
 
 
-
 base_dir = Path(__file__).parents[1]
 logger = logging.getLogger(__name__)
 
 
-def _run_and_log(cmd, *, cwd: Path=None, check: bool=False):
+def _run_and_log(cmd, *, cwd: Path = None, check: bool = False):
     result = subprocess.run(
-        cmd,
-        cwd=cwd,
-        check=check,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.STDOUT
+        cmd, cwd=cwd, check=check, stdout=subprocess.PIPE, stderr=subprocess.STDOUT
     )
-    logger.info('Command %s had exit code %d', cmd, result.returncode)
-    logger.debug('Output: %s', result.stdout)
+    logger.info("Command %s had exit code %d", cmd, result.returncode)
+    logger.debug("Output: %s", result.stdout)
 
 
 def update_source() -> bool:
     """Returns a boolean indicating whether the action was successful."""
     try:
-        _run_and_log(['git', 'checkout', 'main'], cwd=base_dir, check=True)
+        _run_and_log(["git", "checkout", "main"], cwd=base_dir, check=True)
+        _run_and_log(["git", "pull", "https", "main"], cwd=base_dir, check=True)
         _run_and_log(
-            ['git', 'pull', 'https', 'main'],
-           cwd=base_dir,
-           check=True
-        )
-        _run_and_log(
-            ['./venv/bin/python3', 'manage.py', 'test'],
-           cwd=base_dir,
-           check=True
+            ["./venv/bin/python3", "manage.py", "test"], cwd=base_dir, check=True
         )
         return True
     except subprocess.CalledProcessError:
-        logger.exception('failed to update source code')
+        logger.exception("failed to update source code")
         return False
 
 
 def migrate_database() -> bool:
     try:
         _run_and_log(
-            ['./venv/bin/python3', 'manage.py', 'migrate', '--noinput'],
-           cwd=base_dir,
-           check=True
+            ["./venv/bin/python3", "manage.py", "migrate", "--noinput"],
+            cwd=base_dir,
+            check=True,
         )
         return True
     except subprocess.CalledProcessError:
-        logger.exception('failed to perform database migration')
+        logger.exception("failed to perform database migration")
         return False
 
 
 def generate_staticfiles() -> bool:
-    logger.debug('making staticfiles')
+    logger.debug("making staticfiles")
     try:
         _run_and_log(
-            ['./venv/bin/python3', 'manage.py', 'tailwind', 'install'],
-           cwd=base_dir,
-           check=True
+            ["./venv/bin/python3", "manage.py", "tailwind", "install"],
+            cwd=base_dir,
+            check=True,
         )
         _run_and_log(
-            ['./venv/bin/python3', 'manage.py', 'tailwind', 'build'],
-           cwd=base_dir,
-           check=True
+            ["./venv/bin/python3", "manage.py", "tailwind", "build"],
+            cwd=base_dir,
+            check=True,
         )
-        logger.debug('did tailwind build')
+        logger.debug("did tailwind build")
         _run_and_log(
-            ['./venv/bin/python3', 'manage.py', 'collectstatic', '--noinput'],
-           cwd=base_dir,
-           check=True
+            ["./venv/bin/python3", "manage.py", "collectstatic", "--noinput"],
+            cwd=base_dir,
+            check=True,
         )
-        logger.debug('collected')
+        logger.debug("collected")
         return True
     except subprocess.CalledProcessError:
-        logger.exception('failed to generate staticfiles')
+        logger.exception("failed to generate staticfiles")
         return False
 
 
 def rollback_source(commit_hash) -> bool:
     try:
-        _run_and_log(
-            ['git', 'reset', '--hard', commit_hash],
-            cwd=base_dir, check=True
-        )
+        _run_and_log(["git", "reset", "--hard", commit_hash], cwd=base_dir, check=True)
         return True
     except subprocess.CalledProcessError:
-        logger.exception('failed to rollback source code')
+        logger.exception("failed to rollback source code")
         return False
 
 
@@ -111,28 +97,26 @@ def restart_gunicorn():
     # it is impossible to check if this succeeds because it kills our current
     # process, but if the service is configured correctly, systemd will make
     # sure that the service eventually does get restarted.
-    _run_and_log(['sudo', 'systemctl', 'restart', 'gunicorn.service'])
+    _run_and_log(["sudo", "systemctl", "restart", "gunicorn.service"])
 
 
 def get_current_head():
     proc = subprocess.run(
-        ['git', 'rev-parse', 'HEAD'],
-        stdout=subprocess.PIPE,
-        cwd=base_dir
+        ["git", "rev-parse", "HEAD"], stdout=subprocess.PIPE, cwd=base_dir
     )
-    return str(proc.stdout, 'utf8').strip()
+    return str(proc.stdout, "utf8").strip()
 
 
 def autodeploy():
     current_head = get_current_head()
     if not (update_source() and migrate_database() and generate_staticfiles()):
-        logger.info('Redeploy failed. Rolling back source')
+        logger.info("Redeploy failed. Rolling back source")
         if not rollback_source(current_head) and generate_staticfiles():
-            logger.critical('invalid state after bad redeployment')
+            logger.critical("invalid state after bad redeployment")
     else:
-        logger.info('Redeploy successful. Restarting gunicorn')
+        logger.info("Redeploy successful. Restarting gunicorn")
         restart_gunicorn()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     autodeploy()

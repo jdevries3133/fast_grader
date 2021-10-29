@@ -33,10 +33,10 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parents[2]
 
 
-DEBUG = bool(os.getenv('DJANGO_DEBUG'))
+DEBUG = bool(os.getenv("DJANGO_DEBUG"))
 
 
-ALLOWED_HOSTS = ['classfast.app']
+ALLOWED_HOSTS = ["classfast.app"]
 
 
 CORS_ALLOW_ALL_ORIGINS = True
@@ -54,59 +54,55 @@ CORS_ALLOW_HEADERS = [
     "hx-request",
     "hx-current-url",
     "hx-trigger",
-    'hx-boosted',
-    'hx-current-url',
-    'hx-history-restore-request',
-    'hx-prompt',
-    'hx-request',
-    'hx-target',
-    'hx-trigger-name',
-    'hx-trigger',
+    "hx-boosted",
+    "hx-current-url",
+    "hx-history-restore-request",
+    "hx-prompt",
+    "hx-request",
+    "hx-target",
+    "hx-trigger-name",
+    "hx-trigger",
 ]
 
 CORS_EXPOSE_HEADERS = [
-    'hx-push',
-    'hx-redirect',
-    'hx-refresh',
-    'hx-trigger',
-    'hx-trigger-after-settle',
-    'hx-trigger-after-swap',
+    "hx-push",
+    "hx-redirect",
+    "hx-refresh",
+    "hx-trigger",
+    "hx-trigger-after-settle",
+    "hx-trigger-after-swap",
 ]
 
 
 # Application definition
 
 INSTALLED_APPS = [
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
-    'django.contrib.sitemaps',
-    'django.contrib.sites',
-
+    "django.contrib.admin",
+    "django.contrib.auth",
+    "django.contrib.contenttypes",
+    "django.contrib.sessions",
+    "django.contrib.messages",
+    "django.contrib.staticfiles",
+    "django.contrib.sitemaps",
+    "django.contrib.sites",
     # this is our accounts app. Putting it before allauth allows the templates
     # in it to override allauth templates
-    'accounts',
-
-    'allauth',
-    'allauth.account',
-    'allauth.socialaccount',
-    'allauth.socialaccount.providers.google',
-    'corsheaders',
-    'dj_rest_auth',
-    'dj_rest_auth.registration',
-    'htmx_rest',
-    'rest_framework',
-    'rest_framework.authtoken',
-    'tailwind',
-
-    'continuous_deployment',
-    'extension_support',
-    'theme',
-    'grader',
-
+    "accounts",
+    "allauth",
+    "allauth.account",
+    "allauth.socialaccount",
+    "allauth.socialaccount.providers.google",
+    "corsheaders",
+    "dj_rest_auth",
+    "dj_rest_auth.registration",
+    "htmx_rest",
+    "rest_framework",
+    "rest_framework.authtoken",
+    "tailwind",
+    "continuous_deployment",
+    "extension_support",
+    "theme",
+    "grader",
 ]
 
 
@@ -115,67 +111,65 @@ SITE_ID = 1
 
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
-    'django.middleware.security.SecurityMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    "django.middleware.security.SecurityMiddleware",
+    "django.contrib.sessions.middleware.SessionMiddleware",
+    "django.middleware.common.CommonMiddleware",
+    "django.middleware.csrf.CsrfViewMiddleware",
+    "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "django.contrib.messages.middleware.MessageMiddleware",
+    "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
 
-ROOT_URLCONF = 'fast_grader.urls'
+ROOT_URLCONF = "fast_grader.urls"
 
 
 TEMPLATES = [
     {
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [
-            Path(BASE_DIR, 'fast_grader', 'templates'),
+        "BACKEND": "django.template.backends.django.DjangoTemplates",
+        "DIRS": [
+            Path(BASE_DIR, "fast_grader", "templates"),
         ],
-        'APP_DIRS': True,
-        'OPTIONS': {
-            'context_processors': [
-                'django.template.context_processors.debug',
-                'django.template.context_processors.request',
-                'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
-                'fast_grader.template_context.debug_context',
-                'fast_grader.template_context.logrocket_context',
+        "APP_DIRS": True,
+        "OPTIONS": {
+            "context_processors": [
+                "django.template.context_processors.debug",
+                "django.template.context_processors.request",
+                "django.contrib.auth.context_processors.auth",
+                "django.contrib.messages.context_processors.messages",
+                "fast_grader.template_context.debug_context",
+                "fast_grader.template_context.logrocket_context",
             ],
-            'libraries': {
-                'abs_url': 'extension_support.templatetags'
-            }
+            "libraries": {"abs_url": "extension_support.templatetags"},
         },
     },
 ]
 
 
-WSGI_APPLICATION = 'fast_grader.wsgi.application'
+WSGI_APPLICATION = "fast_grader.wsgi.application"
 
 
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+    "default": {
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": BASE_DIR / "db.sqlite3",
     }
 }
 
 
-ACCOUNT_LOGOUT_REDIRECT_URL = '/accounts/login'
+ACCOUNT_LOGOUT_REDIRECT_URL = "/accounts/login"
 
 
 AUTHENTICATION_BACKENDS = [
-    'django.contrib.auth.backends.ModelBackend',
-    'allauth.account.auth_backends.AuthenticationBackend',
+    "django.contrib.auth.backends.ModelBackend",
+    "allauth.account.auth_backends.AuthenticationBackend",
 ]
 
 
-SOCIALACCOUNT_ADAPTER = 'accounts.socialaccount_adapter.FastGraderSocialAccountAdapter'
+SOCIALACCOUNT_ADAPTER = "accounts.socialaccount_adapter.FastGraderSocialAccountAdapter"
 
 
 # Password validation
@@ -183,40 +177,40 @@ SOCIALACCOUNT_ADAPTER = 'accounts.socialaccount_adapter.FastGraderSocialAccountA
 
 AUTH_PASSWORD_VALIDATORS = [
     {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+        "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+        "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+        "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
     },
 ]
 
 
 REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.SessionAuthentication'
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework.authentication.SessionAuthentication",
+        "rest_framework.authentication.TokenAuthentication",
     ],
-    'DEFAULT_CONTENT_NEGOTIATION_CLASS':
-        'htmx_rest.negotiator.HtmxContentNegotiator',
-    'DEFAULT_RENDERER_CLASSES': [
-        'rest_framework.renderers.JSONRenderer',
-        'rest_framework.renderers.BrowsableAPIRenderer',
-        'htmx_rest.renderers.HTMXPartialTemplateRenderer',
-    ]
+    "DEFAULT_CONTENT_NEGOTIATION_CLASS": "htmx_rest.negotiator.HtmxContentNegotiator",
+    "DEFAULT_RENDERER_CLASSES": [
+        "rest_framework.renderers.JSONRenderer",
+        "rest_framework.renderers.BrowsableAPIRenderer",
+        "htmx_rest.renderers.HTMXPartialTemplateRenderer",
+    ],
 }
 
 
 # Internationalization
 # https://docs.djangoproject.com/en/3.2/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = "en-us"
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = "UTC"
 
 USE_I18N = True
 
@@ -228,22 +222,20 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
-STATIC_URL = '/static/'
-STATIC_ROOT = Path(BASE_DIR, 'static_root')
-STATICFILES_DIRS = [
-    Path(BASE_DIR, 'fast_grader', 'static')
-]
+STATIC_URL = "/static/"
+STATIC_ROOT = Path(BASE_DIR, "static_root")
+STATICFILES_DIRS = [Path(BASE_DIR, "fast_grader", "static")]
 
 
-TAILWIND_APP_NAME = 'theme'
+TAILWIND_APP_NAME = "theme"
 
 
 # Where uploaded files go
 # https://docs.djangoproject.com/en/3.2/ref/settings/#media-root
 
-MEDIA_ROOT = Path(BASE_DIR, 'media_root')
+MEDIA_ROOT = Path(BASE_DIR, "media_root")
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"

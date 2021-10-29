@@ -18,6 +18,4 @@ from django.urls import path
 
 from .views import deploy
 
-urlpatterns = [
-    path('do_deploy/', deploy, name='deploy')
-]
+urlpatterns = [path("do_deploy/", deploy, name="deploy")]

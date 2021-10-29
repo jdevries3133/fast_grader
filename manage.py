@@ -6,8 +6,8 @@ import multiprocessing
 
 
 def apply_test_settings():
-    sys.argv.append('--settings=fast_grader.settings.test')
-    print('Running tests with test settings and supressing log output')
+    sys.argv.append("--settings=fast_grader.settings.test")
+    print("Running tests with test settings and supressing log output")
 
 
 def patch_mac_fork_bug():
@@ -22,10 +22,9 @@ def patch_mac_fork_bug():
 
 
 def my_modifications(main):
-
     def new_main():
 
-        if 'test' in sys.argv:
+        if "test" in sys.argv:
             apply_test_settings()
             if sys.platform == "darwin":
                 patch_mac_fork_bug()
@@ -34,10 +33,10 @@ def my_modifications(main):
     return new_main
 
 
-@ my_modifications
+@my_modifications
 def main():
     """Run administrative tasks."""
-    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'fast_grader.settings')
+    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "fast_grader.settings")
     try:
         from django.core.management import execute_from_command_line
     except ImportError as exc:
@@ -49,5 +48,5 @@ def main():
     execute_from_command_line(sys.argv)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

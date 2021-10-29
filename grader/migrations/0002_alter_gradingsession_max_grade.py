@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('grader', '0001_initial'),
+        ("grader", "0001_initial"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='gradingsession',
-            name='max_grade',
+            model_name="gradingsession",
+            name="max_grade",
             field=models.IntegerField(null=True),
         ),
     ]
