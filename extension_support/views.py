@@ -16,8 +16,10 @@
 from django.http.response import Http404
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
+from rest_framework import status
 
 from grader.models import GradingSession
 
@@ -29,23 +31,31 @@ def home(request):
     return Response({}, template_name='ext/home.html')
 
 
-@ login_required
+@ api_view(['GET'])
+@ permission_classes([IsAuthenticated])
 def sessions_list(request):
     qs = GradingSession.objects.filter(course__owner=request.user)  # type: ignore
     synced = qs.filter(last_synced__isnull=False).all()
     unsynced = qs.filter(last_synced__isnull=True).all()
-    return render(request, 'ext/sessions_list.html', {
-        'synced_sessions': synced,
-        'unsynced_sessions': unsynced
-    })
+
+    return Response(
+        {
+            'synced_sessions': synced,
+            'unsynced_sessions': unsynced
+        },
+        template_name='ext/sessions_list.html'
+    )
 
 
-@ login_required
-def session_detail(request, pk):
+@ api_view(['GET'])
+@ permission_classes([IsAuthenticated])
+def session_detail(_, pk):
     try:
         session = GradingSession.objects.get(pk=pk)     # type: ignore
     except GradingSession.DoesNotExist:                 # type: ignore
-        raise Http404()
-    return render(request, 'ext/session_detail.html', {
-        'session': session
-    })
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    return Response(
+        {'session': session},
+        template_name='ext/session_detail.html'
+    )

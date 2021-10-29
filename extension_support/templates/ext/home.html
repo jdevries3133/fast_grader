@@ -5,9 +5,14 @@
 <h1>Welcome!</h1>
 
 <div>
-  <h3>Login with Google</h3>
-  <img
-    id="loginButton"
-    class="w-40 m-auto"
-    src="{{request.scheme}}://{{request.META.HTTP_HOST}}{% static 'account/google_signin/vector/btn_google_light_normal_ios.svg' %}" />
+  {% if request.user.is_authenticated %}
+    <h1>Welcome!</h1>
+    <div hx-get="{% abs_url 'ext_list_sessions' %}" hx-on="load"></div>
+  {% else %}
+    <h3>Login with Google</h3>
+    <img
+      id="loginButton"
+      class="w-40 m-auto"
+      src="{{request.scheme}}://{{request.META.HTTP_HOST}}{% static 'account/google_signin/vector/btn_google_light_normal_ios.svg' %}" />
+  {% endif %}
 </div>

@@ -15,91 +15,98 @@
 
 import datetime
 
-from unittest.mock import MagicMock, patch
+from contextlib import contextmanager
+from unittest.mock import patch
 
 from django.contrib.auth.models import User
 from django.test import TestCase
 from django.urls import reverse
+from rest_framework.authtoken.models import Token
+from rest_framework.test import APIClient
+
+
+class MockSyncedQuerySet:
+    def all(self):
+        return [
+            {"assignment_name": "unsynced assignment 1", "pk": 1},
+            {"assignment_name": "unsynced assignment 2", "pk": 2},
+        ]
+
+
+class MockUnsyncedQuerySet:
+    def all(self):
+        return [
+            {
+                "assignment_name": "synced assgt 1",
+                "pk": 3,
+                "last_synced": datetime.datetime(2021, 2, 3),
+            },
+            {
+                "assignment_name": "synced assgt 2",
+                "pk": 4,
+                "last_synced": datetime.datetime(2020, 2, 3),
+            },
+        ]
+
+
+class MockQs:
+    def filter(self, *, last_synced__isnull):
+        if last_synced__isnull:
+            return MockUnsyncedQuerySet()
+        else:
+            return MockSyncedQuerySet()
+
+
+@contextmanager
+def mocked_queryset():
+    with patch("extension_support.views.GradingSession") as mock_model:
+        mock_model.objects.filter.return_value = MockQs()
+        yield
 
 
 class TestViews(TestCase):
 
     def setUp(self):
-        self.user = User.objects.create_user(
-            username='foo',
-            password='bar'
-        )
+        self.user = User.objects.create_user(username="foo", password="bar")
+        self.client = APIClient()
 
     def login(self):
-        self.client.force_login(user=self.user)
+        try:
+            token = Token.objects.get(user=self.user)  # type: ignore
+        except Token.DoesNotExist:
+            token = Token.objects.create(user=self.user)  # type: ignore
+        self.client.credentials(HTTP_AUTHORIZATION=f"Token {token.key}")
 
-    @ patch('extension_support.views.GradingSession')
-    def test_list_sessions(self, mock_model):
-        # without login, 302 is returned
-        res = self.client.get(reverse('ext_list_sessions'))
-        self.assertEqual(res.status_code, 302)  # type: ignore
+    @patch("extension_support.views.GradingSession", None)
+    def test_list_sessions_forbids_unauthenticated(self):
+        EXPECTED_RESPONSE_STAUS = 403
+        res = self.client.get(reverse("ext_list_sessions"))
+        self.assertEqual(res.status_code, EXPECTED_RESPONSE_STAUS)  # type: ignore
 
+    def test_list_sessions_allows_authenticated(self):
+        with mocked_queryset():
+            EXPECTED_RESPONSE_STAUS = 200
+            self.login()
+            res = self.client.get(reverse("ext_list_sessions"))
+            self.assertEqual(res.status_code, EXPECTED_RESPONSE_STAUS)  # type: ignore
+
+    def test_list_sessions_returns_correct_data(self):
         self.login()
+        with mocked_queryset():
+            res = self.client.get(reverse("ext_list_sessions"))
+            self.assertEqual(
+                res.data["synced_sessions"], MockSyncedQuerySet().all()  # type: ignore
+            )
 
-        # with login, 200 is returned
-        res = self.client.get(reverse('ext_list_sessions'))
-        self.assertEqual(res.status_code, 200)  # type: ignore
-
-
-        class MockSyncedQuerySet:
-
-            def all(self):
-                return [
-                    {
-                        'assignment_name': 'unsynced assignment 1',
-                        'pk': 1
-                    },
-                    {
-                        'assignment_name': 'unsynced assignment 2',
-                        'pk': 2
-                    }
-                ]
-
-
-        class MockUnsyncedQuerySet:
-
-            def all(self):
-                return [
-                    {
-                        'assignment_name': 'synced assgt 1',
-                        'pk': 3,
-                        'last_synced': datetime.datetime(2021, 2, 3),
-                    },
-                    {
-                        'assignment_name': 'synced assgt 2',
-                        'pk': 4,
-                        'last_synced': datetime.datetime(2020, 2, 3),
-                    }
-                ]
-
-        class MockQs:
-            def filter(self, *, last_synced__isnull):
-                if last_synced__isnull:
-                    return MockUnsyncedQuerySet()
-                else:
-                    return MockSyncedQuerySet()
-
-        mock_model.objects.filter.return_value = MockQs()
-        res = self.client.get(reverse('ext_list_sessions'))
-
-        self.assertEqual(
-            res.context['synced_sessions'],  # type: ignore
-            MockSyncedQuerySet().all()
-        )
-
-        self.assertEqual(
-            res.context['unsynced_sessions'],  # type: ignore
-            MockUnsyncedQuerySet().all()
-        )
+            self.assertEqual(
+                res.data["unsynced_sessions"],  # type: ignore
+                MockUnsyncedQuerySet().all(),
+            )
 
     def test_session_detail(self):
+        self.login()
         # login required, will redirect initially
-        res = self.client.get(reverse('ext_session_detail', kwargs={'pk': 1}))
+        res = self.client.get(reverse("ext_session_detail", kwargs={"pk": 1}))
         self.assertTrue(res.status_code, 302)  # type: ignore
 
         self.login()
@@ -116,7 +123,4 @@ class TestViews(TestCase):
             mock.objects.get.return_value = mock_session
             res = self.client.get(reverse('ext_session_detail', kwargs={'pk': 1}))
             # the full session object is passed into the template context
-            self.assertEqual(
-                res.context['session'],  # type: ignore
-                mock_session
-            )
+            self.assertEqual(res.data["session"], mock_session)  # type: ignore
