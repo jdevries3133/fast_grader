@@ -45,6 +45,19 @@ def update_source() -> bool:
         return False
 
 
+def update_dependencies() -> bool:
+    try:
+        _run_and_log(
+            ["./venv/bin/python3", "-m", "pip", "install", "-r", "requirements.txt"],
+            cwd=base_dir,
+            check=True,
+        )
+        return True
+    except subprocess.CalledProcessError:
+        logger.exception("failed to update dependencies")
+        return False
+
+
 def migrate_database() -> bool:
     try:
         _run_and_log(
@@ -107,15 +120,40 @@ def get_current_head():
     return str(proc.stdout, "utf8").strip()
 
 
+def safe_actions_succeeded() -> bool:
+    """If these fail, they will be automatically rolled back, so it's no
+    biggie!"""
+    return update_source() and update_dependencies() and generate_staticfiles()
+
+
+def dangerous_actions_succeeded() -> bool:
+    """If this fails, I need to fix it or take down the site right away."""
+    return migrate_database()
+
+
+def auto_rollback_succeeded(commit_hash) -> bool:
+    return (
+        rollback_source(commit_hash)
+        and generate_staticfiles()
+        and update_dependencies()
+    )
+
+
 def autodeploy():
     current_head = get_current_head()
-    if not (update_source() and migrate_database() and generate_staticfiles()):
+    if not safe_actions_succeeded():
         logger.info("Redeploy failed. Rolling back source")
-        if not rollback_source(current_head) and generate_staticfiles():
+        if not auto_rollback_succeeded(current_head):
             logger.critical("invalid state after bad redeployment")
-    else:
-        logger.info("Redeploy successful. Restarting gunicorn")
-        restart_gunicorn()
+            return
+        return
+
+    if not dangerous_actions_succeeded():
+        logger.critical("source updated, but database migration failed")
+        return
+
+    logger.info("Redeploy successful. Restarting gunicorn")
+    restart_gunicorn()
 
 
 if __name__ == "__main__":
