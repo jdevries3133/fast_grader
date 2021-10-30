@@ -1,0 +1,23 @@
+{% load abs_url %}
+
+<div>
+  <div class="inline-flex flex-col">
+    <p class="text-sm text-gray-700">Assignment Name</p>
+    <p>{{ session.assignment_name }}</p>
+  </div>
+  <div class="inline">
+    <button
+      hx-get="{% abs_url 'ext_syncing_active' session.assignment_name %}"
+      hx-target="body"
+      class="inline p-2 m-1 bg-green-100 syncSessionButton"
+      data-pk="{{ session.pk}}">
+        Sync Now
+    </button>
+    <button
+      hx-target="body"
+      hx-get="{% abs_url 'ext_session_detail' session.pk %}"
+      class="inline p-2 m-1 bg-yellow-100">
+        Details
+    </button>
+  </div>
+</div>

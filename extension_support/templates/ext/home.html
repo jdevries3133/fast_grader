@@ -2,17 +2,11 @@
 {% load static %}
 {% load abs_url %}
 
-<h1>Welcome!</h1>
-
+<button class="absolute flex flex-row items-center justify-center p-1 cursor-pointer openClassFast group bg-gradient-to-tr from-yellow-300 to-red-100 hover:bg-none hover:bg-yellow-100 top-2 right-2">
+  <p class="text-xs italic font-semibold">ClassFast</p>
+  <img src="/icons/favicon-32x32.png" />
+</button>
 <div>
-  {% if request.user.is_authenticated %}
-    <h1>Welcome!</h1>
-    <div hx-get="{% abs_url 'ext_list_sessions' %}" hx-on="load"></div>
-  {% else %}
-    <h3>Login with Google</h3>
-    <img
-      id="loginButton"
-      class="w-40 m-auto"
-      src="{{request.scheme}}://{{request.META.HTTP_HOST}}{% static 'account/google_signin/vector/btn_google_light_normal_ios.svg' %}" />
-  {% endif %}
+  <h1 class="py-3 font-serif font-semibold text-center">Welcome!</h1>
+  <div class="p-3 bg-white rounded-lg shadow-md" hx-get="{% abs_url 'ext_list_sessions' %}" hx-trigger="load"></div>
 </div>

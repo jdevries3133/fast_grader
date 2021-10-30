@@ -1,0 +1,21 @@
+{% extends 'ext/modal.html' %}
+
+{% load abs_url %}
+
+{% block container_div_extra_attrs %}
+hx-get="{% abs_url 'ext_home' %}"
+hx-trigger="from:#exitLoading"
+{% endblock %}
+
+{% block content %}
+
+<div class="h-20">
+  <h1>Syncing Now!</h1>
+  <p>Syncing your grades for {{ assignment_name }} now!</p>
+  <button
+    hx-get="{% abs_url 'ext_home' %}"
+    hx-target="body"
+    id="exitLoading">Stop</button>
+</div>
+
+{% endblock %}

@@ -39,10 +39,11 @@ module.exports = {
     "../../**/*.js",
 
     /**
-     * Python: If you use Tailwind CSS classes in Python, uncomment the following line
-     * and make sure the pattern below matches your project structure.
+     * Styles that the browser extension uses, which are just kept in sync by
+     * hand, since the extension is mostly a shell, and most of the html
+     * content is injected by the backend via htmx
      */
-    // '../../**/*.py'
+    "../../extension_support/styles.txt",
   ],
   darkMode: "media",
   theme: {

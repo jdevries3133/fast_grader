@@ -1,0 +1,10 @@
+<div {% block container_div_extra_attrs %}{% endblock %}
+  class="fixed top-0 left-0 flex items-center justify-center w-full h-full transiton">
+    <div class="absolute w-full h-full bg-gray-900 opacity-50 modal-overlay blur-sm"></div>
+    <div class="container flex flex-col items-center justify-center w-full h-full">
+      <div class="z-50 p-4 mb-4 bg-gray-200 rounded-lg">
+          {% block content %}{% endblock %}
+      </div>
+      <div class="lds-roller"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
+    </div>
+</div>

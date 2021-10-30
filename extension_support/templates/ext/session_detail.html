@@ -1,2 +1,7 @@
-<p>Assignment Name: {{ session.assignment_name }}</p>
-<p>Average Grade: {{ session.average_grade }}</p>
+{% load abs_url %}
+
+<div id="jfkd__Parent">
+  <button class="bg-blue-200 ring-blue-400" preload hx-target="#jfkd__Parent" hx-get="{% abs_url 'ext_home' %}">Go Back</button>
+
+  {% include 'grader/partials/session_detail.html' %}
+</div>

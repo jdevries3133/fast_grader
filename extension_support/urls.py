@@ -15,10 +15,11 @@
 
 from django.urls import path
 
-from .views import sessions_list, session_detail, home
+from . import views
 
 urlpatterns = [
-    path("", home, name="ext_home"),
-    path("session/", sessions_list, name="ext_list_sessions"),
-    path("session/<int:pk>/", session_detail, name="ext_session_detail"),
+    path("", views.home, name="ext_home"),
+    path("session/", views.sessions_list, name="ext_list_sessions"),
+    path("session/<int:pk>/", views.session_detail, name="ext_session_detail"),
+    path("syncing/<str:assgt_name>/", views.syncing_active, name="ext_syncing_active"),
 ]
