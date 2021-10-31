@@ -36,12 +36,18 @@ def update_source() -> bool:
     try:
         _run_and_log(["git", "checkout", "main"], cwd=base_dir, check=True)
         _run_and_log(["git", "pull", "https", "main"], cwd=base_dir, check=True)
-        _run_and_log(
-            ["./venv/bin/python3", "manage.py", "test"], cwd=base_dir, check=True
-        )
         return True
     except subprocess.CalledProcessError:
         logger.exception("failed to update source code")
+        return False
+
+
+def run_tests() -> bool:
+    try:
+        _run_and_log(["./venv/bin/pytest"], cwd=base_dir, check=True)
+        return True
+    except subprocess.CalledProcessError:
+        logger.exception("test suite failed")
         return False
 
 
@@ -123,7 +129,12 @@ def get_current_head():
 def safe_actions_succeeded() -> bool:
     """If these fail, they will be automatically rolled back, so it's no
     biggie!"""
-    return update_source() and update_dependencies() and generate_staticfiles()
+    return (
+        update_source()
+        and run_tests()
+        and update_dependencies()
+        and generate_staticfiles()
+    )
 
 
 def dangerous_actions_succeeded() -> bool:
