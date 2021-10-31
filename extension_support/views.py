@@ -57,9 +57,12 @@ def syncing_active(_, assgt_name: str):
         {"assignment_name": assgt_name}, template_name="ext/syncing_active.html"
     )
 
-@ api_view(['POST'])
+
+@api_view(["POST"])
 def log_error(request):
-    serializer = FrontendLogRecordSerializer(data=request.data, context={'request': request})
+    serializer = FrontendLogRecordSerializer(
+        data=request.data, context={"request": request}
+    )
     if serializer.is_valid(raise_exception=True):
         serializer.save()
         return Response(status=status.HTTP_201_CREATED)

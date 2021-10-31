@@ -20,7 +20,6 @@ from .models import FrontendLogRecord
 
 
 class FrontendLogRecordSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = FrontendLogRecord
         fields = ("associated_user", "created", "message", "extra_data", "dom_dump")
