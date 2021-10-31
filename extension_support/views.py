@@ -19,10 +19,11 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
 
 from grader.models import GradingSession
+from .serializers import FrontendLogRecordSerializer
 
 
 @api_view(["GET"])
-def home(request):
+def home(_):
     return Response({}, template_name="ext/home.html")
 
 
@@ -55,3 +56,10 @@ def syncing_active(_, assgt_name: str):
     return Response(
         {"assignment_name": assgt_name}, template_name="ext/syncing_active.html"
     )
+
+@ api_view(['POST'])
+def log_error(request):
+    serializer = FrontendLogRecordSerializer(data=request.data, context={'request': request})
+    if serializer.is_valid(raise_exception=True):
+        serializer.save()
+        return Response(status=status.HTTP_201_CREATED)

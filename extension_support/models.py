@@ -13,14 +13,13 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-from django.urls import path
+from django.contrib.auth.models import User
+from django.db import models
 
-from . import views
 
-urlpatterns = [
-    path("", views.home, name="ext_home"),
-    path("session/", views.sessions_list, name="ext_list_sessions"),
-    path("session/<int:pk>/", views.session_detail, name="ext_session_detail"),
-    path("syncing/<str:assgt_name>/", views.syncing_active, name="ext_syncing_active"),
-    path("log_error/", views.log_error, name="log_error"),
-]
+class FrontendLogRecord(models.Model):
+    associated_user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    created = models.DateTimeField(auto_now_add=True)
+    message = models.CharField(max_length=500)
+    extra_data = models.JSONField(null=True)
+    dom_dump = models.TextField(null=True)

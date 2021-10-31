@@ -13,14 +13,14 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-from django.urls import path
 
-from . import views
+from rest_framework import serializers
 
-urlpatterns = [
-    path("", views.home, name="ext_home"),
-    path("session/", views.sessions_list, name="ext_list_sessions"),
-    path("session/<int:pk>/", views.session_detail, name="ext_session_detail"),
-    path("syncing/<str:assgt_name>/", views.syncing_active, name="ext_syncing_active"),
-    path("log_error/", views.log_error, name="log_error"),
-]
+from .models import FrontendLogRecord
+
+
+class FrontendLogRecordSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = FrontendLogRecord
+        fields = ("associated_user", "created", "message", "extra_data", "dom_dump")
