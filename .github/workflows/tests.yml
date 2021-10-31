@@ -39,4 +39,4 @@ jobs:
         CI_CD: true
     - name: Run Tests
       run: |
-        python3 manage.py test
+        pytest
