@@ -1,10 +1,9 @@
 {% extends 'base.html' %}
 
-{% load i18n %}
 {% load account socialaccount %}
 {% load static %}
 
-{% block head_title %}{% trans "Sign In with Google" %}{% endblock %}
+{% block head_title %}Sign In with Google{% endblock %}
 
 {% block content %}
 
@@ -32,7 +31,9 @@
         href="mailto:jackdevriesmusic@gmail.com">jackdevriesmusic@gmail.com!</a>
     </p>
   </div>
-  {% include 'account/sign_in_with_google.html' %}
+  <a href="{% provider_login_url 'google' %}">
+    {% include 'account/sign_in_with_google.html' %}
+  </a>
 </div>
 
 

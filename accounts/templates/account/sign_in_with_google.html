@@ -1,11 +1,10 @@
 {% load static %}
 
-<a href="{% url 'profile' %}">
-  <button class="flex flex-row items-center w-full h-full pr-2 m-auto bg-blue-600 gap-2 hover:bg-blue-500">
-    <img class="inline" src="{% static 'account/google_signin/vector/btn_google_light_normal_ios.svg' %}" />
-    <div class="text-left">
-      <p id="feaw__signIn" class="text-white sm:inline">Sign in
-      <p class="text-white sm:inline">with Google</p>
-    </div>
-  </button>
-</a>
+
+<button class="flex flex-row items-center w-full h-full pr-2 m-auto bg-blue-600 gap-2 hover:bg-blue-500">
+  <img class="inline" src="{% static 'account/google_signin/vector/btn_google_light_normal_ios.svg' %}" />
+  <div class="text-left">
+    <p id="feaw__signIn" class="text-white sm:inline">Sign in
+    <p class="text-white sm:inline">with Google</p>
+  </div>
+</button>

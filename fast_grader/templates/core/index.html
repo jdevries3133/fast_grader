@@ -1,6 +1,8 @@
+
 {% extends 'base.html' %}
 
 {% load static %}
+{% load account socialaccount %}
 
 {% block body %}
 
@@ -86,7 +88,9 @@
   <div class="flex flex-col items-center justify-center gap-2 sm:flex-row">
 
     <div class="w-52 h-14">
-    {% include 'account/sign_in_with_google.html' %}
+    <a href="{% provider_login_url 'google' %}">
+      {% include 'account/sign_in_with_google.html' %}
+    </a>
     </div>
 
     <div class="h-14">
