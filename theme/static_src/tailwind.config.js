@@ -37,13 +37,6 @@ module.exports = {
      * patterns match your project structure.
      */
     "../../**/*.js",
-
-    /**
-     * Styles that the browser extension uses, which are just kept in sync by
-     * hand, since the extension is mostly a shell, and most of the html
-     * content is injected by the backend via htmx
-     */
-    "../../extension_support/styles.txt",
   ],
   darkMode: "media",
   theme: {

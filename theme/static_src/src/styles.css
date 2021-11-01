@@ -41,14 +41,6 @@
   }
 }
 
-.min-h-56 {
-  min-height: 14rem;
-}
-
-.min-w-96 {
-  min-width: 24rem;
-}
-
 .link {
   @apply text-blue-700 underline cursor-pointer;
 }
