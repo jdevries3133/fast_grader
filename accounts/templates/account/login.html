@@ -32,12 +32,7 @@
         href="mailto:jackdevriesmusic@gmail.com">jackdevriesmusic@gmail.com!</a>
     </p>
   </div>
-  <div class="text-center">
-    <h1>Sign in with Google</h1>
-    <a href="{% provider_login_url "google" %}">
-      <img class="w-40 m-auto" src="{% static 'account/google_signin/vector/btn_google_light_normal_ios.svg' %}" />
-    </a>
-  </div>
+  {% include 'account/sign_in_with_google.html' %}
 </div>
 
 

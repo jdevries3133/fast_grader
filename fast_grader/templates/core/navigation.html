@@ -21,11 +21,7 @@
             </button>
           </form>
         {% else %}
-          <a href="{% url 'account_login' %}">
-            <button class="block p-2 text-gray-800 bg-green-100 rounded shadow md:m-2 hover:bg-green-200 focus:ring-green-400">
-              Sign In with Google
-            </button>
-          </a>
+          {% include 'account/sign_in_with_google.html' %}
         {% endif %}
       </div>
       <div class="flex flex-col">

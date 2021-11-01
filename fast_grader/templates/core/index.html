@@ -83,23 +83,24 @@
 
 <div class="text-center">
   <h3 class="text-black">What Next?</h3>
-  <a href="{% url 'grader' %}">
-    <button class="p-4 hover:bg-green-200">
-      <span id="fdsafwea__startGrading">Start Grading</span>
-      <svg aria-labelledby="fdsafwea__startGrading" xmlns="http://www.w3.org/2000/svg" class="inline w-5 h-5" viewBox="0 0 20 20" fill="currentColor">
-        <path fill-rule="evenodd" d="M10.293 15.707a1 1 0 010-1.414L14.586 10l-4.293-4.293a1 1 0 111.414-1.414l5 5a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0z" clip-rule="evenodd" />
-        <path fill-rule="evenodd" d="M4.293 15.707a1 1 0 010-1.414L8.586 10 4.293 5.707a1 1 0 011.414-1.414l5 5a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0z" clip-rule="evenodd" />
-      </svg>
-    </button>
-  </a>
-  <a href="{% url 'profile' %}">
-    <button class="p-4 bg-purple-100 hover:bg-purple-200">
-      <span id="feaw__signIn">Sign In with Google</span>
-      <svg aria-labelledby="feaw__signIn" xmlns="http://www.w3.org/2000/svg" class="inline w-5 h-5" viewBox="0 0 20 20" fill="currentColor">
-        <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
-      </svg>
-    </button>
-  </a>
+  <div class="flex flex-col items-center justify-center gap-2 sm:flex-row">
+
+    <div class="w-52 h-14">
+    {% include 'account/sign_in_with_google.html' %}
+    </div>
+
+    <div class="h-14">
+      <a href="{% url 'grader' %}">
+        <button class="h-full m-0 hover:bg-green-200">
+          <span id="fdsafwea__startGrading">Start Grading</span>
+          <svg aria-labelledby="fdsafwea__startGrading" xmlns="http://www.w3.org/2000/svg" class="inline h-8" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M10.293 15.707a1 1 0 010-1.414L14.586 10l-4.293-4.293a1 1 0 111.414-1.414l5 5a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+            <path fill-rule="evenodd" d="M4.293 15.707a1 1 0 010-1.414L8.586 10 4.293 5.707a1 1 0 011.414-1.414l5 5a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+          </svg>
+        </button>
+      </a>
+    </div>
+  </div>
 </div>
 
 
