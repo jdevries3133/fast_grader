@@ -33,13 +33,18 @@ The app converts student assignments to plain text (the best kind of text), and
 caches _all_ student submissions in your browser, so thay are **instantly**
 ready when you are.
 
-### Stable
+### Easy to Use
 
-This application uses the official Google Classroom and Google Docs APIs. It
-is stable and built right, and as long as EdPuzzle or any of your other
-favorite google classroom integrations keep working this one will too.
+The barrier to entry for teachers is kept low. Simple oauth social account
+sign in allows users to get started right away, and our browser extension
+fills the gaps for augmenting the Google Classroom UI.
 
 ### Open Source
 
 If you know the web, come
 [contribute!](https://github.com/jdevries3133/fast_grader)
+
+## See Also
+
+The [Fast Grader Sync browser extension](https://github.com/jdevries3133/fast_grader_extension)
+that accompanies this project.
