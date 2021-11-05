@@ -144,11 +144,7 @@ async function fetchData() {
     state.ready = true;
     indicateSuccess("Your assignment data was loaded.");
   } catch (e) {
-    indicateFailure(
-      "Your assignment data failed to load. If you have been logged in for a " +
-        "while, this is probably because of a nasty bug that I am aware of " +
-        "and working on. Please log out and log back in again!"
-    );
+    indicateFailure("Your assignment data failed to load; please try again!");
     console.error("Failed due to error: ", e);
   }
   removeLoading();
