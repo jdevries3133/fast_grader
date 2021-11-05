@@ -62,4 +62,6 @@ class GradingSessionSerializer(serializers.ModelSerializer):
             "max_grade",
             "teacher_template",
             "submissions",
+            "average_grade",
+            "google_classroom_detail_view_url",
         )

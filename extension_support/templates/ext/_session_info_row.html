@@ -1,9 +1,9 @@
 {% load abs_url %}
 
-<div>
+<div class="flex flex-row items-center p-1 mt-2 rounded border-1 gap-3">
   <div class="inline-flex flex-col">
     <p class="text-sm text-gray-700">Assignment Name</p>
-    <p>{{ session.assignment_name }}</p>
+    <p class="text-base">{{ session.assignment_name }}</p>
   </div>
   <div class="inline">
     <button

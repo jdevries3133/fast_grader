@@ -23,3 +23,6 @@ class FrontendLogRecord(models.Model):
     message = models.CharField(max_length=500)
     extra_data = models.JSONField(null=True)
     dom_dump = models.TextField(null=True)
+
+    def __str__(self):
+        return self.message

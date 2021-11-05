@@ -1,33 +1,32 @@
-
-  <table class="shadow-md">
-    <thead>
+<table class="shadow-md">
+  <thead>
+    <tr>
+      <th class="p-4 text-center bg-green-100 border border-gray-400">Student Name</td>
+      <th class="p-4 text-center bg-green-100 border border-gray-400">Grade</td>
+      <th class="p-4 text-center bg-green-100 border border-gray-400">Comment</td>
+    </tr>
+  </thead>
+  <tbody>
+    {% for submission in session.submissions.all %}
       <tr>
-        <th class="p-4 text-center bg-green-100 border border-gray-400">Student Name</td>
-        <th class="p-4 text-center bg-green-100 border border-gray-400">Grade</td>
-        <th class="p-4 text-center bg-green-100 border border-gray-400">Comment</td>
-      </tr>
-    </thead>
-    <tbody>
-      {% for submission in session.submissions.all %}
-        <tr>
-          {% comment %}
-          TODO: put a button here where the user can click "see submission
-          content," and a modal window will be injected that shows the
-          submission
+        {% comment %}
+        TODO: put a button here where the user can click "see submission
+        content," and a modal window will be injected that shows the
+        submission
 
-          TODO: also, with htmx we could grab a little form and put it into
-          the cell when the cell is clicked on so that the user can edit the
-          grades or comments in place if they wish
-          {% endcomment %}
-          <td class="p-2 bg-gray-100 border border-gray-400">
-            <img
-              class="inline w-10 h-10 border-2 border-green-100 rounded-full"
-              src="{{ submission.profile_photo_url }}=s64-c" />
-            {{ submission.student_name }}
-          </td>
-          <td class="p-2 bg-gray-100 border border-gray-400">{{ submission.grade }}</td>
-          <td class="p-2 bg-gray-100 border border-gray-400">{{ submission.comment|default:'None' }}</td>
-        </tr>
-      {% endfor %}
-    </tbody>
-  </table>
+        TODO: also, with htmx we could grab a little form and put it into
+        the cell when the cell is clicked on so that the user can edit the
+        grades or comments in place if they wish
+        {% endcomment %}
+        <td class="p-2 bg-gray-100 border border-gray-400">
+          <img
+            class="inline w-10 h-10 border-2 border-green-100 rounded-full"
+            src="{{ submission.profile_photo_url }}=s64-c" />
+          {{ submission.student_name }}
+        </td>
+        <td class="p-2 bg-gray-100 border border-gray-400">{{ submission.grade }}</td>
+        <td class="p-2 bg-gray-100 border border-gray-400">{{ submission.comment|default:'None' }}</td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>

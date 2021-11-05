@@ -32,6 +32,11 @@ class GradingSession(models.Model):
     created = models.DateTimeField(auto_now_add=True)
 
     assignment_name = models.CharField(max_length=255)
+
+    # this is the link to the user to view this assignment in the third party
+    # application UI. For google classroom, this is used by the browser
+    # extension to redirect the user to google classroom
+    ui_url = models.CharField(max_length=255)
     course = models.ForeignKey(
         CourseModel,
         related_name="grading_sessions",
@@ -58,6 +63,16 @@ class GradingSession(models.Model):
         if not self.is_graded:
             raise ValueError("cannot get average grade from ungraded assignment")
         return list(self.submissions.aggregate(models.Avg("grade")).values())[0]  # type: ignore
+
+    @property
+    def google_classroom_detail_view_url(self):
+        """The url that google's api returns is a link to the assignment
+        overview, not the page with input fields for each students' grades. For
+        consistency, we just store exactly what the google api gives us in the
+        database, and can transform it through this method."""
+        return str(self.ui_url).replace(
+            "details", "submissions/by-status/and-sort-first-name/all"
+        )
 
     def __str__(self):
         return self.assignment_name

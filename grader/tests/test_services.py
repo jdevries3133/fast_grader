@@ -116,6 +116,7 @@ class TestGetAssignmentData(TestCase):
         )
         self.existing = GradingSession.objects.create(  # type: ignore
             assignment_name="foo assignment",
+            ui_url="",
             course=self._course,
             api_assignment_id="1",
             max_grade=10,
@@ -123,6 +124,7 @@ class TestGetAssignmentData(TestCase):
         )
         self.existing__no_grade = GradingSession.objects.create(  # type: ignore
             assignment_name="foo assignment",
+            ui_url="",
             course=self._course,
             api_assignment_id="2",
             teacher_template="",

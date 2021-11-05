@@ -167,7 +167,7 @@ def list_all_assignment_names(
 
     # fetch data
     response = (
-        service.courses()
+        service.courses()  # type: ignore
         .courseWork()
         .list(  # type: ignore
             pageSize=30, pageToken=page_token, courseId=course.id_, orderBy="dueDate"
@@ -196,7 +196,7 @@ def _fetch_raw_assignment_data(course_id, assignment_id, user, page_token: str =
     """
     service = get_google_classroom_service(user=user)
     submsision_data = (
-        service.courses()
+        service.courses()  # type: ignore
         .courseWork()
         .studentSubmissions()
         .list(  # type: ignore
@@ -360,15 +360,20 @@ def get_assignment_data(
 
         # update the top-level session object (corresponding to a single
         # assignment) if there are new values in the fields.
+        update_performed = False
         if existing.is_graded and (existing.max_grade != assignment.get("maxPoints")):
             existing.max_grade = assignment.get("maxPoints")
+            update_performed = True
 
         if existing.assignment_name != assignment["title"]:
             existing.assignment_name = assignment["title"]
+            update_performed = True
 
-        if existing.assignment_name != assignment[
-            "title"
-        ] or existing.max_grade != assignment.get("maxPoints"):
+        if existing.ui_url != assignment["alternateLink"]:
+            existing.ui_url = assignment["alternateLink"]
+            update_performed = True
+
+        if update_performed:
             existing.save()
 
         submission_updates = []
@@ -446,6 +451,12 @@ def get_assignment_data(
 
     assignment = GradingSession.objects.create(  # type: ignore
         assignment_name=assignment["title"],
+        # TODO: This is only populated if `state` is `PUBLISHED`.
+        # we should be checking if this assignment is published before trying
+        # to access this property, and we don't want to create a new session
+        # without this property.... need to better think through how to
+        # handle that.
+        ui_url=assignment["alternateLink"],
         api_assignment_id=assignment_id,
         max_grade=assignment.get("maxPoints"),
         course=course,
