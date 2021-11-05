@@ -134,7 +134,8 @@ class TestChooseCourseView(TestCase):
 
 class TestAssignmentDataView(TestCase):
     def setUp(self):
-        self.client.force_login(User.objects.create_user("foo", "bar", "baz@b.com"))
+        self.user = User.objects.create_user("foo", "bar", "baz@b.com")
+        self.client.force_login(self.user)
         ses = self.client.session
         ses["course"] = {"id": "foo"}
         ses["assignment"] = {"id": "bar"}
@@ -172,7 +173,7 @@ class TestAssignmentDataView(TestCase):
             content_type="application/json",
         )
         self.assertEqual(res.status_code, 200)  # type: ignore
-        g_mod.objects.get.assert_called_once_with(pk=13)
+        g_mod.objects.get.assert_called_once_with(pk=13, course__owner=self.user)
         self.assertEqual(s_mod.objects.get.mock_calls[0].kwargs, {"pk": 2})
         self.assertEqual(s_mod.objects.get.mock_calls[1].kwargs, {"pk": 4})
 

@@ -62,7 +62,7 @@ def resume_grading(request, pk):
     """Setup the request session so that we can resume a previous grading
     session."""
     try:
-        obj = GradingSession.objects.get(pk=pk)  # type: ignore
+        obj = GradingSession.objects.get(pk=pk, course__owner=request.user)  # type: ignore
     except GradingSession.DoesNotExist:  # type: ignore
         raise Http404("grading session does not exist")
 
@@ -355,7 +355,7 @@ class AssessmentDataView(APIView):
         submissions = request.data.pop("submissions", [])
         # update session
         try:
-            update = GradingSession.objects.get(pk=pk)  # type: ignore
+            update = GradingSession.objects.get(pk=pk, course__owner=request.user)  # type: ignore
         except GradingSession.DoesNotExist:  # type: ignore
             return Response(
                 {"message": f"assignment with id of {pk} not found"},
@@ -383,11 +383,11 @@ class AssessmentDataView(APIView):
 @api_view(["GET"])
 def session_detail(request, pk):
     try:
-        obj = GradingSession.objects.get(pk=pk)  # type: ignore
+        obj = GradingSession.objects.get(pk=pk, course__owner=request.user)  # type: ignore
     except GradingSession.DoesNotExist:  # type: ignore
         raise Http404("session does not exist") from None
 
-    if request.content_type == "application/json":
+    if "application/json" in request.META.get("HTTP_ACCEPT"):
         serializer = GradingSessionSerializer(obj)
         return Response({"session": serializer.data})
 
@@ -398,7 +398,7 @@ class DeleteSession(View):
     def get(self, request, pk):
         """Serve the modal form to confirm session deletion."""
         try:
-            obj = GradingSession.objects.get(pk=pk)  # type: ignore
+            obj = GradingSession.objects.get(pk=pk, course__owner=request.user)  # type: ignore
         except GradingSession.DoesNotExist:  # type: ignore
             raise Http404("session does not exist") from None
 
@@ -411,7 +411,7 @@ class DeleteSession(View):
     def delete(self, request, pk):
         """Posted upon reciept of the modal form."""
         try:
-            obj = GradingSession.objects.get(pk=pk)  # type: ignore
+            obj = GradingSession.objects.get(pk=pk, course__owner=request.user)  # type: ignore
         except GradingSession.DoesNotExist:  # type: ignore
             raise Http404("session does not exist") from None
 
