@@ -114,7 +114,7 @@ def get_student_data(*, user: User, course_id: str) -> list[StudentResource]:
     hardcore for us."""
     service = get_google_classroom_service(user=user)
     response = (
-        service.courses()
+        service.courses()  # type: ignore
         .students()
         .list(  # type: ignore
             courseId=course_id,
@@ -208,7 +208,7 @@ def _fetch_raw_assignment_data(course_id, assignment_id, user, page_token: str =
         .execute()
     )
     assignment_data = (
-        service.courses()
+        service.courses()  # type: ignore
         .courseWork()
         .get(  # type: ignore
             courseId=course_id,
@@ -275,7 +275,7 @@ def concatenate_attachments(
         header = [a.name, "=" * len(a.name)]
         try:
             data = (
-                service.files()
+                service.files()  # type: ignore
                 .export(fileId=a.id_, mimeType="text/plain")  # type: ignore
                 .execute()
             )
