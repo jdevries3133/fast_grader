@@ -52,6 +52,7 @@ def session_detail(_, pk):
 
 
 @api_view(["GET"])
+@permission_classes([IsAuthenticated])
 def syncing_active(_, assgt_name: str):
     return Response(
         {"assignment_name": assgt_name}, template_name="ext/syncing_active.html"

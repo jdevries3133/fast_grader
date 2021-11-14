@@ -26,7 +26,7 @@ from django.urls import reverse
 from django.views import View
 from django.views.defaults import bad_request, page_not_found
 
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -381,6 +381,7 @@ class AssessmentDataView(APIView):
 
 
 @api_view(["GET"])
+@permission_classes([IsAuthenticated])
 def session_detail(request, pk):
     try:
         obj = GradingSession.objects.get(pk=pk, course__owner=request.user)  # type: ignore
