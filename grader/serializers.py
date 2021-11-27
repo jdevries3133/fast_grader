@@ -31,6 +31,7 @@ class AssignmentSubmissionSerializer(serializers.ModelSerializer):
             "pk",
             "api_student_profile_id",
             "api_student_submission_id",
+            "profile_photo_url",
             "submission",
             "student_name",
             "grade",
