@@ -8,7 +8,6 @@
 {% else %}
 
 <div class="flex flex-col gap-3">
-
   <div>
     <h3>Unsynced Grading Sessions</h3>
     {% for session in unsynced_sessions %}
@@ -22,7 +21,10 @@
       {% include 'ext/_session_info_row.html' %}
     {% endfor %}
   </div>
-
 </div>
 
 {% endif %}
+
+{% comment %}
+vi:filetype=htmldjango
+{% endcomment %}
