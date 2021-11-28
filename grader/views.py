@@ -28,6 +28,7 @@ from django.views.defaults import bad_request, page_not_found
 
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.views import APIView
+from rest_framework.viewsets import ModelViewSet
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
@@ -361,9 +362,11 @@ class AssessmentDataView(APIView):
                 {"message": f"assignment with id of {pk} not found"},
                 status=status.HTTP_404_NOT_FOUND,
             )
-        serializer = GradingSessionSerializer(update, data=request.data, partial=True)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
+        session_serializer = GradingSessionSerializer(
+            update, data=request.data, partial=True
+        )
+        session_serializer.is_valid(raise_exception=True)
+        session_serializer.save()
         for s in submissions:
             try:
                 update = AssignmentSubmission.objects.get(pk=s["pk"])  # type: ignore
@@ -372,12 +375,13 @@ class AssessmentDataView(APIView):
                     {"message": (f"student submission with id of {pk} not found")},
                     status=status.HTTP_404_NOT_FOUND,
                 )
-            cereal = AssignmentSubmissionSerializer(update, data=s, partial=True)
-            cereal.is_valid(raise_exception=True)
-            cereal.save()
+            submission_serializer = AssignmentSubmissionSerializer(
+                update, data=s, partial=True
+            )
+            submission_serializer.is_valid(raise_exception=True)
+            submission_serializer.save()
 
-        # update student submissions
-        return Response(status=status.HTTP_200_OK)
+        return Response(session_serializer.data, status=status.HTTP_200_OK)
 
 
 @api_view(["GET"])
@@ -393,6 +397,14 @@ def session_detail(request, pk):
         return Response({"session": serializer.data})
 
     return render(request, "grader/session_detail.html", context={"session": obj})
+
+
+class SessionViewSet(ModelViewSet):
+    permission_classes = [IsAuthenticated]
+    serializer_class = GradingSessionSerializer
+
+    def get_queryset(self):
+        return GradingSession.objects.filter(course__owner=self.request.user)  # type: ignore
 
 
 class DeleteSession(View):

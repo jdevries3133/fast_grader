@@ -14,8 +14,10 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 from django.urls import path
+from rest_framework import routers
 
 from .views import (
+    SessionViewSet,
     DeleteSession,
     flush_selections,
     grader,
@@ -37,6 +39,11 @@ urlpatterns = [
     path(
         "choose_assignment/", ChooseAssignmentView.as_view(), name="choose_assignment"
     ),
+    # viewsets can't render html, so this duplication is necessary for now...
     path("session/<int:pk>/", session_detail, name="session_detail"),
     path("session/<int:pk>/delete/", DeleteSession.as_view(), name="delete_session"),
 ]
+
+router = routers.SimpleRouter()
+router.register(r"session_viewset", SessionViewSet, "session_viewset")
+urlpatterns += router.urls

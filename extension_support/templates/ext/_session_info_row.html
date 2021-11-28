@@ -11,7 +11,11 @@
       hx-target="body"
       class="inline p-2 m-1 bg-green-100 syncSessionButton"
       data-pk="{{ session.pk}}">
-        Sync Now
+      {% if session.last_synced %}
+        Re-Sync
+      {% else %}
+        Sync Grades
+      {% endif %}
     </button>
     <button
       hx-target="body"

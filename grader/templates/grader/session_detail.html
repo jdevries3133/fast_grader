@@ -10,7 +10,7 @@
   <h1 class="my-8">{{ session.assignment_name }}</h1>
 
   <a href="{% url 'resume_grading' session.pk %}">
-    <button class="p-2 bg-yellow-100 focus:ring-yellow-100">Resume Grading This Assignment</button>
+    <button class="p-2 bg-green-100 focus:ring-green-100">Resume Grading This Assignment</button>
   </a>
 
   {% include 'grader/partials/session_detail.html' %}

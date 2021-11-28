@@ -31,8 +31,8 @@ def home(_):
 @permission_classes([IsAuthenticated])
 def sessions_list(request):
     qs = GradingSession.objects.filter(course__owner=request.user)  # type: ignore
-    synced = qs.filter(last_synced__isnull=False).all()
-    unsynced = qs.filter(last_synced__isnull=True).all()
+    synced = qs.filter(sync_state=GradingSession.SyncState.SYNCED)
+    unsynced = qs.filter(sync_state=GradingSession.SyncState.UNSYNCED)
 
     return Response(
         {"synced_sessions": synced, "unsynced_sessions": unsynced},

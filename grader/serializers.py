@@ -14,8 +14,8 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import logging
-from django.core.exceptions import ValidationError
 
+from django.core.exceptions import ValidationError
 from rest_framework import serializers
 
 from .models import GradingSession, AssignmentSubmission
@@ -47,13 +47,14 @@ class AssignmentSubmissionSerializer(serializers.ModelSerializer):
         return data
 
     def to_representation(self, instance):
-        repr_ = super().to_representation(instance)
-        repr_["submission"] = repr_["submission"].split("\n")
-        return repr_
+        ret = super().to_representation(instance)
+        ret["submission"] = ret["submission"].split("\n")
+        return ret
 
 
 class GradingSessionSerializer(serializers.ModelSerializer):
     submissions = AssignmentSubmissionSerializer(many=True)
+    sync_state = serializers.CharField(max_length=20)
 
     class Meta:
         model = GradingSession
@@ -65,4 +66,20 @@ class GradingSessionSerializer(serializers.ModelSerializer):
             "submissions",
             "average_grade",
             "google_classroom_detail_view_url",
+            "sync_state",
         )
+
+    def to_representation(self, instance):
+        ret = super().to_representation(instance)
+        ret["sync_state"] = instance.SyncState(instance.sync_state).label
+        return ret
+
+    def validate_sync_state(self, value):
+        try:
+            idx = GradingSession.SyncState.labels.index(value)
+            value = GradingSession.SyncState.values[idx]
+        except ValueError:
+            if value in GradingSession.SyncState.values:
+                return value
+            raise ValidationError(f"{value} is not a valid choice")
+        return value

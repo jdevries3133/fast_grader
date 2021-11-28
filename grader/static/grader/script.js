@@ -128,18 +128,22 @@ function getModal(containerElement, innerHTML) {
   return el;
 }
 
+async function fetchData() {
+  const uri = state.viewDiffOnly ? dataUri + "?diff=true" : dataUri;
+  const response = await fetch(uri);
+  if (!response.ok) {
+    throw new Error("Data get request failed");
+  }
+  return response.json();
+}
+
 /**
  * Populate state.assignmentData.submissions
  */
-async function fetchData() {
+async function updateStateWithData() {
   const removeLoading = indicateLoading();
   try {
-    const uri = state.viewDiffOnly ? dataUri + "?diff=true" : dataUri;
-    const response = await fetch(uri);
-    if (!response.ok) {
-      throw new Error("Data get request failed");
-    }
-    const data = await response.json();
+    const data = await fetchData();
     state.assignmentData = data;
     state.ready = true;
     indicateSuccess("Your assignment data was loaded.");
@@ -164,14 +168,47 @@ async function syncData() {
     removeLoading();
     throw new Error("Update failed");
   };
+
   // sending the submission is problematic because the serializer on the
   // backend is jank and broken. We don't need to update the submission
   // anyway, so let's just remove it from the request data
-  const data = { ...state.assignmentData };
-  data.submissions = state.assignmentData.submissions.map((i) => {
+  const postData = { ...state.assignmentData };
+  postData.submissions = state.assignmentData.submissions.map((i) => {
     delete i.submission;
     return i;
   });
+
+  // we need to take a look at the original data again to see if there have
+  // been any changes to grades or comments, which determines whether the
+  // sync state needs to be set.
+  //
+  // TODO: store the original request in state, so that another network request
+  // is not needed here
+
+  const originalData = await fetchData();
+  const origIdMap = {};
+  originalData.submissions.forEach(({ grade, comment, profile_photo_url }) => {
+    origIdMap[profile_photo_url] = {
+      grade,
+      comment,
+    };
+  });
+
+  // if the data is synced, then no change is made – which is what we set as
+  // the default. As we check for changes, we will set this value to 'UNSYNCED'
+  // if a change is identified.
+  let sync_state = "SYNCED";
+  postData.submissions.forEach(({ grade, comment, profile_photo_url }) => {
+    if (origIdMap[profile_photo_url].grade != grade) {
+      sync_state = "UNSYNCED";
+    }
+    if (origIdMap[profile_photo_url].comment != comment) {
+      sync_state = "UNSYNCED";
+    }
+  });
+
+  postData.sync_state = sync_state;
+
   try {
     const res = await fetch(dataUri, {
       headers: new Headers({
@@ -179,7 +216,7 @@ async function syncData() {
         "X-CSRFToken": getCookie("csrftoken"),
       }),
       method: "PATCH",
-      body: JSON.stringify(data),
+      body: JSON.stringify(postData),
       mode: "same-origin",
     });
     if (res.ok) {
@@ -634,7 +671,7 @@ async function handleDiffSelectSlider() {
   const newState = !inputEl.checked;
   state.viewDiffOnly = newState;
   inputEl.checked = newState;
-  await fetchData();
+  await updateStateWithData();
   updateView();
 }
 
@@ -722,7 +759,7 @@ function handleKeyUp(e) {
  * configuration
  */
 async function init() {
-  await fetchData();
+  await updateStateWithData();
   updateView();
 
   document.body.addEventListener("keypress", handleKeyPress);

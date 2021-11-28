@@ -15,6 +15,8 @@
 
 from django.contrib.auth.models import User
 from django.db import models
+from django.utils.translation import gettext_lazy as _
+
 
 from .utils import normalize_protocol_url
 
@@ -51,8 +53,16 @@ class GradingSession(models.Model):
     max_grade = models.IntegerField(null=True)
     teacher_template = models.TextField(blank=True)
 
-    # sync information is consumed by the browser extension
-    last_synced = models.DateTimeField(null=True)
+    # TODO: the first thing to do here is definitevely determine how sync
+    # state will be handled (with an enum probably), then to update everything
+    # else.
+    class SyncState(models.TextChoices):
+        UNSYNCED = "U", _("UNSYNCED")
+        SYNCED = "S", _("SYNCED")
+
+    sync_state = models.CharField(
+        max_length=2, choices=SyncState.choices, default=SyncState.UNSYNCED
+    )
 
     @property
     def is_graded(self) -> bool:

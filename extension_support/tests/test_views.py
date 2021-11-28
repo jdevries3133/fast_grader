@@ -37,25 +37,17 @@ class MockSyncedQuerySet:
 class MockUnsyncedQuerySet:
     def all(self):
         return [
-            {
-                "assignment_name": "synced assgt 1",
-                "pk": 3,
-                "last_synced": datetime.datetime(2021, 2, 3),
-            },
-            {
-                "assignment_name": "synced assgt 2",
-                "pk": 4,
-                "last_synced": datetime.datetime(2020, 2, 3),
-            },
+            {"assignment_name": "synced assgt 1", "pk": 3, "sync_state": "synced"},
+            {"assignment_name": "synced assgt 2", "pk": 4, "sync_state": "synced"},
         ]
 
 
 class MockQs:
-    def filter(self, *, last_synced__isnull):
-        if last_synced__isnull:
-            return MockUnsyncedQuerySet()
-        else:
+    def filter(self, *, sync_state):
+        if sync_state == GradingSession.State.NEVER_SYNCED:
             return MockSyncedQuerySet()
+        else:
+            return MockUnsyncedQuerySet()
 
 
 @contextmanager
