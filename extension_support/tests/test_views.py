@@ -13,11 +13,9 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import datetime
-
 from contextlib import contextmanager
+from types import SimpleNamespace
 from unittest.mock import patch
-import pytest
 
 from django.contrib.auth.models import User
 from django.test import TestCase
@@ -25,35 +23,36 @@ from django.urls import reverse
 from rest_framework.authtoken.models import Token
 from rest_framework.test import APIClient
 
-
-class MockSyncedQuerySet:
-    def all(self):
-        return [
-            {"assignment_name": "unsynced assignment 1", "pk": 1},
-            {"assignment_name": "unsynced assignment 2", "pk": 2},
-        ]
+from grader.models import GradingSession
 
 
-class MockUnsyncedQuerySet:
-    def all(self):
-        return [
-            {"assignment_name": "synced assgt 1", "pk": 3, "sync_state": "synced"},
-            {"assignment_name": "synced assgt 2", "pk": 4, "sync_state": "synced"},
-        ]
+def mock_synced_queryset():
+    return [
+        {"assignment_name": "synced assignment 1", "pk": 1, "sync_state": "SYNCED"},
+        {"assignment_name": "synced assignment 2", "pk": 2, "sync_state": "SYNCED"},
+    ]
+
+
+def mock_unsynced_queryset():
+    return [
+        {"assignment_name": "unsynced assgt 1", "pk": 3, "sync_state": "UNSYNCED"},
+        {"assignment_name": "unsynced assgt 2", "pk": 4, "sync_state": "UNSYNCED"},
+    ]
 
 
 class MockQs:
     def filter(self, *, sync_state):
-        if sync_state == GradingSession.State.NEVER_SYNCED:
-            return MockSyncedQuerySet()
+        if sync_state == GradingSession.SyncState.SYNCED:
+            return mock_synced_queryset()
         else:
-            return MockUnsyncedQuerySet()
+            return mock_unsynced_queryset()
 
 
 @contextmanager
 def mocked_queryset():
     with patch("extension_support.views.GradingSession") as mock_model:
         mock_model.objects.filter.return_value = MockQs()
+        mock_model.SyncState = GradingSession.SyncState
         yield
 
 
@@ -65,7 +64,7 @@ class TestViews(TestCase):
     def login(self):
         try:
             token = Token.objects.get(user=self.user)  # type: ignore
-        except Token.DoesNotExist:
+        except Token.DoesNotExist:  # type: ignore
             token = Token.objects.create(user=self.user)  # type: ignore
         self.client.credentials(HTTP_AUTHORIZATION=f"Token {token.key}")
 
@@ -73,6 +72,7 @@ class TestViews(TestCase):
     def test_list_sessions_forbids_unauthenticated(self):
         EXPECTED_RESPONSE_STAUS = 403
         res = self.client.get(reverse("ext_list_sessions"))
+
         self.assertEqual(res.status_code, EXPECTED_RESPONSE_STAUS)  # type: ignore
 
     def test_list_sessions_allows_authenticated(self):
@@ -87,12 +87,11 @@ class TestViews(TestCase):
         with mocked_queryset():
             res = self.client.get(reverse("ext_list_sessions"))
             self.assertEqual(
-                res.data["synced_sessions"], MockSyncedQuerySet().all()  # type: ignore
+                res.data["synced_sessions"], mock_synced_queryset()  # type: ignore
             )
 
             self.assertEqual(
-                res.data["unsynced_sessions"],  # type: ignore
-                MockUnsyncedQuerySet().all(),
+                res.data["unsynced_sessions"], mock_unsynced_queryset()  # type: ignore
             )
 
     def test_session_detail(self):

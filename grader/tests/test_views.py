@@ -162,6 +162,7 @@ class TestAssignmentDataView(TestCase):
     def test_patch(self, s_ser, g_ser, s_mod, g_mod):
         g_mod.objects.get.return_value = sentinel.g_model
         s_mod.objects.get.return_value = sentinel.s_model
+        g_ser.return_value.data = "foo"
         request_data = {
             "pk": 13,
             "data": "foo",
