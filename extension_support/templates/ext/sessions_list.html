@@ -13,6 +13,11 @@
 <div class="flex flex-col gap-3">
   <div>
     <h3>Unsynced Grading Sessions</h3>
+
+    {% if not unsynced_sessions %}
+      <p>All synced up!</p>
+    {% endif %}
+
     {% for session in unsynced_sessions %}
       {% include 'ext/_session_info_row.html' %}
     {% endfor %}
@@ -20,6 +25,11 @@
 
   <div>
     <h3>Synced Grading Sessions</h3>
+
+    {% if not synced_sessions %}
+      <p>No synced sessions yet!</p>
+    {% endif %}
+
     {% for session in synced_sessions %}
       {% include 'ext/_session_info_row.html' %}
     {% endfor %}
