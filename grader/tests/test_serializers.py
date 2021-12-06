@@ -14,11 +14,14 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 from unittest.mock import MagicMock
+from unittest.mock import patch
 from django.core.exceptions import ValidationError
 
 from django.test import TestCase
 
-from grader.serializers import AssignmentSubmissionSerializer, GradingSessionSerializer
+from grader.serializers import (
+    AssignmentSubmissionSerializer,
+)
 
 
 class TestAssignmentSubmissionSerializer(TestCase):
@@ -26,7 +29,8 @@ class TestAssignmentSubmissionSerializer(TestCase):
         self.mock = MagicMock()
         self.instance = AssignmentSubmissionSerializer()
 
-    def test_to_representation(self):
+    @patch("grader.serializers.update_submission")
+    def test_to_representation(self, updater_mock):
         """Submission should be represented as a list of strings"""
         # setup
         self.mock.submission.__str__.return_value = "foo\nbar"
@@ -34,6 +38,7 @@ class TestAssignmentSubmissionSerializer(TestCase):
         result = self.instance.to_representation(self.mock)
         # assertion
         self.assertEqual(result["submission"], ["foo", "bar"])
+        updater_mock.assert_called_once()
 
     def test_validate_submission_joins_lists(self):
         result = self.instance.validate_submission(["join", "lists"])

@@ -18,8 +18,7 @@ import json
 import logging
 
 from dataclasses import dataclass
-from typing import Union
-from difflib import unified_diff
+from typing import Union, Tuple
 
 from allauth.socialaccount.models import SocialToken
 from django.contrib.auth.models import User
@@ -28,8 +27,10 @@ from googleapiclient.discovery import build
 from google.oauth2.credentials import Credentials
 from googleapiclient.errors import HttpError as GoogClientHttpError
 
-from .models import GradingSession, AssignmentSubmission, CourseModel
+from .models import AssignmentSubmission, CourseModel, GradingSession, TeacherTemplate
 
+
+# TODO: import these from django.conf to avoid the need for error handling here
 
 # in testing environments, the secrets file may not exist, so it's ok in those
 # cases to continue, since google api services will be mocked, anyway
@@ -51,12 +52,13 @@ logger = logging.getLogger(__name__)
 
 
 def _get_google_api_service(*, user: User, service: str, version: str):
-    qs = SocialToken.objects.filter(  # type: ignore
+    qs = SocialToken.objects.filter(
         account__user=user,
         account__provider="google",
     )
 
     token = qs.order_by("-expires_at").first()
+    assert token
 
     credentials = Credentials(
         token=token.token,
@@ -66,8 +68,7 @@ def _get_google_api_service(*, user: User, service: str, version: str):
         client_secret=GOOGLE_CLIENT_SECRET,
     )
 
-    service = build(service, version, credentials=credentials)  # type: ignore
-    return service
+    return build(service, version, credentials=credentials)
 
 
 def get_google_classroom_service(*, user: User):
@@ -108,29 +109,28 @@ class StudentResource(APIItem):
     photo_url: str
 
 
-def get_student_data(*, user: User, course_id: str) -> list[StudentResource]:
+def get_student_data(
+    *, user: User, course_id: str, student_id: str, service=None
+) -> StudentResource:
     """We are going to ignore paging here and just get 200 students. If anyone
     is grading more than 200 assignments in one session, they are just too
     hardcore for us."""
-    service = get_google_classroom_service(user=user)
-    response = (
+    if not service:
+        service = get_google_classroom_service(user=user)
+    student = (
         service.courses()  # type: ignore
         .students()
-        .list(  # type: ignore
+        .get(  # type: ignore
             courseId=course_id,
-            pageSize=200,
+            userId=student_id,
         )
         .execute()
     )
-    students = response.get("students")
-    return [
-        StudentResource(
-            id_=s["profile"]["id"],
-            name=s["profile"]["name"]["fullName"],
-            photo_url=s["profile"].get("photoUrl", ""),
-        )
-        for s in students
-    ]
+    return StudentResource(
+        id_=student_id,
+        name=student["profile"]["name"]["fullName"],
+        photo_url=student["profile"].get("photoUrl", ""),
+    )
 
 
 def list_all_class_names(
@@ -169,9 +169,7 @@ def list_all_assignment_names(
     response = (
         service.courses()  # type: ignore
         .courseWork()
-        .list(  # type: ignore
-            pageSize=30, pageToken=page_token, courseId=course.id_, orderBy="dueDate"
-        )
+        .list(pageSize=30, pageToken=page_token, courseId=course.id_, orderBy="dueDate")
         .execute()
     )
     data = response.get("courseWork")
@@ -183,40 +181,6 @@ def list_all_assignment_names(
     # format data and wrap in dataclasses
     classes = [APIItem(r["id"], r["title"]) for r in data]
     return AssignmentList(response.get("nextPageToken"), classes)
-
-
-def _fetch_raw_assignment_data(course_id, assignment_id, user, page_token: str = None):
-    """Returns a tuple of submission_data and assignment_data.
-
-    Submission data contains information about the students' submissions,
-    like google drive links.
-
-    Assignment data constains details about the assignment, like the
-    maximum number of points
-    """
-    service = get_google_classroom_service(user=user)
-    submsision_data = (
-        service.courses()  # type: ignore
-        .courseWork()
-        .studentSubmissions()
-        .list(  # type: ignore
-            courseId=course_id,
-            courseWorkId=assignment_id,
-            pageToken=page_token,
-            states="TURNED_IN",
-        )
-        .execute()
-    )
-    assignment_data = (
-        service.courses()  # type: ignore
-        .courseWork()
-        .get(  # type: ignore
-            courseId=course_id,
-            id=assignment_id,
-        )
-        .execute()
-    )
-    return submsision_data, assignment_data
 
 
 def download_drive_file_as(*, user: User, id_: str, mime_type: str) -> str:
@@ -246,7 +210,7 @@ class StringifiedAttachment:
 class ConcatOutput:
     data: list[StringifiedAttachment]
 
-    def join_lines(self) -> list[str]:
+    def combine_content(self) -> list[str]:
         out = []
         for i in self.data:
             out.extend(i.header)
@@ -307,189 +271,215 @@ def concatenate_attachments(
     return ConcatOutput(output)
 
 
-def get_assignment_data(
-    *,
+def _update_teacher_template(
+    user: User,
     course_id: str,
     assignment_id: str,
-    user: User,
-    student_data: list[StudentResource],
-    page_token: str = None,
-    diff_only: bool = False,
-) -> GradingSession:
-    """Student submissions are fetched and squashed into a single string of
-    text. If there are multiple attachments, they are concatenated with titles
-    in-between.
+    template: Union[TeacherTemplate, None],
+) -> Tuple[TeacherTemplate, bool]:
+    """Returns a boolean indicating whether the template was created."""
+    service = get_google_classroom_service(user=user)
+    assignment_data = (
+        service.courses()  # type: ignore
+        .courseWork()
+        .get(  # type: ignore
+            courseId=course_id,
+            id=assignment_id,
+        )
+        .execute()
+    )
+    attachments = [
+        DriveAttachment(
+            id_=i.get("driveFile", {}).get("driveFile", {}).get("id"),
+            name=i.get("driveFile", {}).get("driveFile", {}).get("title"),
+        )
+        for i in assignment_data.get("materials", {})
+    ]
+    template_content = concatenate_attachments(user=user, attachments=attachments)
+
+    was_created = False
+    if template:
+        stringified = "\n".join(template_content.combine_content())
+        if stringified != template.content:
+            template.content = stringified
+            template.save()
+    else:
+        was_created = True
+        template = TeacherTemplate.objects.create(
+            content="\n".join(template_content.combine_content())
+        )
+    return template, was_created
+
+
+def _update_submission(
+    user: User, submission: AssignmentSubmission
+) -> AssignmentSubmission:
+    # pull repetitively used values out of the submission
+    course_id = submission.assignment.course.api_course_id  # type: ignore
+    assignment_id = submission.assignment.api_assignment_id  # type: ignore
+
+    # get submission from Classroom API
+    service = get_google_classroom_service(user=user)
+    submission_data = (
+        service.courses()  # type: ignore
+        .courseWork()
+        .studentSubmissions()
+        .get(  # type: ignore
+            courseId=course_id,
+            courseWorkId=assignment_id,
+            id=submission.api_student_submission_id,
+        )
+        .execute()
+    )
+    student_data = get_student_data(
+        user=user,
+        course_id=course_id,
+        student_id=submission_data["userId"],
+        service=service,
+    )
+
+    # update top-level submission fields
+    submission.student_name = student_data.name
+    submission._profile_photo_url = student_data.photo_url
+    submission.grade = submission_data.get("assignedGrade") or submission_data.get(
+        "draftGrade"
+    )
+
+    # update submission content
+    drive_attachments = [
+        DriveAttachment(
+            id_=i.get("driveFile", {}).get("id"),
+            name=i.get("driveFile", {}).get("title"),
+        )
+        for i in submission_data.get("assignmentSubmission", {}).get("attachments", {})
+    ]
+    content = concatenate_attachments(user=user, attachments=drive_attachments)
+
+    # update models
+    if content != submission.submission:
+        submission.submission = "\n".join(content.combine_content())
+        submission.save()
+    return submission
+
+
+def update_submission(
+    *, submission: AssignmentSubmission, force_update: bool = False
+) -> AssignmentSubmission:
+    """Update the content of the submission and the teacher template. By
+    default, only update items that are more than one day old, unless the
+    `force_update` parameter is set to True."""
+    user = submission.assignment.course.owner
+
+    if force_update or submission.needs_update:
+        submission = _update_submission(user, submission)
+
+    if (
+        force_update
+        or not submission.teacher_template
+        or submission.teacher_template.needs_update
+    ):
+        template, was_created = _update_teacher_template(
+            user,
+            submission.assignment.course.api_course_id,
+            submission.assignment.api_assignment_id,
+            submission.teacher_template,
+        )
+        if was_created:
+            submission.teacher_template = template
+            submission.save()
+
+    return submission
+
+
+def _list_assignment_submissions(session: GradingSession) -> list:
+    """Retrieve all top-level courseWork submission resources for an
+    assignment."""
+
+    service = get_google_classroom_service(user=session.course.owner)
+
+    ret = []
+    page_token = None
+    while True:
+        res = (
+            service.courses()  # type: ignore
+            .courseWork()
+            .studentSubmissions()
+            .list(
+                courseId=session.course.api_course_id,
+                courseWorkId=session.api_assignment_id,
+                pageToken=page_token,
+            )
+            .execute()
+        )
+        ret += res["studentSubmissions"]
+        if (page_token := res.get("nextPageToken")) is None:
+            break
+
+    return ret
+
+
+def overwrite_submissions_using_api_data(session: GradingSession):
+    """Delete all AssignmentSubmission objects for a session, and use the
+    response from the courses.courseWork Classroom API endpoint to make new
+    ones. This service is used on GradingSession creation, and also could
+    be helpful for "syncing" an assignment with Google Classroom.
+
+    Note:
+        submission content and student profile information are lost in this
+        operation, and will be lazily re-fetched in a future operation when
+        needed. This obviously has a hidden downstream cost.
+
+        this also causes comments to be lost, which mostly makes this service
+        useless for updating, since I don't think we'd ever want that. **IT
+        SHOULD BE MODIFIED TO PRESERVE THE COMMENT BEFORE BEING USED FOR
+        UPDATING**
     """
-    student_id_to_data = {resource.id_: resource for resource in student_data}
-    # TODO: too thicc
-    # TODO: not tested
-    # TODO: doin' too much
-    submissions, assignment = _fetch_raw_assignment_data(
-        course_id, assignment_id, user, page_token
-    )
-    # prepare teacher attachment to diff against, if requested
-    if diff_only:
-        attachments = [
-            DriveAttachment(
-                id_=i.get("driveFile", {}).get("driveFile", {}).get("id"),
-                name=i.get("driveFile", {}).get("driveFile", {}).get("title"),
-            )
-            for i in assignment.get("materials", {})
-        ]
-        teacher_template = concatenate_attachments(user=user, attachments=attachments)
+    submissions = AssignmentSubmission.objects.filter(assignment=session)
+    submissions.delete()
 
-    # ----
-    # if there is an existing session, we will update it rather than creating
-    # a new one
-    # ----
-
-    existing = GradingSession.objects.filter(  # type: ignore
-        course__api_course_id=course_id,
-        api_assignment_id=assignment_id,
-        course__owner=user,
-    ).prefetch_related("submissions")
-    if existing:
-
-        # sanity check
-        if not len(existing) == 1:
-            raise ValueError(
-                "more than one grading session exists in the database for a "
-                "single assignment"
-            )
-        existing = existing.first()
-
-        # update the top-level session object (corresponding to a single
-        # assignment) if there are new values in the fields.
-        update_performed = False
-        if existing.is_graded and (existing.max_grade != assignment.get("maxPoints")):
-            existing.max_grade = assignment.get("maxPoints")
-            update_performed = True
-
-        if existing.assignment_name != assignment["title"]:
-            existing.assignment_name = assignment["title"]
-            update_performed = True
-
-        if existing.ui_url != assignment["alternateLink"]:
-            existing.ui_url = assignment["alternateLink"]
-            update_performed = True
-
-        if update_performed:
-            existing.save()
-
-        submission_updates = []
-        for submission_from_database in existing.submissions.all():
-            match_found = False
-            for submission_from_google in submissions.get("studentSubmissions", []):
-                if (
-                    submission_from_database.api_student_submission_id
-                    == submission_from_google["id"]
-                ):
-                    match_found = True
-
-                    # fetch all attachments
-                    attachments = [
-                        DriveAttachment(
-                            id_=i["driveFile"]["id"], name=i["driveFile"]["title"]
-                        )
-                        for i in submission_from_google["assignmentSubmission"][
-                            "attachments"
-                        ]
-                    ]
-                    output = concatenate_attachments(user=user, attachments=attachments)
-
-                    # prepare diff if requested
-                    if diff_only:
-                        for i_st, st in enumerate(output.data):
-                            for i_te, te in enumerate(teacher_template.data):
-                                if te.header[0] in st.header[0]:
-                                    diff = list(
-                                        unified_diff(
-                                            te.content,
-                                            st.content,
-                                            n=1,
-                                            fromfile="teacher original",
-                                            tofile="student submission",
-                                        )
-                                    )
-                                    output.data[i_st].content = diff
-
-                    # finalize submission resource update
-                    submission_from_database.submission = "\n".join(output.join_lines())
-                    submission_updates.append(submission_from_database)
-
-            if not match_found:
-                raise NotImplementedError(
-                    "A submission came back from Google that does not currently "
-                    "exist in our database. It must be created."
-                )
-
-        AssignmentSubmission.objects.bulk_update(  # type: ignore
-            submission_updates,
-            (
-                # fields to update
-                "api_student_profile_id",
-                "student_name",
-                "_profile_photo_url",
-                "submission",
-            ),
-        )
-        return existing
-
-    # ----
-    # Otherwise (there is not existing session), we need to take the API data
-    # and create a new one
-    # ----
-
-    course_resource = get_course(user=user, course_id=assignment["courseId"])
-
-    try:
-        course = CourseModel.objects.get(api_course_id=course_id)  # type: ignore
-    except CourseModel.DoesNotExist:  # type: ignore
-        course = CourseModel.objects.create(  # type: ignore
-            owner=user, name=course_resource["name"], api_course_id=course_id
-        )
-
-    assignment = GradingSession.objects.create(  # type: ignore
-        assignment_name=assignment["title"],
-        # TODO: This is only populated if `state` is `PUBLISHED`.
-        # we should be checking if this assignment is published before trying
-        # to access this property, and we don't want to create a new session
-        # without this property.... need to better think through how to
-        # handle that.
-        ui_url=assignment["alternateLink"],
-        api_assignment_id=assignment_id,
-        max_grade=assignment.get("maxPoints"),
-        course=course,
-    )
-
-    submissions = submissions.get("studentSubmissions", [])
-    submission_models = []
-    for sub in submissions:
-        output = concatenate_attachments(
-            user=user,
-            attachments=[
-                DriveAttachment(id_=i["driveFile"]["id"], name=i["driveFile"]["title"])
-                for i in sub["assignmentSubmission"]["attachments"]
-            ],
-        )
-        if diff_only:
-            raise NotImplementedError
-        submission_string = "\n".join(output.join_lines())
-        if student_resource := student_id_to_data.get(sub["userId"]):
-            name = student_resource.name
-            photo_url = student_resource.photo_url
-        else:
-            name = "unknown"
-            photo_url = None
-        submission_models.append(
+    new_submissions = []
+    for goog_submission in _list_assignment_submissions(session):
+        new_submissions.append(
             AssignmentSubmission(
-                assignment=assignment,
-                api_student_submission_id=sub["id"],
-                api_student_profile_id=sub["userId"],
-                student_name=name,
-                _profile_photo_url=photo_url,
-                submission=submission_string,
+                assignment=session,
+                api_student_profile_id=goog_submission["userId"],
+                api_student_submission_id=goog_submission["id"],
+                grade=goog_submission.get("assignedGrade")
+                or goog_submission.get("draftGrade"),
             )
         )
-    AssignmentSubmission.objects.bulk_create(submission_models)  # type: ignore
-    return assignment
+
+    AssignmentSubmission.objects.bulk_create(new_submissions)
+
+
+def create_or_get_grading_session(
+    *, user: User, course: CourseModel, assignment_id: str, full_update: bool = False
+) -> Tuple[GradingSession, bool]:
+    """Returns a tuple indicating whether the session was created. If an
+    existing model is found in the database, a request to Google is not made
+    unless `full_update` is set to true."""
+
+    # first, get the source of truth from Google API
+    service = get_google_classroom_service(user=user)
+    goog_detail = (
+        service.courses()  # type: ignore
+        .courseWork()
+        .get(courseId=course.api_course_id, id=assignment_id)  # type: ignore
+        .execute()
+    )
+
+    # get or update operation on our database
+    session, created = GradingSession.objects.update_or_create(
+        course=course,
+        api_assignment_id=assignment_id,
+        assignment_name=goog_detail["title"],
+        ui_url=goog_detail["alternateLink"],
+        max_grade=goog_detail["maxPoints"],
+    )
+
+    # reach into deeper nesting if necessary
+    if created or full_update:
+        overwrite_submissions_using_api_data(session)
+        return session, True
+
+    return session, False

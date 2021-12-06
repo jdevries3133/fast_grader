@@ -17,11 +17,6 @@
 from .base import *
 from .consume_secrets_file import *
 
-# inject type hints all over the place
-import django_stubs_ext
-
-django_stubs_ext.monkeypatch()
-
 
 # for django-tailwind
 INTERNAL_IPS = ["127.0.0.1"]

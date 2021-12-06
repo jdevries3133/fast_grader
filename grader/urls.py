@@ -17,33 +17,36 @@ from django.urls import path
 from rest_framework import routers
 
 from .views import (
-    SessionViewSet,
     DeleteSession,
     flush_selections,
     grader,
+    user_selections,
     grading_tool,
     resume_grading,
     session_detail,
     ChooseCourseView,
     ChooseAssignmentView,
-    AssessmentDataView,
+    GradingSessionViewSet,
+    AssignmentSubmissionViewSet,
 )
 
 urlpatterns = [
     path("", grader, name="grader"),
     path("<int:pk>/", resume_grading, name="resume_grading"),
     path("flush_selections/", flush_selections, name="flush_selections"),
+    path("user_selections/", user_selections, name="user_selections"),
     path("tool/", grading_tool, name="grading_tool"),
-    path("assignment_data/", AssessmentDataView.as_view(), name="assignment_data"),
     path("choose_course/", ChooseCourseView.as_view(), name="choose_course"),
     path(
         "choose_assignment/", ChooseAssignmentView.as_view(), name="choose_assignment"
     ),
-    # viewsets can't render html, so this duplication is necessary for now...
     path("session/<int:pk>/", session_detail, name="session_detail"),
     path("session/<int:pk>/delete/", DeleteSession.as_view(), name="delete_session"),
 ]
 
 router = routers.SimpleRouter()
-router.register(r"session_viewset", SessionViewSet, "session_viewset")
+router.register(r"session_viewset", GradingSessionViewSet, "session_viewset")
+router.register(
+    r"assignment_submission", AssignmentSubmissionViewSet, "session_viewset"
+)
 urlpatterns += router.urls

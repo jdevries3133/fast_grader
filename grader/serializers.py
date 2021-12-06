@@ -18,6 +18,8 @@ import logging
 from django.core.exceptions import ValidationError
 from rest_framework import serializers
 
+from grader.services import update_submission
+
 from .models import GradingSession, AssignmentSubmission
 
 
@@ -47,15 +49,14 @@ class AssignmentSubmissionSerializer(serializers.ModelSerializer):
         return data
 
     def to_representation(self, instance):
+        if instance:
+            update_submission(submission=instance)
         ret = super().to_representation(instance)
         ret["submission"] = ret["submission"].split("\n")
         return ret
 
 
 class GradingSessionSerializer(serializers.ModelSerializer):
-    submissions = AssignmentSubmissionSerializer(many=True)
-    sync_state = serializers.CharField(max_length=20)
-
     class Meta:
         model = GradingSession
         fields = (
@@ -68,18 +69,3 @@ class GradingSessionSerializer(serializers.ModelSerializer):
             "google_classroom_detail_view_url",
             "sync_state",
         )
-
-    def to_representation(self, instance):
-        ret = super().to_representation(instance)
-        ret["sync_state"] = instance.SyncState(instance.sync_state).label
-        return ret
-
-    def validate_sync_state(self, value):
-        try:
-            idx = GradingSession.SyncState.labels.index(value)
-            value = GradingSession.SyncState.values[idx]
-        except ValueError:
-            if value in GradingSession.SyncState.values:
-                return value
-            raise ValidationError(f"{value} is not a valid choice")
-        return value

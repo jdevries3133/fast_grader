@@ -13,6 +13,7 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+from django.utils import timezone
 from django.contrib.auth.models import User
 from django.db import models
 from django.utils.translation import gettext_lazy as _
@@ -43,14 +44,13 @@ class GradingSession(models.Model):
         CourseModel,
         related_name="grading_sessions",
         on_delete=models.CASCADE,
-        null=True,
     )
 
     # only one session can exist for a given assignment. Users can resume
     # previous sessions, and submission data may need to be updated when
     # it is out of sync
     api_assignment_id = models.CharField(max_length=50, unique=True)
-    max_grade = models.IntegerField(null=True)
+    max_grade = models.IntegerField()
     teacher_template = models.TextField(blank=True)
 
     # TODO: the first thing to do here is definitevely determine how sync
@@ -71,7 +71,7 @@ class GradingSession(models.Model):
     @property
     def average_grade(self):
         if not self.is_graded:
-            raise ValueError("cannot get average grade from ungraded assignment")
+            return None
         return list(self.submissions.aggregate(models.Avg("grade")).values())[0]  # type: ignore
 
     @property
@@ -88,26 +88,77 @@ class GradingSession(models.Model):
         return self.assignment_name
 
 
+class TeacherTemplate(models.Model):
+    """This string is diffed against to provide the differences template. Here,
+    the individual attachments Google Drive objects are irrelevant. Like the
+    `submission` field on the `AssignmentSubmission` object, this is a sorted
+    and concatenated string of all the attachments on the assignment. At this
+    stage, we don't really care what is in here – it just gives us something
+    to diff against while we are serving student submissions"""
+
+    content = models.TextField()
+    last_updated = models.DateTimeField(auto_now=True)
+
+    @property
+    def needs_update(self):
+        return bool((timezone.now() - self.last_updated).days > 1)  # type: ignore
+
+
 class AssignmentSubmission(models.Model):
-    # id's needed to fetch more data at different levels
+    # relations
     assignment = models.ForeignKey(
         GradingSession, related_name="submissions", on_delete=models.CASCADE
     )
+    teacher_template = models.ForeignKey(
+        TeacherTemplate, on_delete=models.SET_NULL, null=True
+    )
+
+    # ids for Google APIs
     api_student_profile_id = models.CharField(max_length=50)
     api_student_submission_id = models.CharField(max_length=50)
 
-    # information about this assignment
-    student_name = models.CharField(max_length=200)
+    # student information
+    # this information is nullable, because it requires a separate request to
+    # fetch, and this allows us to do that lazily.
+    student_name = models.CharField(max_length=200, null=True)
     _profile_photo_url = models.CharField(max_length=200, null=True)
-    grade = models.IntegerField(blank=True, null=True)
 
-    # TODO: rename to `content`?
-    submission = models.TextField(blank=True)
+    # grading information
+    grade = models.IntegerField(blank=True)
     comment = models.TextField(blank=True)
 
+    # submission content
+    submission = models.TextField(blank=True)
+
+    # metadata
+    last_updated = models.DateTimeField(auto_now=True)
+
     def __str__(self):
-        return self.student_name
+        return self.student_name or "no name"
 
     @property
     def profile_photo_url(self):
         return normalize_protocol_url(url=self._profile_photo_url)  # type: ignore
+
+    @property
+    def needs_update(self):
+        """A detail request will fill the `blank=True` fields on this model.
+        Therefore, if any of those fields are empty, or if the model is older
+        than one day, a request will be updated.
+
+        Downstream, this will result in a detail request being sent to the
+        Classroom API, allowing these fields to be filled, or other updates to
+        be applied."""
+        is_old = bool((timezone.now() - self.last_updated).days > 1)  # type: ignore
+        missing_fields = False
+        for field in (
+            "teacher_template",
+            "student_name",
+            "_profile_photo_url",
+            "grade",
+            "submission",
+        ):
+            if not getattr(self, field):
+                print(f"MISSING {field}")
+                missing_fields = True
+        return is_old or missing_fields

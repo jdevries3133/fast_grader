@@ -20,8 +20,6 @@
  * globals and application state
  */
 
-const dataUri = "/grader/assignment_data/";
-
 const state = {
   isInitialized: false,
   // the global shortcut listener is paused when we are recieving keyboard
@@ -128,13 +126,94 @@ function getModal(containerElement, innerHTML) {
   return el;
 }
 
+/****************************************************************************
+ * api & network requests
+ */
+
+/**
+ * This actually fetches the list of submissions, which is a shallow
+ * representation of only an array of pk's. hydrateSubmission() is where
+ * fetching of individual AssignmentSubmission resources happens.
+ */
 async function fetchData() {
-  const uri = state.viewDiffOnly ? dataUri + "?diff=true" : dataUri;
-  const response = await fetch(uri);
-  if (!response.ok) {
-    throw new Error("Data get request failed");
+  try {
+    let res = await fetch("/grader/user_selections/");
+    const choices = await res.json();
+    res = await fetch(
+      `/grader/session_viewset/${choices.selected_assignment}/`
+    );
+    return res.json();
+  } catch (e) {
+    console.error(e);
+    indicateFailure(
+      "Could not get grading session information. Please try again."
+    );
   }
-  return response.json();
+}
+
+/**
+ * Get the detailed submission resource for the current submission.
+ */
+async function getSubmissionDetails() {
+  const removeLoading = indicateLoading();
+  // be flexible depending on whether this slot in the array is literally just
+  // the pk, or it looks more like { pk: number }
+  let pk = state.assignmentData.submissions[state.currentlyViewingIndex];
+  if (typeof pk !== "number" && "pk" in pk) {
+    let { pk } = pk;
+  }
+  const res = await fetch(`/grader/assignment_submission/${pk}/`);
+  if (res.ok) {
+    state.assignmentData.submissions[state.currentlyViewingIndex] =
+      await res.json();
+    removeLoading();
+  } else {
+    removeLoading();
+    indicateFailure(
+      "Could not get details for this submission. Please try again."
+    );
+  }
+}
+
+/**
+ * Wrapper around getSubmissionDetails which checks if the detailed submission
+ * resource has been fetched. After the main init function, items in the array
+ * `state.assignmentData.submissions` will look like this:
+ *   [
+ *     { pk: number },
+ *     ...
+ *   ]
+ *
+ * Therefore, this function checks for the presence of the other fields:
+ * - `student_name`
+ * - `grade`
+ * - `comment`
+ * - `submission` (text content)
+ * - etc.
+ *
+ * If required fields are absent, `getSubmissionDetails` is fired, which
+ * will get the full detailed resource from the backend.
+ */
+async function checkSubmissionDetails() {
+  const submission_fields = [
+    "pk",
+    "api_student_profile_id",
+    "api_student_submission_id",
+    "profile_photo_url",
+    "submission",
+    "student_name",
+    "grade",
+    "comment",
+  ];
+  for (const field of submission_fields) {
+    if (
+      typeof state.assignmentData.submissions[state.currentlyViewingIndex] ===
+        "number" ||
+      !(field in state.assignmentData.submissions[state.currentlyViewingIndex])
+    ) {
+      return getSubmissionDetails();
+    }
+  }
 }
 
 /**
@@ -146,6 +225,7 @@ async function updateStateWithData() {
     const data = await fetchData();
     state.assignmentData = data;
     state.ready = true;
+    await checkSubmissionDetails();
     indicateSuccess("Your assignment data was loaded.");
   } catch (e) {
     indicateFailure("Your assignment data failed to load; please try again!");
@@ -155,79 +235,30 @@ async function updateStateWithData() {
 }
 
 /**
- * Send state.assignmentData.submissions to the backend, and append any new
- * assignments to the list.
+ * Save the current submission object individually. Should be fired after
+ * any change to ensure there are no out-of-sync changes.
  */
-async function syncData() {
-  const removeLoading = indicateLoading();
-  const _fail = () => {
-    indicateFailure(
-      "Data did not sync, please sync again. Do not refresh, or your changes " +
-        "will be lost"
-    );
-    removeLoading();
-    throw new Error("Update failed");
+async function saveSubmission() {
+  // this could change while we await other stuff, so we'll grab out own copies
+  // to make sure we are async safe
+  const index = state.currentlyViewingIndex;
+  const current = {
+    ...state.assignmentData.submissions[index],
   };
 
-  // sending the submission is problematic because the serializer on the
-  // backend is jank and broken. We don't need to update the submission
-  // anyway, so let's just remove it from the request data
-  const postData = { ...state.assignmentData };
-  postData.submissions = state.assignmentData.submissions.map((i) => {
-    delete i.submission;
-    return i;
+  // no point in sending the submission content
+  delete current.submission;
+
+  const res = await fetch(`/grader/assignment_submission/${current.pk}/`, {
+    body: JSON.stringify(current),
+    method: "PATCH",
+    headers: new Headers({
+      "Content-Type": "application/json",
+      "X-CSRFToken": getCookie("csrftoken"),
+    }),
   });
-
-  // we need to take a look at the original data again to see if there have
-  // been any changes to grades or comments, which determines whether the
-  // sync state needs to be set.
-  //
-  // TODO: store the original request in state, so that another network request
-  // is not needed here
-
-  const originalData = await fetchData();
-  const origIdMap = {};
-  originalData.submissions.forEach(({ grade, comment, profile_photo_url }) => {
-    origIdMap[profile_photo_url] = {
-      grade,
-      comment,
-    };
-  });
-
-  // if the data is synced, then no change is made – which is what we set as
-  // the default. As we check for changes, we will set this value to 'UNSYNCED'
-  // if a change is identified.
-  let sync_state = "SYNCED";
-  postData.submissions.forEach(({ grade, comment, profile_photo_url }) => {
-    if (origIdMap[profile_photo_url].grade != grade) {
-      sync_state = "UNSYNCED";
-    }
-    if (origIdMap[profile_photo_url].comment != comment) {
-      sync_state = "UNSYNCED";
-    }
-  });
-
-  postData.sync_state = sync_state;
-
-  try {
-    const res = await fetch(dataUri, {
-      headers: new Headers({
-        "Content-Type": "application/json",
-        "X-CSRFToken": getCookie("csrftoken"),
-      }),
-      method: "PATCH",
-      body: JSON.stringify(postData),
-      mode: "same-origin",
-    });
-    if (res.ok) {
-      indicateSuccess("Data was saved");
-      removeLoading();
-    } else {
-      _fail();
-    }
-  } catch (e) {
-    _fail();
-  }
+  const result = await res.json();
+  state.assignmentData.submissions[index] = result;
 }
 
 /****************************************************************************
@@ -264,11 +295,12 @@ async function updateView() {
   progressEl.innerText = `${state.currentlyViewingIndex + 1}/${
     state.assignmentData.submissions.length
   }`;
-  nameEl.innerText = current.student_name;
+  nameEl.innerText = current.student_name || "unknown";
   commentEl.innerHTML = current.comment || "<i>No Comment</i>";
-  pagerEl.innerHTML = current.submission
-    .map(
-      (chunk) => `<code class="
+  if (current.submission) {
+    pagerEl.innerHTML = current.submission
+      .map(
+        (chunk) => `<code class="
       overflow-hidden
       overflow-clip
       break-word
@@ -283,8 +315,9 @@ async function updateView() {
           : "rounded"
       }
     ">${chunk}</code>`
-    )
-    .join("");
+      )
+      .join("");
+  }
 }
 
 function removeBlur() {
@@ -314,10 +347,8 @@ function indicateLoading() {
   const innerHTML = `
   <div class="z-50 mb-4 p-4 rounded-lg bg-gray-200">
     <h1>Please wait</h1>
-    <p>This might take a while! Not to worry, optimizations are coming soon!</p>
-    <p>In the meantime, please be patient and <b>do not hit refresh!</b>
-    </p>
-    <p class="text-xs"><i>Unless you want to start over</i> 😉</p>
+    <p>Each assignment takes a while the first time, and is lightning fast thereafter.</p>
+    <p>Don't worry, optimizations are coming soon to allow this to happen in the background!</p>
   </div>
   <div id="loadingSpinner" class="lds-roller"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
   `;
@@ -421,14 +452,17 @@ function handleGradeInput(char) {
         newValue <= state.assignmentData.max_grade
       ) {
         // set current.grade only if the newValue is valid.
+        current.changed = true;
         current.grade = newValue;
       }
     }
   } else {
     // "backspace" the last number from the grade field
     if (curGradeStr.length <= 1) {
+      current.changed = true;
       current.grade = 0;
     } else {
+      current.changed = true;
       current.grade = parseInt(curGradeStr.slice(0, -1));
     }
   }
@@ -440,36 +474,24 @@ function handleGradeInput(char) {
  * The register MUST have a comment value already defined.
  */
 function applyComment(register) {
+  const current = state.assignmentData.submissions[state.currentlyViewingIndex];
   const comment = state.commentBank.registers[register];
   if (!comment) {
-    state.assignmentData.submissions[state.currentlyViewingIndex].comment = "";
+    current.comment = "";
   } else {
-    state.assignmentData.submissions[state.currentlyViewingIndex].comment =
-      comment;
+    current.comment = comment;
   }
+  current.changed = true;
   updateView();
 }
 
 /**
- * onSubmit handler for the modal comment input when it is a manual comment;
- * i.e.  the `c` key was pressed.
+ * This same handler recieves the comment-entry modal form, regardless of
+ * whether it is a comment bank comment, or a manual comment. DOM state will
+ * cause this handler to behave appropriately for both circumstances. See
+ * `injectCommentBankModal`.
  */
-function handleManualCommentInputRecieved(e) {
-  e.preventDefault();
-
-  const userInput = e.target.elements.comment.value;
-  const register = e.target.elements.register.value;
-
-  state.commentBank.registers[register] = userInput;
-  applyComment(register);
-  removeCommentBankModal();
-}
-
-/**
- * onSubmit handler for the modal comment input when it is a comment-bank
- * comment; i.e.  the `b` key was pressed.
- */
-function handleCommentBankInputRecieved(e) {
+function handleCommentModalSubmitted(e) {
   e.preventDefault();
   const userInput = e.target.elements.comment.value;
   const register = e.target.elements.register.value;
@@ -482,6 +504,11 @@ function handleCommentBankInputRecieved(e) {
 /**
  * Inject a form for the user to compose a comment, either into a comment
  * bank register, or as a manual comment.
+ *
+ * By setting the hidden register field to `null` for manual comments, those
+ * will be saved into a hidden register and applied immediately (like banked
+ * comments). Putting this state into the DOM at this stage simplifies
+ * downstream form submission handling.
  */
 function injectCommentBankModal(
   registerName = null,
@@ -536,7 +563,7 @@ function injectCommentBankModal(
     "submit",
     // whether a prefix register is defined determines which event handler
     // gets used
-    register ? handleCommentBankInputRecieved : handleManualCommentInputRecieved
+    handleCommentModalSubmitted
   );
 
   document.body.appendChild(form);
@@ -616,20 +643,24 @@ function beginCommentBankFlow(register) {
  *    shift key held => move back
  *    no shift held  => move forward
  */
-function switchStudent() {
+async function switchStudent() {
   let newIndex;
   switch (state.shiftHeld) {
     case false:
       newIndex = state.currentlyViewingIndex + 1;
       if (newIndex < state.assignmentData.submissions.length) {
+        await saveSubmission();
         state.currentlyViewingIndex = newIndex;
+        await checkSubmissionDetails();
         updateView();
       }
       break;
     case true:
       newIndex = state.currentlyViewingIndex - 1;
       if (newIndex >= 0) {
+        await saveSubmission();
         state.currentlyViewingIndex = newIndex;
+        await checkSubmissionDetails();
         updateView();
       }
       break;
@@ -639,32 +670,6 @@ function switchStudent() {
 /****************************************************************************
  * event handlers
  */
-
-/**
- * Handler will trigger when user presses the "Save and Exit" button. If the
- * grader is initialized, we will save their work before exiting, then
- * redirect to account home upon successful save.
- */
-async function handleSaveAndExit() {
-  const _exit = () =>
-    (window.location.href = `${window.location.origin}/accounts/profile/`);
-
-  if (!state.isInitialized) {
-    // if the app is not initialized, there is nothing to save and nothing to
-    // lose. We can exit safely without care.
-    _exit();
-  } else {
-    try {
-      await syncData();
-      _exit();
-    } catch (e) {
-      indicateFailure(
-        "Abandoning request to leave grader to avoid losing work. Please try " +
-          "saving again"
-      );
-    }
-  }
-}
 
 async function handleDiffSelectSlider() {
   const inputEl = document.getElementById("diffSelectInput");
@@ -703,7 +708,9 @@ function handleKeyPress(e) {
       );
       break;
     case "s":
-      syncData();
+      saveSubmission().then(() => {
+        indicateSuccess("saved");
+      });
       break;
     case "Enter":
       // next or prev student
@@ -773,6 +780,3 @@ async function init() {
 }
 
 document.body.addEventListener("startGrader", init);
-document
-  .getElementById("leaveGrader")
-  .addEventListener("click", handleSaveAndExit);

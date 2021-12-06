@@ -13,9 +13,7 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-from copy import deepcopy
-import json
-from unittest.mock import patch, sentinel
+from unittest.mock import patch
 
 from django.contrib.auth.models import User
 from django.test import TestCase
@@ -129,63 +127,4 @@ class TestChooseCourseView(TestCase):
         self.assertEqual(
             response.templates[0].name,  # type: ignore
             "grader/partials/course_choice_made.html",
-        )
-
-
-class TestAssignmentDataView(TestCase):
-    def setUp(self):
-        self.user = User.objects.create_user("foo", "bar", "baz@b.com")
-        self.client.force_login(self.user)
-        ses = self.client.session
-        ses["course"] = {"id": "foo"}
-        ses["assignment"] = {"id": "bar"}
-        ses["student_id_to_name_mapping"] = {}
-        ses.save()
-
-    def test_dispatch(self):
-        """Why is this set up like this, this is not a happy http time"""
-        ses = self.client.session
-        del ses["course"]
-        del ses["assignment"]
-        ses.save()
-        res = self.client.get(reverse("assignment_data"))
-        self.assertEqual(res.status_code, 400)  # type: ignore
-        self.assertIn(
-            "Course and assignment must be selected",
-            json.loads(res.content)["msg"],  # type: ignore
-        )
-
-    @patch("grader.views.GradingSession")
-    @patch("grader.views.AssignmentSubmission")
-    @patch("grader.views.GradingSessionSerializer")
-    @patch("grader.views.AssignmentSubmissionSerializer")
-    def test_patch(self, s_ser, g_ser, s_mod, g_mod):
-        g_mod.objects.get.return_value = sentinel.g_model
-        s_mod.objects.get.return_value = sentinel.s_model
-        g_ser.return_value.data = "foo"
-        request_data = {
-            "pk": 13,
-            "data": "foo",
-            "submissions": [{"pk": 2, "data": "foo"}, {"pk": 4, "data": "bar"}],
-        }
-        res = self.client.patch(
-            reverse("assignment_data"),
-            data=json.dumps(request_data),
-            content_type="application/json",
-        )
-        self.assertEqual(res.status_code, 200)  # type: ignore
-        g_mod.objects.get.assert_called_once_with(pk=13, course__owner=self.user)
-        self.assertEqual(s_mod.objects.get.mock_calls[0].kwargs, {"pk": 2})
-        self.assertEqual(s_mod.objects.get.mock_calls[1].kwargs, {"pk": 4})
-
-        top_level_only = deepcopy(request_data)
-        submissions = top_level_only.pop("submissions")
-
-        self.assertEqual(s_ser.mock_calls[0].args, (sentinel.s_model,))
-        self.assertEqual(
-            s_ser.mock_calls[0].kwargs, {"data": submissions[0], "partial": True}
-        )
-
-        g_ser.assert_called_once_with(
-            sentinel.g_model, data=top_level_only, partial=True
         )

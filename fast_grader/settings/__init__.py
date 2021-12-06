@@ -15,12 +15,7 @@
 
 import os
 
-try:
-    if os.getenv("DJANGO_DEBUG"):
-        from .development import *
-    else:
-        from .production import *
-except ImportError:
-    # this happens when there is no secrets file with test settings, for
-    # example
-    pass
+if os.getenv("DJANGO_DEBUG"):
+    from .development import *
+else:
+    from .production import *
