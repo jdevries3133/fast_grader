@@ -43,6 +43,7 @@ from .services import (
 
 from .serializers import (
     AssignmentSubmissionSerializer,
+    DeepGradingSessionSerializer,
     GradingSessionSerializer,
 )
 
@@ -390,6 +391,10 @@ class GradingSessionViewSet(ModelViewSet):
 
     def get_queryset(self):
         return GradingSession.objects.filter(course__owner=self.request.user)  # type: ignore
+
+
+class DeepAssignmentSubmissionViewSet(GradingSessionViewSet):
+    serializer_class = DeepGradingSessionSerializer
 
 
 class AssignmentSubmissionViewSet(ModelViewSet):

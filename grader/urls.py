@@ -17,6 +17,7 @@ from django.urls import path
 from rest_framework import routers
 
 from .views import (
+    DeepAssignmentSubmissionViewSet,
     DeleteSession,
     flush_selections,
     grader,
@@ -46,6 +47,9 @@ urlpatterns = [
 
 router = routers.SimpleRouter()
 router.register(r"session_viewset", GradingSessionViewSet, "session_viewset")
+router.register(
+    r"deep_session", DeepAssignmentSubmissionViewSet, "deep_session_viewset"
+)
 router.register(
     r"assignment_submission", AssignmentSubmissionViewSet, "session_viewset"
 )

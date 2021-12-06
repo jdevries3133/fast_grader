@@ -69,3 +69,9 @@ class GradingSessionSerializer(serializers.ModelSerializer):
             "google_classroom_detail_view_url",
             "sync_state",
         )
+
+
+class DeepGradingSessionSerializer(GradingSessionSerializer):
+    """Nested serializer that includes full AssignmentSubmissions"""
+
+    submissions = AssignmentSubmissionSerializer(many=True)
