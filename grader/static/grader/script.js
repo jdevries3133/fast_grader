@@ -126,6 +126,32 @@ function getModal(containerElement, innerHTML) {
   return el;
 }
 
+/**
+ * Helper to mark the current item unsynced.
+ */
+async function markUnSynced() {
+  if (state.assignmentData.sync_state === "U") {
+    return;
+  }
+  try {
+    const postData = { ...state.assignmentData, sync_state: "U" };
+
+    // we are updating the top-level resource; don't need to send the list
+    // of submissions
+    delete postData.submissions;
+    await fetch(`/grader/session_viewset/${postData.pk}/`, {
+      body: JSON.stringify(postData),
+      method: "PATCH",
+      headers: new Headers({
+        "Content-Type": "application/json",
+        "X-CSRFToken": getCookie("csrftoken"),
+      }),
+    });
+  } catch (e) {
+    console.error("failed to mark session as unsynced", e);
+  }
+}
+
 /****************************************************************************
  * api & network requests
  */
@@ -135,7 +161,7 @@ function getModal(containerElement, innerHTML) {
  * representation of only an array of pk's. hydrateSubmission() is where
  * fetching of individual AssignmentSubmission resources happens.
  */
-async function fetchData() {
+async function fetchSession() {
   try {
     let res = await fetch("/grader/user_selections/");
     const choices = await res.json();
@@ -222,7 +248,7 @@ async function checkSubmissionDetails() {
 async function updateStateWithData() {
   const removeLoading = indicateLoading();
   try {
-    const data = await fetchData();
+    const data = await fetchSession();
     state.assignmentData = data;
     state.ready = true;
     await checkSubmissionDetails();
@@ -437,6 +463,7 @@ function indicateFailure(msg, clearAfterSeconds = null) {
  */
 function handleGradeInput(char) {
   const current = state.assignmentData.submissions[state.currentlyViewingIndex];
+  const originalGrade = current.grade;
   const curGradeStr = current.grade ? current?.grade?.toString() : "";
   // concatenate the input to the grade field, only if it is a number
   if (char !== "Backspace") {
@@ -466,6 +493,10 @@ function handleGradeInput(char) {
       current.grade = parseInt(curGradeStr.slice(0, -1));
     }
   }
+  // mark the item unsynced if the grade changed
+  if (originalGrade !== current.grade) {
+    markUnSynced();
+  }
   updateView();
 }
 
@@ -479,6 +510,9 @@ function applyComment(register) {
   if (!comment) {
     current.comment = "";
   } else {
+    if (current.comment !== comment) {
+      markUnSynced();
+    }
     current.comment = comment;
   }
   current.changed = true;
