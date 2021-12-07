@@ -38,7 +38,6 @@ from .services import (
     create_or_get_grading_session,
     list_all_class_names,
     list_all_assignment_names,
-    get_student_data,
 )
 
 from .serializers import (
@@ -127,7 +126,13 @@ def user_selections(request):
             {"message": "assignment has not been selected yet"},
             status=status.HTTP_404_NOT_FOUND,
         )
-    session = GradingSession.objects.get(pk=assignment_pk, course__owner=request.user)
+    try:
+        session = GradingSession.objects.get(
+            pk=assignment_pk, course__owner=request.user
+        )
+    except (GradingSession.DoesNotExist, Exception):
+        logger.exception("failed to initialize grading session")
+        return flush_selections(request)
 
     return Response({"selected_course": course.pk, "selected_assignment": session.pk})
 

@@ -103,7 +103,7 @@ class TeacherTemplate(models.Model):
 
     @property
     def needs_update(self):
-        return bool((timezone.now() - self.last_updated).days > 1)  # type: ignore
+        return bool((timezone.now() - self.last_updated).days > 2)  # type: ignore
 
 
 class AssignmentSubmission(models.Model):
@@ -122,8 +122,10 @@ class AssignmentSubmission(models.Model):
     # student information
     # this information is nullable, because it requires a separate request to
     # fetch, and this allows us to do that lazily.
-    student_name = models.CharField(max_length=200, null=True)
-    _profile_photo_url = models.CharField(max_length=200, null=True)
+
+    # TODO: this should be default='unknown'
+    student_name = models.CharField(max_length=200, blank=True, default="")
+    _profile_photo_url = models.CharField(max_length=200, blank=True, default="")
 
     # grading information
     grade = models.IntegerField(blank=True)
@@ -161,7 +163,6 @@ class AssignmentSubmission(models.Model):
             "submission",
         ):
             if not getattr(self, field):
-                print(f"MISSING {field}")
                 missing_fields = True
         return is_old or missing_fields
 

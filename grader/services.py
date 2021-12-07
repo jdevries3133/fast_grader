@@ -14,12 +14,11 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-from difflib import unified_diff
 import json
 import logging
 
 from dataclasses import dataclass
-from typing import Union, Tuple, Sequence
+from typing import Union, Tuple
 
 from allauth.socialaccount.models import SocialToken
 from django.contrib.auth.models import User
@@ -388,6 +387,8 @@ def _update_submission(
                         name=student_item.get("driveFile", {}).get("title"),
                     )
                 )
+
+    # TODO: don't lose attachments that don't match to a teacher attachment
 
     content = concatenate_attachments(
         user=user, attachments=ordered_student_attachments

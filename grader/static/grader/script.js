@@ -139,14 +139,17 @@ async function markUnSynced() {
     // we are updating the top-level resource; don't need to send the list
     // of submissions
     delete postData.submissions;
-    await fetch(`/grader/session_viewset/${postData.pk}/`, {
-      body: JSON.stringify(postData),
-      method: "PATCH",
-      headers: new Headers({
-        "Content-Type": "application/json",
-        "X-CSRFToken": getCookie("csrftoken"),
-      }),
-    });
+    await fetch(
+      `/grader/session_viewset/${postData.pk}/?diff=${state.viewDiffOnly}`,
+      {
+        body: JSON.stringify(postData),
+        method: "PATCH",
+        headers: new Headers({
+          "Content-Type": "application/json",
+          "X-CSRFToken": getCookie("csrftoken"),
+        }),
+      }
+    );
   } catch (e) {
     console.error("failed to mark session as unsynced", e);
   }
@@ -277,14 +280,17 @@ async function saveSubmission() {
   // no point in sending the submission content
   delete current.submission;
 
-  const res = await fetch(`/grader/assignment_submission/${current.pk}/`, {
-    body: JSON.stringify(current),
-    method: "PATCH",
-    headers: new Headers({
-      "Content-Type": "application/json",
-      "X-CSRFToken": getCookie("csrftoken"),
-    }),
-  });
+  const res = await fetch(
+    `/grader/assignment_submission/${current.pk}/?diff=${state.viewDiffOnly}`,
+    {
+      body: JSON.stringify(current),
+      method: "PATCH",
+      headers: new Headers({
+        "Content-Type": "application/json",
+        "X-CSRFToken": getCookie("csrftoken"),
+      }),
+    }
+  );
   const result = await res.json();
   state.assignmentData.submissions[index] = result;
 }
@@ -375,8 +381,8 @@ function indicateLoading() {
   const innerHTML = `
   <div class="z-50 mb-4 p-4 rounded-lg bg-gray-200">
     <h1>Please wait</h1>
-    <p>Each assignment takes a while the first time, and is lightning fast thereafter.</p>
-    <p>Don't worry, optimizations are coming soon to allow this to happen in the background!</p>
+    <p>Each student submission takes a while the first time, and is lightning fast thereafter.</p>
+    <p>Don't worry, optimizations are coming soon!</p>
   </div>
   <div id="loadingSpinner" class="lds-roller"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
   `;
