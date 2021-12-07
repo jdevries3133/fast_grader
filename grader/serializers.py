@@ -49,10 +49,24 @@ class AssignmentSubmissionSerializer(serializers.ModelSerializer):
         return data
 
     def to_representation(self, instance):
+        # TODO: this self-updating behavior should be in the model
         if instance:
             update_submission(submission=instance)
+
         ret = super().to_representation(instance)
-        ret["submission"] = ret["submission"].split("\n")
+
+        # when diff is requested by query param, render the diff
+        if (request := self.context.get("request")) and (
+            request.query_params.get("diff") == "true"
+        ):
+            ret["submission"] = instance.diff
+
+        # otherwise, just normalize the submission by breaking it into a list
+        # of strings
+        else:
+            # split up into an array of strings
+            ret["submission"] = ret["submission"].split("\n")
+
         return ret
 
 

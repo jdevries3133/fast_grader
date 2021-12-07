@@ -13,6 +13,8 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+from difflib import unified_diff
+
 from django.utils import timezone
 from django.contrib.auth.models import User
 from django.db import models
@@ -162,3 +164,24 @@ class AssignmentSubmission(models.Model):
                 print(f"MISSING {field}")
                 missing_fields = True
         return is_old or missing_fields
+
+    @property
+    def diff(self) -> list[str]:
+        # avoid circular import
+        from grader.services import update_submission
+
+        if not self.teacher_template:
+            update_submission(submission=self)
+
+        assert self.teacher_template
+        assert self.submission
+
+        return list(
+            unified_diff(
+                self.submission.split("\n"),
+                self.teacher_template.content.split("\n"),
+                fromfile="teacher template",
+                tofile="student submission",
+                n=3,
+            )
+        )

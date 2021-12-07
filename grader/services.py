@@ -14,11 +14,12 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+from difflib import unified_diff
 import json
 import logging
 
 from dataclasses import dataclass
-from typing import Union, Tuple
+from typing import Union, Tuple, Sequence
 
 from allauth.socialaccount.models import SocialToken
 from django.contrib.auth.models import User
@@ -222,7 +223,8 @@ def concatenate_attachments(
     *, user: User, attachments: list[DriveAttachment]
 ) -> ConcatOutput:
     """Download each attachment as plain text and concatenate them together,
-    returning a ConcatOutput object.
+    returning a ConcatOutput object. Outputted files are sorted in alphabetical
+    order by filename.
 
     Note:
         An object is returned because we can separate the header, which
@@ -311,9 +313,25 @@ def _update_teacher_template(
     return template, was_created
 
 
+def parse_order(template_content: str):
+    """Given a teacher template already combined into a single string by
+    ConcatOutput.combine_content(), parse the headers back out."""
+    lines = template_content.split("\n")
+    headers = []
+    for i, l in enumerate(lines):
+        if "===" in l:
+            try:
+                headers.append(lines[i - 1])
+            except IndexError:
+                pass
+    return [h.strip() for h in headers]
+
+
 def _update_submission(
     user: User, submission: AssignmentSubmission
 ) -> AssignmentSubmission:
+    assert submission.teacher_template
+
     # pull repetitively used values out of the submission
     course_id = submission.assignment.course.api_course_id  # type: ignore
     assignment_id = submission.assignment.api_assignment_id  # type: ignore
@@ -345,15 +363,35 @@ def _update_submission(
         "draftGrade"
     )
 
-    # update submission content
-    drive_attachments = [
-        DriveAttachment(
-            id_=i.get("driveFile", {}).get("id"),
-            name=i.get("driveFile", {}).get("title"),
-        )
-        for i in submission_data.get("assignmentSubmission", {}).get("attachments", {})
-    ]
-    content = concatenate_attachments(user=user, attachments=drive_attachments)
+    # diffs will be more accurate if we reorder student attachments to match
+    # the order of teacher attachments. Note that student attachment names
+    # will include, but not match, teacher attachment names. i.e.:
+    #
+    # | Teacher Attachment Name | Student Submission Name     |
+    # | ----------------------- | --------------------------- |
+    # | foo document            | Student Name - foo document |
+    #
+    # therefore, for a matching student submission, we can make the following
+    # assertion:
+    #
+    # >>> assert teacher_attachment_name in student_submission_name
+
+    template_item_order = parse_order(submission.teacher_template.content)
+    attachments = submission_data.get("assignmentSubmission", {}).get("attachments", {})
+    ordered_student_attachments = []
+    for teacher_item in template_item_order:
+        for student_item in attachments:
+            if teacher_item in student_item["driveFile"]["title"]:
+                ordered_student_attachments.append(
+                    DriveAttachment(
+                        id_=student_item.get("driveFile", {}).get("id"),
+                        name=student_item.get("driveFile", {}).get("title"),
+                    )
+                )
+
+    content = concatenate_attachments(
+        user=user, attachments=ordered_student_attachments
+    )
 
     # update models
     if content != submission.submission:
@@ -370,9 +408,6 @@ def update_submission(
     `force_update` parameter is set to True."""
     user = submission.assignment.course.owner
 
-    if force_update or submission.needs_update:
-        submission = _update_submission(user, submission)
-
     if (
         force_update
         or not submission.teacher_template
@@ -387,6 +422,9 @@ def update_submission(
         if was_created:
             submission.teacher_template = template
             submission.save()
+
+    if force_update or submission.needs_update:
+        submission = _update_submission(user, submission)
 
     return submission
 

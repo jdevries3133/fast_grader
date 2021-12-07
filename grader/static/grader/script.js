@@ -188,7 +188,9 @@ async function getSubmissionDetails() {
   if (typeof pk !== "number" && "pk" in pk) {
     let { pk } = pk;
   }
-  const res = await fetch(`/grader/assignment_submission/${pk}/`);
+  const res = await fetch(
+    `/grader/assignment_submission/${pk}/?diff=${state.viewDiffOnly}`
+  );
   if (res.ok) {
     state.assignmentData.submissions[state.currentlyViewingIndex] =
       await res.json();
