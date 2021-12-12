@@ -6,111 +6,136 @@
 <div class="container p-2 pt-8 bg-gray-100 rounded lg:rounded lg:m-4 lg:p-4 max-w-prose">
   <h1 class="mb-3">Help</h1>
 
-  <h3 class="mb-4">Where do comments and grades go?</h3>
-  <p class="m-2">
-    Fast Grader is currently in a pre-release stage of development. When
-    officially released, we will have the feature to sync grades and comments
-    to google classroom. However, that feature is not currently implemented,
-    because the purpose of this pre-release version of the site is simply to
-    give teachers the opportunity to test out the grading tool itself.
-  </p>
-  <h3 id="commentBank" class="mb-4">How does the comment bank work?</h3>
-  <p class="m-2">
-    The comment bank is a bit tricky to use at first, but once you get the hang
-    of it, it becomes blazing fast and it's a very convenient way to input
-    comments.  The comment bank uses a concept of "registers." Think of a
-    register like a bucket that comments can be saved into and later recalled
-    from. Registers have single-character names, which ties into how they are
-    accessed by keyboard shortcuts.
-  </p>
-  <p class="m-2">
-    A lowercase <code>b</code> is the keyboard shortcut for accessing the
-    comment bank, then type any other character to reference a specific
-    register of the comment bank. If no comment is already saved to that
-    register, a window will pop up allowing you to compose one. This action
-    will also apply the comment you just wrote for the current student. Now,
-    you can use the same keyboard combination,
-    <code>b&lt;register-name&gt;</code>, to apply that comment to a future
-    student.
-  </p>
-  <p class="m-2">
-    You can imagine that you might start a grading session by populating the
-    comment bank with a few comments, then you can very quickly move between
-    scholars, grade and apply comments without evet taking your hands off the
-    keyboard.
-  </p>
-  <p class="m-2">
-    Also, if you need to revise a comment in the comment bank, you can do that
-    by using the uppercase "B", and then the register name just like before.
-    This will cause the edit dialog box to come up, even if a comment is
-    already in the comment bank. This action will update the comment bank and
-    also apply the new comment to the current student, but will not
-    retroactively update comments where they were used before.
-  </p>
-  <p class="m-2">
-    Note that in the current comment bank, you cannot save comments across
-    grading sessions, but this feature is on the feature roadmap for this
-    project!
-  </p>
-  <p class="m-2">
-    If you have any feedback on the comment bank, please let me know by opening
-    a GitHub issue or sending me an email (see below).
-  </p>
-  <h3 class="mb-4">What is the feature roadmap?</h3>
-  <p class="m-2">
-    This website is currently in pre-release. There are many more features that
-    we plan to implement ASAP!
-  </p>
-  <h4 class="m-2 text-lg text-bold">Before Initial Release</h4>
-  <ul class="ml-8 list-disc">
-    <li>Sync grades with google classroom</li>
-    <li>Sync comments with google classroom</li>
-  </ul>
-  <h4 class="m-2 text-lg text-bold">After Initial Release</h4>
-  <ul class="ml-8 list-disc">
-    <li>
-      Improve differences view in grading tool to be more concise and
-      intuitive
-    </li>
-    <li>
-      Optimize performance and page load time, especially when starting a
-      grading session
-    </li>
-    <li>
-      Comment bank persistence: ability to save the comment bank across
-      grading sessions
-    </li>
-    <li>
-      Widgets to select assignments to grades, instead of the current dropdown
-      list form
-    </li>
-    <li>Queue up multiple assignments to grade at the same time</li>
-    <li>Save comment bank across grading sessions</li>
-  </ul>
-  <h3 class="mt-4 mb-4">How do I report a bug?</h3>
-    <a href="https://github.com/jdevries3133/fast_grader/issues/new">
-      <button class="block">Submit Bug Report</button>
-    </a>
+  <details class="mb-6">
+    <summary class="cursor-pointer">
+      <h3 class="mb-4 inline">How do I get grades into Google Classroom?</h3>
+      <a href="https://chrome.google.com/webstore/detail/grade-sync-for-fast-grade/abjpdpjdpbcnpflodcknkiebmnglgikp">
+        <button class="block">Install Grade Sync Extension</button>
+      </a>
+    </summary>
+    <p class="m-2">
+      When you finish a grading session, grades are only saved to our platform.
+      To sync them with google classroom, use the
+      <a
+        class="link"
+        href="https://chrome.google.com/webstore/detail/grade-sync-for-fast-grade/abjpdpjdpbcnpflodcknkiebmnglgikp"
+      >Grade Sync for Fast Grader</a>
+      browser extension for Chrome.
+    </p>
+    <p class="m-2">
+      This browser extension will open up Google Classroom in your browser, and
+      input the grades for you. Note that this is still experimental. Take a
+      second to check that the grades are accurate! Again, remember that the
+      current incarnation of this web app is a prototype. I use it for my
+      grading and find it very useful, but it is rough around the edges. Use it
+      where you feel comfortable, and please reach out if you need help! My
+      email is <a class="link" href="mailto:jack@mail.classfast.app">jack@mail.classfast.app</a>
+    </p>
+  </details>
+
+  <details class="mb-6">
+    <summary class="cursor-pointer">
+      <h3 id="diffing" class="inline mb-4">What does the "View Differences Only" Switch Do?</h3>
+    </summary>
+    <p class="m-2">
+      The "View Differences Only" button causes the website to grab the
+      student's submission content, and the content of your original
+      attachments on the assignment. Then, it produces a view of the
+      differences between those two sets of content, so that you can cut the
+      bloat out of your grading process, and just see what the student
+      <i>actually did.</i>
+    </p>
+    <p class="m-2">
+      It isn't perfect, yet. For example, it doesn't do you much good at
+      finding small changes in long runs of text, but the finer details of this
+      feature will be improved in the future.
+    </p>
+    <p class="m-2">
+      Overall, it's really great for putting the focus on what changes the
+      student made, which can turn a 3-page document, or a 10-slide Google
+      Slide into a tiny text summary that fits on just one screen. By viewing
+      only the students' changes, you get a very rapid and reflective view
+      of their work, with less need to click, scroll, skim, and search for
+      where they actually put those answers.
+    </p>
+
+  </details>
+
+  <details class="mb-6">
+    <summary class="cursor-pointer">
+      <h3 class="inline mb-4">What is in the feature roadmap?</h3>
+    </summary>
+    <p class="m-2">
+      The website as you see it now should be seen as a prototype. Right now,
+      we are working on a redesign of the whole system, now that we have a good
+      understanding of the problem, and a better idea of how to solve it. We will
+      be requesting feedback from teachers throughout the process, so please
+      reach out and email me at
+      <a class="link" href="mailto:jack@mail.classfast.app">jack@mail.classfast.app!</a>
+    </p>
+    <h4 class="m-2 text-lg text-bold">Coming Soon</h4>
+    <ul class="ml-8 list-disc">
+      <li>
+        New brand, new frontend, improved user interface and user experiences
+      </li>
+      <li>
+        Development of a more robust backend and system testing pipeline to cut
+        down on bugs and broken deployments
+      </li>
+      <li>
+        Improve differences view in grading tool to be more concise and
+        informative
+      </li>
+      <li>
+        Optimize performance and page load time by predictively fetching data
+        for your grading session
+      </li>
+      <li>
+        Commenting and a comment bank, including ability to save and manage
+        comment banks through your account
+      </li>
+      <li>Queue up multiple assignments to grade at the same time, in a single session. Even across classrooms!</li>
+      <li>Support for Canvas, which is another Learning Mangement System (LMS)</li>
+    </ul>
+  </details>
+
+  <details class="mb-6">
+    <summary class="cursor-pointer">
+      <h3 class="mt-4 mb-4 inline">How do I report a bug?</h3>
+        <a href="https://github.com/jdevries3133/fast_grader/issues/new">
+          <button class="block">Submit Bug Report</button>
+        </a>
+    </summary>
   <p class="m-2">
     Bug reports are extremely appreciated! Click the button above to submit a
     bug report on GitHub. Or, send me a personal email at
     <a
       class="link"
-      href="mailto:jackdevriesmusic@gmail.com">jackdevriesmusic@gmail.com.</a>
+      href="mailto:jack@mail.classfast.app">jack@mail.classfast.app</a>
   </p>
-  <h3 class="mt-4 mb-4">How do I request a new feature?</h3>
-    <a href="https://github.com/jdevries3133/fast_grader/issues/new">
-      <button class="block bg-blue-200 focus:ring-blue-400">Make a Feature Request</button>
-    </a>
-  <p class="m-2">
-    Use the same process as submitting a bug report! Open up an issue on the
-    GitHub repository, or 
-    <a 
-      class="link"
-      href="mailto:jackdevriesmusic@gmail.com">send me an email!</a>
-  </p>
+  </details>
+  <details class="mb-6">
+    <summary class="cursor-pointer">
+      <h3 class="inline mt-4 mb-4">How do I request a new feature?</h3>
+      <a href="https://github.com/jdevries3133/fast_grader/issues/new">
+        <button class="block bg-blue-200 focus:ring-blue-400">Make a Feature Request</button>
+      </a>
+    </summary>
+    <p class="m-2">
+      Use the same process as submitting a bug report! Open up an issue on the
+      GitHub repository, or 
+      <a 
+        class="link"
+        href="mailto:jack@mail.classfast.app">send me an email!</a>
+    </p>
+  </details>
 
 </div>
+
+<script>
+  const el = document.querySelector('details')
+  el.open = true;
+</script>
 
 {% endblock %}
 

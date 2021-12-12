@@ -22,7 +22,8 @@
   <p class="my-2">
     Fast Grader will not sell your data, including your personally
     identifiable information or email address to third parties.
-    {% comment %}
+  </p>
+  <p class="my-2">
     However, we will utilize Google AdSense to
     support free use of our platform with advertisements. Please note the
     following regarding Google AdSense:
@@ -46,7 +47,6 @@
     </li>
 
   </ul>
-  {% endcomment %}
   <h4 class="my-2 mt-6 text-lg text-bold">Use of your Google Data</h4>
   <p class="my-2">
     This application integrates with Google Classroom and Google Drive. By
@@ -112,29 +112,44 @@
     Children's Online Privacy Protection Rule ("COPPA")
   </h4>
   <p class="my-2">
-    This website is COPPA compliant, because any personal information about
-    individuals under 13 years of age is provided by an adult who has the
-    permission to do so. Any student information in our database (as defined
-    under COPPA) is treated as sensitive data under the presumption that all
-    students are potentially under thirteen years of age. Fast Grader uses
-    industry standard security practices, including Transport Layer Security
-    (TLS), and user authentication via Google.
+    Fast Grader is a COPPA compliant application.  Any COPPA-protected data
+    stored in our database is stored securely, and will perpetually be handled
+    in accordance with COPPA regulations. COPPA demands that the personally
+    identifiable data of individuals under 13 years of age is never sold or
+    transferred to a third party, and that we continue to engage in industry
+    best practices to prevent a security breach.
   </p>
+  <p class="my-2">
+    Broadly speaking, these are pieces of data that we do store to allow our
+    platform to function, and we always consider this information to be
+    COPPA protected, and assume that it belongs to individuals under 13 years
+    of age:
+    <ul class="ml-8 list-disc">
+      <li>student names</li>
+      <li>links to students' profile pictures</li>
+    </ul>
+  </p>
+  <p class="my-2">
+    We will continue to update the list above to keep you updated on what
+    COPPA-protected data is stored in our databases.
+  </p
   <h2 class="mt-6">Account Deletion</h2>
   <p class="my-2">
     Because this site is in an early stage of development, if you would like
     delete your account, please send me a personal email at
     <a 
       class="link"
-      href="mailto:jackdevriesmusic@gmail.com">jackdevriesmusic@gmail.com</a>
+      href="mailto:jack@mail.classfast.app">jack@mail.classfast.app</a>
     so I can accommodate that request.
   <p class="my-2">
     Note that if you can delete grading sessions in your
     <a
       class="link"
       href="{% url 'profile' %}">profile home page</a>
-    without deleting your account if you wish. This data will also be
-    immediately, permanently, and irreversibly deleted from our database.
+    without deleting your account. This will have the effect of permanently
+    deleting student names, grades, and feedback from our database. However, if
+    you do wish to delete your account and all associated data, I can easily
+    accommodate that request. Please just ask!
 </div>
 
 {% endblock %}
