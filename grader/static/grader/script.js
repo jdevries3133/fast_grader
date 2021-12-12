@@ -49,7 +49,7 @@ const state = {
         // API at `/grader/assignment_data`
         student_name: "...",
         grade: null, // number!
-        comment: null,
+        comment: "",
         submission: "",
         assignment: {
           max_grade: 75,
@@ -57,20 +57,6 @@ const state = {
         },
       },
     ],
-  },
-
-  commentBank: {
-    registers: {
-      // comments in each comment bank register will be stored here
-    },
-    prefixKey: {
-      value: "",
-      choices: {
-        normalMode: "b",
-        editMode: "B",
-        noPrefix: "",
-      },
-    },
   },
 };
 
@@ -237,7 +223,6 @@ async function checkSubmissionDetails() {
     "submission",
     "student_name",
     "grade",
-    "comment",
   ];
   for (const field of submission_fields) {
     if (
@@ -314,7 +299,6 @@ async function updateView() {
   const nameEl = document.getElementById("grName");
   const gradeEl = document.getElementById("grGrade");
   const maxGradeEl = document.getElementById("grMaxGrade");
-  const commentEl = document.getElementById("grComment");
   const pagerEl = document.getElementById("studentContent");
 
   // if the assignment is ungraded, we will transform the whole grading
@@ -337,7 +321,6 @@ async function updateView() {
   if (!current) return;
 
   nameEl.innerText = current.student_name || "unknown";
-  commentEl.innerHTML = current.comment || "<i>No Comment</i>";
   if (current.submission) {
     pagerEl.innerHTML = current.submission
       .map(
@@ -516,177 +499,6 @@ function handleGradeInput(char) {
 }
 
 /**
- * Apply the comment from a given register to the current assignment.
- * The register MUST have a comment value already defined.
- */
-function applyComment(register) {
-  const current = state.assignmentData.submissions[state.currentlyViewingIndex];
-  const comment = state.commentBank.registers[register];
-  if (!comment) {
-    current.comment = "";
-  } else {
-    if (current.comment !== comment) {
-      markUnSynced();
-    }
-    current.comment = comment;
-  }
-  current.changed = true;
-  updateView();
-}
-
-/**
- * This same handler recieves the comment-entry modal form, regardless of
- * whether it is a comment bank comment, or a manual comment. DOM state will
- * cause this handler to behave appropriately for both circumstances. See
- * `injectCommentBankModal`.
- */
-function handleCommentModalSubmitted(e) {
-  e.preventDefault();
-  const userInput = e.target.elements.comment.value;
-  const register = e.target.elements.register.value;
-  state.commentBank.registers[register] = userInput;
-
-  applyComment(register);
-  removeCommentBankModal();
-}
-
-/**
- * Inject a form for the user to compose a comment, either into a comment
- * bank register, or as a manual comment.
- *
- * By setting the hidden register field to `null` for manual comments, those
- * will be saved into a hidden register and applied immediately (like banked
- * comments). Putting this state into the DOM at this stage simplifies
- * downstream form submission handling.
- */
-function injectCommentBankModal(
-  registerName = null,
-  currentValue = "",
-  prompt = "Please enter your comment"
-) {
-  // validate register choice. It can be null, in the case of a manual comment
-  let register;
-  if (registerName && /[a-zA-Z,.\/;']/.test(registerName)) {
-    register = registerName;
-  } else {
-    // manual comment
-    register = null;
-  }
-
-  // update DOM
-  applyBlur();
-
-  // block keyboard shortcut response
-  state.shortcutListenerActive = false;
-
-  // inject the form
-  const innerHTML = `
-    <div class="modal-container relative p-1 lg:p-3 bg-white w-11/12 md:max-w-md mx-auto rounded shadow-lg z-50 overflow-y-auto">
-      <input type="hidden" value="${register}" name="register" />
-      <div>
-        <label for="comment">${prompt}</label>
-
-        <p class="mb-1 text-xs text-gray-600">
-          ${
-            Math.random() > 0.5
-              ? `Tip: did you know that you can use the <code>tab</code> key to
-          focus on the "submit" button, then the <code>spacebar</code> to
-          click it without your mouse?`
-              : `Tip: did you know you can dismiss this dialogue box by simply
-          pressing the <code>Escape</code> key instead of the close button?`
-          }
-          <span class="text-green-700"> Very speedy!</span>
-        </p>
-
-        <textarea id="commentInput" name="comment" placeholder="Enter your comment"></textarea>
-      </div>
-      <input class="p-1 rounded shadow focus:ring-2 focus:ring-black" type="submit" value="Submit" />
-      <button class="p-1 m-1 font-medium text-white bg-red-700 rounded shadow focus:ring-red-300" hover:bg-red-600 onClick="removeCommentBankModal()">Close</button>
-    </div>
-  `;
-
-  const form = getModal("form", innerHTML);
-
-  form.id = "commentInputForm";
-  form.addEventListener(
-    "submit",
-    // whether a prefix register is defined determines which event handler
-    // gets used
-    handleCommentModalSubmitted
-  );
-
-  document.body.appendChild(form);
-
-  // the setTimeout is necessary here because for some reason, focusing the
-  // textarea causes the keyboard shortcut key to end up in the text input,
-  // and even if the value is reset here, the bug still happens, but wrapping
-  // it in setTimeout capitulates the cursed javascript overlords
-  setTimeout(() => {
-    const commentInput = document.getElementById("commentInput");
-    commentInput.focus();
-    commentInput.value = currentValue || "";
-  });
-}
-
-/**
- * In response to user pressing the "close" button. Does not mean that we
- * recieved input, so we will just restore the state and return.
- */
-function removeCommentBankModal() {
-  document.getElementById("commentInputForm").remove();
-  removeBlur();
-  state.shortcutListenerActive = true;
-}
-
-/**
- * A comment bank sequence is 'b' or 'B' followed by any postfix character.
- *
- * 'b' triggers an input-mode action. If the postfix register has a comment, it
- * will be input into the comment field. If not, the user may enter a new
- * comment, save it to that register, and then the new comment bank comment
- * will be input.
- *
- * 'B' triggers an comment bank edit-mode action. It allows the user to revise
- * comment bank entries.
- *
- */
-function beginCommentBankFlow(register) {
-  // validate register
-  if (!/[a-zA-Z,.\/;']/.test(register)) {
-    console.error("Invalid register: ", register);
-  }
-  if (
-    state.commentBank.registers[register] &&
-    state.commentBank.prefixKey.value ===
-      state.commentBank.prefixKey.choices.normalMode
-  ) {
-    // the register is has a comment, and we are in normal mode; let's apply
-    // the saved comment
-    state.assignmentData.submissions[state.currentlyViewingIndex].comment =
-      copyStr(state.commentBank.registers[register]);
-    updateView();
-  } else if (
-    // if the prefix key was `B`, we are going to edit the stored comment
-    // bank value no matter what
-    state.commentBank.prefixKey.value ===
-      state.commentBank.prefixKey.choices.editMode ||
-    // also, we need input if the register is empty
-    state.commentBank.registers[register] === undefined
-  ) {
-    // at this point, we are done with the prefix, so let's unset it before
-    // injecting the user input modal
-    state.commentBank.prefixKey.value =
-      state.commentBank.prefixKey.choices.noPrefix;
-
-    injectCommentBankModal(
-      register,
-      state.commentBank.registers[register],
-      `Enter a comment for comment bank register ${register}`
-    );
-  }
-}
-
-/**
  * Move to the next or previous student, depending on whether the shift key
  * is held:
  *    shift key held => move back
@@ -741,21 +553,6 @@ function handleKeyPress(e) {
   if (!state.shortcutListenerActive) return;
 
   switch (e.key) {
-    // comment bank
-    case state.commentBank.prefixKey.choices.normalMode:
-      state.commentBank.prefixKey.value =
-        state.commentBank.prefixKey.choices.normalMode;
-      break;
-    case state.commentBank.prefixKey.choices.editMode:
-      state.commentBank.prefixKey.value =
-        state.commentBank.prefixKey.choices.editMode;
-      break;
-    case "c":
-      injectCommentBankModal(
-        null,
-        state.assignmentData.submissions[state.currentlyViewingIndex].comment
-      );
-      break;
     case "s":
       saveSubmission().then(() => {
         indicateSuccess("saved");
@@ -769,15 +566,6 @@ function handleKeyPress(e) {
       if (e.keyCode >= 48 && e.keyCode <= 71) {
         // number or backspace
         handleGradeInput(e.key);
-      } else {
-        // if a comment bank prefix has been set, then *this* is the postfix
-        // character, so we will respond to it
-        if (
-          state.commentBank.prefixKey.value !==
-          state.commentBank.prefixKey.choices.noPrefix
-        ) {
-          beginCommentBankFlow(e.key);
-        }
       }
   }
 }
@@ -792,9 +580,6 @@ function handleKeyDown(e) {
       break;
     case "Backspace":
       state.shortcutListenerActive && handleGradeInput(e.key);
-      break;
-    case "Escape":
-      removeCommentBankModal();
       break;
   }
 }
