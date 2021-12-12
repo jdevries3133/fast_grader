@@ -299,7 +299,7 @@ class ChooseAssignmentView(LoginRequiredMixin, View):
         if self.request.session.get("assignment") is not None:
             return self._choice_made()
 
-        return super().dispatch(*a, **kw)
+        return super().dispatch(request, *a, **kw)
 
     def get(self, request):
         # fetch data and update _id_to_assignment_name_mapping
