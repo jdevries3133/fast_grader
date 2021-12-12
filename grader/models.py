@@ -153,7 +153,7 @@ class AssignmentSubmission(models.Model):
         Downstream, this will result in a detail request being sent to the
         Classroom API, allowing these fields to be filled, or other updates to
         be applied."""
-        is_old = bool((timezone.now() - self.last_updated).days > 1)  # type: ignore
+        is_old = bool((timezone.now() - self.last_updated).days > 2)  # type: ignore
         missing_fields = False
         for field in (
             "teacher_template",
@@ -178,8 +178,8 @@ class AssignmentSubmission(models.Model):
 
         return list(
             unified_diff(
-                self.submission.split("\n"),
                 self.teacher_template.content.split("\n"),
+                self.submission.split("\n"),
                 fromfile="teacher template",
                 tofile="student submission",
                 n=3,

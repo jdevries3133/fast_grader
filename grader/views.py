@@ -14,7 +14,6 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import logging
-import dataclasses
 
 from django.contrib.auth.models import User
 from django.http.response import Http404
@@ -61,16 +60,9 @@ def grader(request):
 def resume_grading(request, pk):
     """Setup the request session so that we can resume a previous grading
     session."""
-    try:
-        obj = GradingSession.objects.get(pk=pk, course__owner=request.user)  # type: ignore
-    except GradingSession.DoesNotExist:  # type: ignore
-        raise Http404("grading session does not exist")
+    if GradingSession.objects.filter(pk=pk, course__owner=request.user).exists():
+        request.session["grading_session_pk"] = pk
 
-    request.session["course"] = {"id": obj.course.api_course_id, "name": obj.course.name}  # type: ignore
-    request.session["assignment"] = {
-        "id": obj.api_assignment_id,
-        "name": obj.assignment_name,
-    }
     return grader(request)
 
 
@@ -114,27 +106,26 @@ def user_selections(request):
         selected_assignment: number
         - pk of the assignment the user selected via `ChooseAssignmentView`
     """
-    if (course_pk := request.session.get("course_model_pk")) is None:
-        return Response(
-            {"message": "course has not been selected yet"},
-            status=status.HTTP_404_NOT_FOUND,
-        )
-    course = CourseModel.objects.get(pk=course_pk, owner=request.user)
 
-    if (assignment_pk := request.session.get("grading_session_pk")) is None:
+    # look for presence of the session in state. As long as we have that, we
+    # can lookup the related course from the session model, and cleanup session
+    # state to satisfy ChooseCourseView and ChooseAssignmentView if needed
+
+    if (session_pk := request.session.get("grading_session_pk")) is None:
         return Response(
             {"message": "assignment has not been selected yet"},
             status=status.HTTP_404_NOT_FOUND,
         )
+
     try:
-        session = GradingSession.objects.get(
-            pk=assignment_pk, course__owner=request.user
-        )
+        session = GradingSession.objects.get(pk=session_pk, course__owner=request.user)
     except (GradingSession.DoesNotExist, Exception):
         logger.exception("failed to initialize grading session")
         return flush_selections(request)
 
-    return Response({"selected_course": course.pk, "selected_assignment": session.pk})
+    return Response(
+        {"selected_course": session.course.pk, "selected_assignment": session.pk}
+    )
 
 
 @method_decorator(login_required, name="dispatch")
@@ -177,7 +168,15 @@ class ChooseCourseView(View):
 
     def dispatch(self, request, *a, **kw):
         """Early exit if the course choice was already made."""
-        if request.session.get("course") is not None:
+        if (pk := request.session.get("grading_session_pk")) is not None:
+            course = GradingSession.objects.get(pk=pk).course
+            request.session["course"] = {
+                "id": course.api_course_id,
+                "name": course.name,
+            }
+            return self._course_choice_made(request)
+
+        if request.session.get("course_model_pk") is not None:
             return self._course_choice_made(request)
         return super().dispatch(request, *a, **kw)
 
@@ -281,7 +280,14 @@ class ChooseAssignmentView(LoginRequiredMixin, View):
         request.
     """
 
-    def dispatch(self, *a, **kw):
+    def dispatch(self, request, *a, **kw):
+        if (pk := request.session.get("grading_session_pk")) is not None:
+            course = GradingSession.objects.get(pk=pk).course
+            request.session["course"] = {
+                "id": course.api_course_id,
+                "name": course.name,
+            }
+            return self._choice_made()
         # 1. We make sure that session['course'] is already set, because the
         #    flow through the above view should be complete
         if self.request.session.get("course") is None:
@@ -366,10 +372,12 @@ class ChooseAssignmentView(LoginRequiredMixin, View):
         return result.next_page_token
 
     def _choice_made(self):
+        pk = self.request.session["grading_session_pk"]
+        obj = GradingSession.objects.get(pk=pk)
         response = render(
             self.request,
             "grader/partials/assignment_choice_made.html",
-            context=self.request.session["assignment"],
+            context={"name": obj.assignment_name, "id": obj.api_assignment_id},
         )
         # after the choice is made, we can send a signal to the frontend to
         # initialize the grading tool
