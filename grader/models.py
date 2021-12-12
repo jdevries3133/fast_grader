@@ -128,7 +128,7 @@ class AssignmentSubmission(models.Model):
     _profile_photo_url = models.CharField(max_length=200, blank=True, default="")
 
     # grading information
-    grade = models.IntegerField(blank=True)
+    grade = models.IntegerField(null=True)
     comment = models.TextField(blank=True)
 
     # submission content
@@ -159,7 +159,6 @@ class AssignmentSubmission(models.Model):
             "teacher_template",
             "student_name",
             "_profile_photo_url",
-            "grade",
             "submission",
         ):
             if not getattr(self, field):

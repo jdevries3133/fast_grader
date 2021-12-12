@@ -226,6 +226,9 @@ async function getSubmissionDetails() {
  * will get the full detailed resource from the backend.
  */
 async function checkSubmissionDetails() {
+  // early return if the current item is not defined; i.e., an empty array was
+  // returned by the API
+  if (!state.assignmentData.submissions[state.currentlyViewingIndex]) return;
   const submission_fields = [
     "pk",
     "api_student_profile_id",
@@ -329,6 +332,10 @@ async function updateView() {
   progressEl.innerText = `${state.currentlyViewingIndex + 1}/${
     state.assignmentData.submissions.length
   }`;
+
+  // if the current item is not defined, there is nothing more to do.
+  if (!current) return;
+
   nameEl.innerText = current.student_name || "unknown";
   commentEl.innerHTML = current.comment || "<i>No Comment</i>";
   if (current.submission) {
