@@ -25,10 +25,13 @@ logger = logging.getLogger(__name__)
 
 def _run_and_log(cmd, *, cwd: Path = None, check: bool = False):
     result = subprocess.run(
-        cmd, cwd=cwd, check=check, stdout=subprocess.PIPE, stderr=subprocess.STDOUT
+        cmd, cwd=cwd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT
     )
     logger.info("Command %s had exit code %d", cmd, result.returncode)
     logger.debug("Output: %s", result.stdout)
+    if check and result.returncode:
+        raise subprocess.CalledProcessError(result.returncode, cmd, result.stderr)
+    return True
 
 
 def update_source() -> bool:
