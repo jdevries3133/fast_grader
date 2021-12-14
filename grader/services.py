@@ -140,17 +140,17 @@ def list_all_class_names(
     service = get_google_classroom_service(user=user)
 
     # fetch data
-    request = service.courses().list(pageSize=30, pageToken=page_token)  # type: ignore
-    response = request.execute()
-    result = response.get("courses")
+    res = service.courses().list(courseStates="ACTIVE", pageSize=30, pageToken=page_token).execute()  # type: ignore
+    result = res.get("courses")
 
     # validate response
     if result is None:
         raise Http404("User does not have any courses")
 
     # format data and wrap in dataclasses
+    result = [i for i in result if i.get("teacherFolder")]
     classes = [CourseResource(r["id"], r["name"]) for r in result]
-    return CourseList(response.get("nextPageToken"), classes)
+    return CourseList(res.get("nextPageToken"), classes)
 
 
 @dataclass
