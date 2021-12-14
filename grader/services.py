@@ -213,6 +213,18 @@ class ConcatOutput:
     def combine_content(self) -> list[str]:
         out = []
         for i in self.data:
+
+            # headers for student attachments have the naming convention:
+            #   `Student Name - Document Name`
+            # we want to remove the student name to normalize the header, so
+            # that the diff against the teacher attachment doesn't identify
+            # this header as differing
+            if " - " in i.header[0]:
+                # we're operating on the first element in the header. The
+                # second element is the underline (`===== ...`)
+                _, i.header[0], *_ = i.header[0].split(" - ")
+                i.header[1] = "=" * len(i.header[0])
+
             out.extend(i.header)
             out.extend(i.content)
         return out
