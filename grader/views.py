@@ -53,6 +53,11 @@ logger = logging.getLogger(__name__)
 def grader(request):
     """This template is basically just a wireframe that includes a bunch
     of dynamic htmx components, defined in the views below."""
+    if (
+        pk := request.session.get("grading_session_pk")
+    ) and not GradingSession.objects.filter(pk=pk, course__owner=request.user).exists():
+        return flush_selections(request)
+
     return render(request, "grader/main.html")
 
 
