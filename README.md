@@ -1,18 +1,16 @@
 # ⚡️ Grade Like Lightning 🌩
 
-test ci/cd
-
 [![Test Suites](https://github.com/jdevries3133/fast_grader/actions/workflows/tests.yml/badge.svg)](https://github.com/jdevries3133/fast_grader/actions/workflows/tests.yml)
 
 ![Fast Grader Logo](./fast_grader/static/logo.png)
 
-**Grading in Google Classroom _really_ stinks.**
+**Grading in Online Assignments is not Fun**
 
 Let's say you are grading a google docs/slides assignment. The grading page
 itself is a javascript behemoth that takes several seconds to load, then the
 embedded google document itself takes additional seconds to load! Then, you
 will sit around for even longer while the page glitches out as every image,
-video, animation, and css file moseys its way on in to the page.
+video and animation moseys its way on into the page.
 
 To add insult to injury, Google Classroom has no keyboard shortcuts for
 advancing between assignments, entering the grading box, etc. It is a painful
@@ -44,7 +42,13 @@ fills the gaps for augmenting the Google Classroom UI.
 If you know the web, come
 [contribute!](https://github.com/jdevries3133/fast_grader)
 
-## See Also
+## Software Components
 
-The [Fast Grader Sync browser extension](https://github.com/jdevries3133/fast_grader_extension)
-that accompanies this project.
+This is a monorepo with a variety of fun inside:
+
+| Path        | Content                                                                                                                             |
+| ----------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| ./mailu     | Our config for [mailu](https://mailu.io), a docker-compose based fully-featured email service which we host at `mail.classfast.app` |
+| ./django    | The prototype Django application, which we are gradually eliminating                                                                |
+| ./remix     | The new [remix.run](https://remix.run) application, which we are gradually building out                                             |
+| ./extension | The browser extension which facilitates "manual" grade syncing in Google Classroom via DOM manipulation                             |
