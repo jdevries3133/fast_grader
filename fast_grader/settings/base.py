@@ -99,7 +99,6 @@ INSTALLED_APPS = [
     "rest_framework",
     "rest_framework.authtoken",
     "tailwind",
-    "continuous_deployment",
     "extension_support",
     "theme",
     "grader",

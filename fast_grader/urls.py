@@ -34,7 +34,6 @@ urlpatterns = [
     path("dj_rest_auth/", include("dj_rest_auth.urls")),
     path("dj_rest_auth/registration/", include("dj_rest_auth.registration.urls")),
     path("grader/", include("grader.urls")),
-    path("ci_cd/", include("continuous_deployment.urls")),
     path("ext/", include("extension_support.urls")),
     path("admin/", admin.site.urls),
     # static-ish pages that are core to this site
