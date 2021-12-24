@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <link
+      href="http://localhost:8000/static/css/dist/styles.css"
+      rel="stylesheet"
+    />
+    <link href="/styles.css" rel="stylesheet" />
+    <script src="/vendor/htmx@1.6.1.js"></script>
+  </head>
+
+  <body
+    class="
+      p-2
+      bg-gradient-to-tr
+      from-lime-100
+      via-green-100
+      to-lime-200
+      bg-blur
+    "
+  >
+    <div hx-trigger="load delay:100ms" hx-get="http://localhost:8000/ext/">
+      <!-- loading indicator -->
+      <div
+        class="
+          fixed
+          top-0
+          left-0
+          flex
+          items-center
+          justify-center
+          w-full
+          h-full
+          transiton
+        "
+      >
+        <div
+          class="
+            absolute
+            w-full
+            h-full
+            bg-gray-900
+            opacity-50
+            modal-overlay
+            blur-sm
+          "
+        ></div>
+        <div
+          class="
+            container
+            flex flex-col
+            items-center
+            justify-center
+            w-full
+            h-full
+          "
+        >
+          <div class="z-50 p-4 mb-4 bg-gray-200 rounded-lg">
+            <h1>Loading</h1>
+          </div>
+          <div class="lds-roller">
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script src="browser-polyfill.js"></script>
+    <script src="popup.bundle.js"></script>
+  </body>
+</html>
