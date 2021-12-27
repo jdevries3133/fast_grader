@@ -1,8 +1,10 @@
 # ⚡️ Grade Like Lightning 🌩
 
-[![Test Suites](https://github.com/jdevries3133/fast_grader/actions/workflows/tests.yml/badge.svg)](https://github.com/jdevries3133/fast_grader/actions/workflows/tests.yml)
+[![Django Tests](https://github.com/jdevries3133/fast_grader/actions/workflows/django.yml/badge.svg)](https://github.com/jdevries3133/fast_grader/actions/workflows/django.yml)
 
-![Fast Grader Logo](./fast_grader/static/logo.png)
+[![Node.js CI](https://github.com/jdevries3133/fast_grader/actions/workflows/extension.yml/badge.svg)](https://github.com/jdevries3133/fast_grader/actions/workflows/extension.yml)
+
+![Fast Grader Logo](./django/fast_grader/static/logo.png)
 
 **Grading in Online Assignments is not Fun**
 
