@@ -15,7 +15,6 @@
 
 
 from .base import *
-from .consume_secrets_file import *
 
 
 # for django-tailwind
@@ -25,43 +24,8 @@ CORS_ORIGIN_ALLOW_ALL = True
 CORS_ALLOW_CREDENTIALS = True
 ALLOWED_HOSTS = ["localhost"]
 
-# see Python's logging levels for valid strings to use
-# https://docs.python.org/3/library/logging.html#logging-levels
-LOG_LEVEL = "DEBUG"
-
 
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 
 
 ENABLE_LOGROCKET = False
-
-
-LOGGING = {
-    "version": 1,
-    "disable_existing_loggers": False,
-    "formatters": {
-        "verbose": {
-            "format": "{levelname} {asctime} {module} {process:d} {thread:d} {message}",
-            "style": "{",
-        },
-    },
-    "handlers": {
-        "console_logger": {
-            "level": 0,
-            "class": "logging.StreamHandler",
-            "formatter": "verbose",
-        },
-    },
-    "root": {
-        "handlers": ["console_logger"],
-        "level": LOG_LEVEL,
-        "propagate": True,
-    },
-    "loggers": {
-        "file": {
-            "handlers": ["console_logger"],
-            "level": LOG_LEVEL,
-            "propagate": True,
-        },
-    },
-}

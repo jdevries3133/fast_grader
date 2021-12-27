@@ -6,8 +6,10 @@
 
 # `rn` is available in https://github.com/jdevries3133/shell_scripts
 
-source $(pwd)/django/venv/bin/activate && \
-    rn "python3 $(pwd)/django/manage.py runserver,\
-python3 $(pwd)/django/manage.py tailwind start,\
-npm --prefix=$(pwd)/extension run dev,\
-npm --prefix=$(pwd)/extension run tailwind-dev"
+basedir=$(pwd)
+
+cd django
+
+rn "bash hack/run_devcontainer.sh,\
+npm --prefix=$basedir/extension run dev,\
+npm --prefix=$basedir/extension run tailwind-dev"

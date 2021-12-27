@@ -36,7 +36,12 @@ BASE_DIR = Path(__file__).resolve().parents[2]
 DEBUG = bool(os.getenv("DJANGO_DEBUG"))
 
 
-ALLOWED_HOSTS = ["classfast.app"]
+SECRET_KEY = os.environ.get("DJANGO_SECRET")
+if SECRET_KEY is None:
+    raise ValueError("SECRET_KEY not defined in the environment")
+
+
+ALLOWED_HOSTS = ["classfast.app", "localhost"]
 
 
 CORS_ALLOW_ALL_ORIGINS = True
@@ -170,6 +175,30 @@ AUTHENTICATION_BACKENDS = [
 
 SOCIALACCOUNT_ADAPTER = "accounts.socialaccount_adapter.FastGraderSocialAccountAdapter"
 
+SOCIALACCOUNT_PROVIDERS = {
+    "google": {
+        "APP": {
+            "client_id": os.getenv("GOOGLE_CLIENT_ID"),
+            "secret": os.getenv("GOOGLE_CLIENT_SECRET"),
+            "key": "",
+        },
+        "AUTH_PARAMS": {
+            "access_type": "offline",
+        },
+        "SCOPE": [
+            "email",
+            "profile",
+            "https://www.googleapis.com/auth/classroom.coursework.students.readonly",
+            "https://www.googleapis.com/auth/classroom.courses.readonly",
+            "https://www.googleapis.com/auth/classroom.courseworkmaterials.readonly",
+            "https://www.googleapis.com/auth/classroom.student-submissions.students.readonly",
+            "https://www.googleapis.com/auth/classroom.rosters.readonly",
+            "https://www.googleapis.com/auth/classroom.profile.photos",
+            "https://www.googleapis.com/auth/drive.readonly",
+        ],
+    }
+}
+
 
 # Password validation
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
@@ -238,3 +267,38 @@ MEDIA_ROOT = Path(BASE_DIR, "media_root")
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+
+# see Python's logging levels for valid strings to use
+# https://docs.python.org/3/library/logging.html#logging-levels
+LOG_LEVEL = "DEBUG"
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "verbose": {
+            "format": "{levelname} {asctime} {module} {process:d} {thread:d} {message}",
+            "style": "{",
+        },
+    },
+    "handlers": {
+        "console_logger": {
+            "level": 0,
+            "class": "logging.StreamHandler",
+            "formatter": "verbose",
+        },
+    },
+    "root": {
+        "handlers": ["console_logger"],
+        "level": LOG_LEVEL,
+        "propagate": True,
+    },
+    "loggers": {
+        "file": {
+            "handlers": ["console_logger"],
+            "level": LOG_LEVEL,
+            "propagate": True,
+        },
+    },
+}

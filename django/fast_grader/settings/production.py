@@ -13,55 +13,29 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import os
+
 from .base import *
-from .consume_secrets_file import *
+
+
+def exc_getenv(key) -> str:
+    """Get value from the environment, or raise an exception if it's not
+    defined"""
+    if not (value := os.getenv(key)):
+        raise ValueError(f"{key} is not provided in environment")
+    return value
 
 
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": "fast_grader",
-        "USER": POSTGRESQL_USERNAME,
-        "PASSWORD": POSTGRESQL_PASSWORD,
-        "HOST": "localhost",
+        "NAME": exc_getenv("POSTGRESQL_DB"),
+        "USER": exc_getenv("POSTGRESQL_USERNAME"),
+        "PASSWORD": exc_getenv("POSTGRESQL_PASSWORD"),
+        "HOST": exc_getenv("POSTGRESQL_HOST"),
         "PORT": "5432",
     }
 }
 
 
-NPM_BIN_PATH = "/usr/local/bin/npm"
-
-
 ENABLE_LOGROCKET = True
-
-
-LOGGING = {
-    "version": 1,
-    "disable_existing_loggers": False,
-    "formatters": {
-        "verbose": {
-            "format": "{levelname} {asctime} {module} {process:d} {thread:d} {message}",
-            "style": "{",
-        },
-    },
-    "handlers": {
-        "file_logger": {
-            "level": 0,
-            "class": "logging.FileHandler",
-            "filename": os.path.join(BASE_DIR, "main.log"),
-            "formatter": "verbose",
-        },
-    },
-    "root": {
-        "handlers": ["file_logger"],
-        "level": "DEBUG",
-        "propagate": True,
-    },
-    "loggers": {
-        "file": {
-            "handlers": ["file_logger"],
-            "level": "DEBUG",
-            "propagate": True,
-        },
-    },
-}
