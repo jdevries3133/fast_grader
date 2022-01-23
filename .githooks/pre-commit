@@ -1,0 +1,17 @@
+#!/bin/sh
+
+# check code format before commits. Currently, no linters are configured
+# for this project.
+
+
+terraform fmt -recursive -check > /dev/null
+
+if [[ $? -ne 0 ]];
+then
+    echo "run 'terraform fmt' to format terraform source"
+    exit 1
+fi
+
+pushd django
+$(pwd)/venv/bin/black --check .
+popd

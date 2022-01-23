@@ -1,0 +1,27 @@
+# generic python
+*.pyc
+__pycache__
+venv
+*.o
+*.so
+*.log
+dist
+.coverage
+htmlcov
+
+# .env files
+.env*
+
+# editor
+Session.vim
+.vscode
+.idea
+
+# django
+db.sqlite3
+static_root
+
+# terraform
+.terraform/*
+terraform.tfstate
+terraform.tfstate.backup

@@ -17,15 +17,18 @@
 from .base import *
 
 
-# for django-tailwind
-INTERNAL_IPS = ["127.0.0.1"]
+ALLOWED_HOSTS = ["*"]
+
 
 CORS_ORIGIN_ALLOW_ALL = True
 CORS_ALLOW_CREDENTIALS = True
-ALLOWED_HOSTS = ["localhost"]
 
 
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 
 
 ENABLE_LOGROCKET = False
+
+
+# for django-tailwind
+INTERNAL_IPS = ["*"]

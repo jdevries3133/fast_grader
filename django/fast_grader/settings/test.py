@@ -13,19 +13,28 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-"""Speed up tests, provide defaults for secret values."""
+"""Setup and speed up tests"""
+
+from django.core.management.utils import get_random_secret_key
 
 from .base import *
-
-import logging
-
-logging.disable()
 
 
 ENABLE_LOGROCKET = False
 
 
+# it's convenient not to need this during testing. Grabbing a random key also
+# ensures that accidental deployment of test settings would cause things to
+# blow up instead of being quietly insecure
+SECRET_KEY = get_random_secret_key()
+
+
 # --- OPTIMIZATIONS
+
+# no need to log during testing
+import logging
+
+logging.disable()
 
 # debug adds overhead without changing test output
 DEBUG = False
@@ -35,9 +44,3 @@ DEBUG = False
 PASSWORD_HASHERS = [
     "django.contrib.auth.hashers.MD5PasswordHasher",
 ]
-
-
-# --- SECRET VALUES PLACEHOLDERS
-
-# provide defaults for secure settings that are not included
-SECRET_KEY = "foo"

@@ -13,10 +13,13 @@ htmlcov
 Session.vim
 .vscode
 .idea
+scratch.md
 
 # django
 db.sqlite3
 static_root
 
-# keep big demo video out of version control
-demo.mp4
+# terraform
+.terraform
+*.tfstate*
+secret.auto.tfvars
