@@ -1,0 +1,101 @@
+# Copyright (C) 2021 John DeVries
+
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+
+# ---
+# This monolithic action does a bunch of things:
+#
+# - build the django app container
+# - run unit tests against the container
+# - push the container to docker hub
+# - deploy the development infrastructure to minikube
+# - run system integration tests against this ephemeral system
+# - deploy to staging with terraform
+
+
+name: CI/CD
+
+on: push
+
+jobs:
+    push-container:
+
+    name: Push new container to Docker Hub
+    runs-on: ubuntu-latest
+    environment: staging
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: setup Docker buildx
+      id: buildx
+      uses: docker/setup-buildx-action@master
+      with:
+        install: true
+
+    - name: Login to Docker Hub
+      uses: docker/login-action@v1
+      with:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+    - name: Retrieve Docker layers from cache
+      uses: actions/cache@v2
+      with:
+        path: /tmp/.buildx-cache
+        key: ${{ runner.os }}-multi-buildx-${{ github.sha }}
+        restore-keys: |
+          ${{ runner.os }}-multi-buildx
+
+    - name: Prepare for deployment by building docker images, etc.
+      working-directory: ./django
+      run: make push
+
+    - name: Update cache of Docker layers for next time
+      run: |
+        rm -rf /tmp/.buildx-cache
+        mv /tmp/.buildx-cache-new /tmp/.buildx-cache
+
+  test-container:
+    name: Django application unit tests, run against newly pushed container
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Run tests
+        working-directory: ./django
+        run: docker run jdevries3133/fast_grader_django:(cat VERSION) pytest
+
+  test-extension:
+
+    name: Browser extension unit tests
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [14.x, 15.x]
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: Install dependencies
+        working-directory: ./extension
+        run: |
+          npm ci
+          npm run test
+
