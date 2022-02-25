@@ -12,5 +12,5 @@ fi
 
 pushd django
 # check that django code was formatted
-$(pwd)/venv/bin/black --check .
+black --check .
 popd
