@@ -43,7 +43,7 @@ push:
 
 .PHONY: test
 test:
-	docker-compose up -d
+	COMPOSE_DOCKER_CLI_BUILD=0 docker-compose up -d
 	docker exec $(HASH) pytest
 
 
