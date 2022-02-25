@@ -54,4 +54,7 @@ endif
 
 .PHONY: deploy
 deploy:
-	terraform apply -auto-approve
+ifdef CI
+	terraform init -input=false
+endif
+	terraform apply -auto-approve -input=false
