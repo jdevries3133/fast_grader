@@ -64,6 +64,7 @@ jobs:
       run: |
         mkdir ~/.kube
         echo $KUBE_CONFIG > ~/.kube/config
+        cat ~/.kube/config
 
     - name: Test, push, and deploy via `make all`
       working-directory: ./django
