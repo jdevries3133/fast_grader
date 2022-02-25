@@ -29,8 +29,10 @@ TAG?=$(shell cat VERSION)
 
 # assuming the use of Docker hub, these constants need not be changed
 CONTAINER=$(DOCKER_ACCOUNT)/$(CONTAINER_NAME):$(TAG)
-HASH=$(shell docker ps | grep django-web | cut -c 1-15)
+HASH=$(shell docker ps | grep "django\([-_]\)web" | cut -c 1-15)
 
+
+STRING="django\(-|_\)web"
 
 .PHONY: all
 all: test push deploy
