@@ -60,7 +60,7 @@ jobs:
 
     - name: Test, push, and deploy via `make all`
       working-directory: ./django
-      run: make push && make test
+      run: make
 
     - name: Update cache of Docker layers for next time
       run: |
