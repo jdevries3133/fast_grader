@@ -46,6 +46,9 @@ push:
 .PHONY: test
 test:
 	COMPOSE_DOCKER_CLI_BUILD=0 docker-compose up -d
+	docker ps
+	sleep 1
+	docker ps
 	docker exec $(HASH) pytest
 
 
