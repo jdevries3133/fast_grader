@@ -19,7 +19,7 @@ services:
       POSTGRES_DB: app
       POSTGRES_HOST: db
       DJANGO_SECRET: whatever
-      DJANGO_DEBUG: true
+      DJANGO_DEBUG: yes
       DJANGO_SETTINGS_MODULE: fast_grader.settings.development
 
       # can be provided via a `.env` file

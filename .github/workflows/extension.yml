@@ -2,8 +2,7 @@ name: Browser Extension
 
 on:
   push:
-    paths:
-      - "./extension/**"
+    paths: "./extension/**"
 
 
 jobs:

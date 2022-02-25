@@ -27,7 +27,9 @@
 
 name: CI/CD
 
-on: push
+on:
+  push:
+    paths: "./django/**"
 
 jobs:
   django-deploy:
