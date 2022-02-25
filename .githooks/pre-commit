@@ -1,9 +1,7 @@
 #!/bin/sh
 
-# check code format before commits. Currently, no linters are configured
-# for this project.
 
-
+# check that terraform code was formatted
 terraform fmt -recursive -check > /dev/null
 
 if [[ $? -ne 0 ]];
@@ -13,5 +11,6 @@ then
 fi
 
 pushd django
+# check that django code was formatted
 $(pwd)/venv/bin/black --check .
 popd

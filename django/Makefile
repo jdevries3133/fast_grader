@@ -29,8 +29,23 @@ TAG?=$(shell cat VERSION)
 
 # assuming the use of Docker hub, these constants need not be changed
 CONTAINER=$(DOCKER_ACCOUNT)/$(CONTAINER_NAME):$(TAG)
+HASH=$(shell docker ps | grep django-web | cut -c 1-15)
+
+
+.PHONY: all
+all: test push deploy
 
 
 .PHONY: push
 push:
 	docker buildx build --platform linux/amd64 --push -t $(CONTAINER) .
+
+
+.PHONY: test
+test:
+	docker exec $(HASH) pytest
+
+
+.PHONY: deploy
+deploy:
+	terraform apply -auto-approve

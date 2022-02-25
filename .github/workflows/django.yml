@@ -33,4 +33,4 @@ jobs:
           -e GOOGLE_CLIENT_ID="any value" \
           -e GOOGLE_CLIENT_SECRET="any value" \
           fast_grader \
-          python3 manage.py test
+          pytest

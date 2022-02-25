@@ -36,8 +36,8 @@ from .models import AssignmentSubmission, CourseModel, GradingSession, TeacherTe
 # - google api adapter
 
 
-GOOGLE_CLIENT_ID = settings.SOCIALACCOUNT_PROVIDERS['google']['APP']['client_id']
-GOOGLE_CLIENT_SECRET = settings.SOCIALACCOUNT_PROVIDERS['google']['APP']['secret']
+GOOGLE_CLIENT_ID = settings.SOCIALACCOUNT_PROVIDERS["google"]["APP"]["client_id"]
+GOOGLE_CLIENT_SECRET = settings.SOCIALACCOUNT_PROVIDERS["google"]["APP"]["secret"]
 
 
 logger = logging.getLogger(__name__)

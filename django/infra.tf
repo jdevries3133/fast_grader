@@ -47,7 +47,7 @@ module "basic-deployment" {
   version = "0.0.9"
 
   app_name  = "fast-grader"
-  container = "jdevries3133/fast_grader_django:0.0.3"
+  container = "jdevries3133/fast_grader_django:${file("./VERSION")}"
   domain    = "classfast.app"
 
   extra_env = {
