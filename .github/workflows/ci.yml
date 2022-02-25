@@ -58,6 +58,11 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-multi-buildx
 
+    - name: Setup kubernetes context
+      env:
+        KUBE_CONFIG: ${{ secrets.KUBE_CONFIG }}
+      run: echo $KUBE_CONFIG > ~/.kube/config
+
     - name: Test, push, and deploy via `make all`
       working-directory: ./django
       env:
