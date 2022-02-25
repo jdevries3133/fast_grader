@@ -33,8 +33,6 @@ CONTAINER=$(DOCKER_ACCOUNT)/$(CONTAINER_NAME):$(TAG)
 
 .PHONY: all
 all: test push deploy
-	tf init -input=false
-	tf plan -input=false
 
 
 .PHONY: push
@@ -44,6 +42,8 @@ push:
 
 .PHONY: test
 test:
+	tf init -input=false
+	tf plan -input=false
 	# the docker-compose and BuildKit integration is broken, so we need to
 	# disable it for now. This also causes caching to become less effective,
 	# so uncomment this override whenever the integration is fixed
