@@ -43,7 +43,7 @@ push:
 
 .PHONY: test
 test:
-	docker exec $(HASH) pytest
+	docker run $(CONTAINER) pytest
 
 
 .PHONY: deploy
