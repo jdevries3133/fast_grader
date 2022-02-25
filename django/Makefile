@@ -43,11 +43,11 @@ push:
 .PHONY: test
 test:
 	COMPOSE_DOCKER_CLI_BUILD=0 docker-compose up -d
-	# don't ask me why docker-compose uses different naming conventions on
-	# mac vs linux :/
-if CI:
+	@# don't ask me why docker-compose uses different naming conventions on
+	@# mac vs linux :/
+ifdef CI
 	docker exec django_web_1 pytest
-else:
+else
 	docker exec django-web-1 pytest
 endif
 
