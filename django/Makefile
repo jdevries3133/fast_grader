@@ -33,6 +33,8 @@ CONTAINER=$(DOCKER_ACCOUNT)/$(CONTAINER_NAME):$(TAG)
 
 .PHONY: all
 all: test push deploy
+	tf init -input=false
+	tf plan -input=false
 
 
 .PHONY: push
@@ -42,6 +44,9 @@ push:
 
 .PHONY: test
 test:
+	# the docker-compose and BuildKit integration is broken, so we need to
+	# disable it for now. This also causes caching to become less effective,
+	# so uncomment this override whenever the integration is fixed
 	COMPOSE_DOCKER_CLI_BUILD=0 docker-compose up -d
 	@# don't ask me why docker-compose uses different naming conventions on
 	@# mac vs linux :/
