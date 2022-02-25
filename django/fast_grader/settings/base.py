@@ -38,10 +38,10 @@ DEBUG = bool(os.getenv("DJANGO_DEBUG"))
 
 SECRET_KEY = os.environ.get("DJANGO_SECRET")
 if SECRET_KEY is None:
-    raise ValueError("SECRET_KEY not defined in the environment")
+    raise ValueError("DJANGO_SECRET not defined in the environment")
 
 
-ALLOWED_HOSTS = ["classfast.app", "localhost", "127.0.0.1"]
+ALLOWED_HOSTS = ["classfast.app"]
 
 
 CORS_ALLOW_ALL_ORIGINS = True
@@ -104,6 +104,7 @@ INSTALLED_APPS = [
     "rest_framework",
     "rest_framework.authtoken",
     "tailwind",
+    "django_browser_reload",
     "extension_support",
     "theme",
     "grader",
@@ -116,12 +117,14 @@ SITE_ID = 1
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "django_browser_reload.middleware.BrowserReloadMiddleware"
 ]
 
 
@@ -158,10 +161,10 @@ WSGI_APPLICATION = "fast_grader.wsgi.application"
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": os.getenv("POSTGRESQL_DB"),
-        "USER": os.getenv("POSTGRESQL_USERNAME"),
-        "PASSWORD": os.getenv("POSTGRESQL_PASSWORD"),
-        "HOST": os.getenv("POSTGRESQL_HOST"),
+        "NAME": os.getenv("POSTGRES_DB"),
+        "USER": os.getenv("POSTGRES_USER"),
+        "PASSWORD": os.getenv("POSTGRES_PASSWORD"),
+        "HOST": os.getenv("POSTGRES_HOST"),
         "PORT": "5432",
     }
 }
@@ -256,6 +259,7 @@ USE_TZ = True
 STATIC_URL = "/static/"
 STATIC_ROOT = Path(BASE_DIR, "static_root")
 STATICFILES_DIRS = [Path(BASE_DIR, "fast_grader", "static")]
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 
 TAILWIND_APP_NAME = "theme"

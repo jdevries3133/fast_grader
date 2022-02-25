@@ -23,6 +23,7 @@ from typing import Union, Tuple
 from allauth.socialaccount.models import SocialToken
 from django.contrib.auth.models import User
 from django.http.response import Http404
+from django.conf import settings
 from googleapiclient.discovery import build
 from google.oauth2.credentials import Credentials
 from googleapiclient.errors import HttpError as GoogClientHttpError
@@ -30,22 +31,13 @@ from googleapiclient.errors import HttpError as GoogClientHttpError
 from .models import AssignmentSubmission, CourseModel, GradingSession, TeacherTemplate
 
 
-# TODO: import these from django.conf to avoid the need for error handling here
-
-# in testing environments, the secrets file may not exist, so it's ok in those
-# cases to continue, since google api services will be mocked, anyway
-try:
-    from fast_grader.settings.secrets import GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET
-except ImportError:
-    GOOGLE_CLIENT_ID = None
-    GOOGLE_CLIENT_SECRET = None
-
-
-# todo: refactor this into smaller modules by factoring out:
+# TODO: refactor this into smaller modules by factoring out:
 # - dataclasses
 # - google api adapter
-#
-# especially because we might end up with several api adapter integrations
+
+
+GOOGLE_CLIENT_ID = settings.SOCIALACCOUNT_PROVIDERS['google']['APP']['client_id']
+GOOGLE_CLIENT_SECRET = settings.SOCIALACCOUNT_PROVIDERS['google']['APP']['secret']
 
 
 logger = logging.getLogger(__name__)

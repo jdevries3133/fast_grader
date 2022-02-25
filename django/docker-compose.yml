@@ -1,0 +1,34 @@
+# Suitable for development only!!
+
+
+services:
+  web:
+    build: .
+    ports:
+      - "8000:8000"
+    links:
+      - db
+    volumes:
+      - .:/src
+    entrypoint:
+      - sh
+      - entrypoint_dev.sh
+    environment:
+      POSTGRES_USER: app
+      POSTGRES_PASSWORD: app
+      POSTGRES_DB: app
+      POSTGRES_HOST: db
+      DJANGO_SECRET: whatever
+      DJANGO_DEBUG: true
+      DJANGO_SETTINGS_MODULE: fast_grader.settings.development
+
+      # can be provided via a `.env` file
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
+  db:
+    image: postgres:14
+    environment:
+      POSTGRES_USER: app
+      POSTGRES_PASSWORD: app
+      POSTGRES_DB: app
+

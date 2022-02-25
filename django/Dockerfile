@@ -28,10 +28,15 @@ RUN pip install --user -r requirements.txt
 
 COPY . .
 
-ENV DJANGO_SECRET="some value for now; will be unset in the next build stage"
+# Django startup will fail if these environment variables are undefined. Build
+# args are unset after build time, so their values don't matter
+ARG DJANGO_SECRET="anything"
+ARG GOOGLE_CLIENT_ID="anything"
+ARG GOOGLE_CLIENT_SECRET="anything"
+
 RUN python3 manage.py tailwind install
 RUN python3 manage.py tailwind build
-RUN python3 manage.py collectstatic
+RUN python3 manage.py collectstatic --no-input
 
 
 
@@ -43,12 +48,7 @@ ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
 # python runtime dependencies
-RUN apk add --no-cache \
-    libffi-dev \
-    postgresql-dev \
-    python3-dev \
-    musl-dev \
-    openssl-dev
+RUN apk add --no-cache libpq
 
 WORKDIR /src
 

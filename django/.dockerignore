@@ -25,3 +25,5 @@ static_root
 .terraform/*
 terraform.tfstate
 terraform.tfstate.backup
+
+Dockerfile
