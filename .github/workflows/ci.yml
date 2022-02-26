@@ -66,7 +66,7 @@ jobs:
         TF_VAR_google_client_secret: ${{ secrets.GOOGLE_CLIENT_SECRET }}
       run: |
         mkdir ~/.kube
-        echo ${{ secrets.KUBE_CONFIG}} > ~/.kube/config
+        echo "${{ secrets.KUBE_CONFIG}}" > ~/.kube/config
         make
 
     - name: Update cache of Docker layers for next time
