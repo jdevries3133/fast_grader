@@ -22,6 +22,16 @@ terraform {
   }
 }
 
+provider "kubernetes" {
+  config_context = "microk8s"
+}
+
+provider "helm" {
+  kubernetes {
+    config_context = "microk8s"
+  }
+}
+
 variable "google_client_secret" {
   type      = string
   sensitive = true
