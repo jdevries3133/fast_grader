@@ -24,6 +24,10 @@
 # - run system integration tests against this ephemeral system
 # - deploy to staging with terraform
 
+# TODO:
+# - image gets built twice due to use of regular docker *and* BuildKit
+# - there is no caching, so the container is built from scratch each time
+
 
 name: CI/CD
 

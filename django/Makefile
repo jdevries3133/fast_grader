@@ -42,8 +42,6 @@ push:
 
 .PHONY: test
 test:
-	terraform init -input=false
-	terraform plan -input=false
 	# the docker-compose and BuildKit integration is broken, so we need to
 	# disable it for now. This also causes caching to become less effective,
 	# so uncomment this override whenever the integration is fixed
@@ -61,5 +59,8 @@ endif
 deploy:
 ifdef CI
 	terraform init -input=false
-endif
 	terraform apply -auto-approve -input=false
+else
+	terraform apply
+endif
+
