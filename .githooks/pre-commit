@@ -6,7 +6,7 @@ terraform fmt -recursive -check > /dev/null
 
 if [[ $? -ne 0 ]];
 then
-    echo "run 'terraform fmt' to format terraform source"
+    echo "run 'terraform fmt -recursive' to format terraform source"
     exit 1
 fi
 
