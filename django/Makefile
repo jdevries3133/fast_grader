@@ -25,7 +25,7 @@
 DOCKER_ACCOUNT=jdevries3133
 CONTAINER_NAME=fast_grader_django
 
-TAG?=$(shell cat VERSION)
+TAG?=0.0.10-$(shell git rev-parse HEAD)
 
 # assuming the use of Docker hub, these constants need not be changed
 CONTAINER=$(DOCKER_ACCOUNT)/$(CONTAINER_NAME):$(TAG)

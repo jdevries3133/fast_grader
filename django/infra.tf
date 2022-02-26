@@ -18,8 +18,11 @@ terraform {
       source  = "hashicorp/helm"
       version = ">= 2.4.1"
     }
-
   }
+}
+
+data "external" "git_hash" {
+  program = ["sh", "git_sha.sh"]
 }
 
 provider "kubernetes" {
@@ -47,7 +50,7 @@ module "basic-deployment" {
   version = "0.0.9"
 
   app_name  = "fast-grader"
-  container = "jdevries3133/fast_grader_django:0.0.9"
+  container = "jdevries3133/fast_grader_django:0.0.10-${data.external.git_hash.result.sha}"
   domain    = "classfast.app"
 
   extra_env = {
