@@ -65,7 +65,8 @@ jobs:
       run: |
         mkdir ~/.kube
         echo $KUBE_CONFIG > ~/.kube/config
-        echo $TEST
+        echo $TEST > temp
+        python3 cat.py temp
 
     - name: Test, push, and deploy via `make all`
       working-directory: ./django
