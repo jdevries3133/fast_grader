@@ -50,14 +50,6 @@ jobs:
         username: jdevries3133
         password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-    - name: Retrieve Docker layers from cache
-      uses: actions/cache@v2
-      with:
-        path: /tmp/.buildx-cache
-        key: ${{ runner.os }}-multi-buildx-${{ github.sha }}
-        restore-keys: |
-          ${{ runner.os }}-multi-buildx
-
     - name: Test, push, and deploy via `make all`
       working-directory: ./django
       env:
@@ -68,9 +60,3 @@ jobs:
         mkdir ~/.kube
         echo "${{ secrets.KUBE_CONFIG}}" > ~/.kube/config
         make
-
-    - name: Update cache of Docker layers for next time
-      run: |
-        rm -rf /tmp/.buildx-cache
-        mkdir /tmp/.buildx-cache
-        (mv /tmp/.buildx-cache-new /tmp/.buildx-cache) || /bin/true
