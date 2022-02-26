@@ -61,9 +61,11 @@ jobs:
     - name: Setup kubernetes context
       env:
         KUBE_CONFIG: ${{ secrets.KUBE_CONFIG }}
+        TEST: ${{ secrets.TEST }}
       run: |
         mkdir ~/.kube
         echo $KUBE_CONFIG > ~/.kube/config
+        echo $TEST
 
     - name: Test, push, and deploy via `make all`
       working-directory: ./django
