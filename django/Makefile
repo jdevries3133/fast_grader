@@ -36,13 +36,11 @@ CONTAINER=$(DOCKER_ACCOUNT)/$(CONTAINER_NAME):$(TAG)
 all: test push deploy
 
 
-.PHONY: push
-push:
-ifdef CI
-
-else
-	docker buildx build --platform linux/amd64 --push -t $(CONTAINER) .
-endif
+.PHONY: setup
+setup:
+	@# this attempts to pull the container of the last major version. Hopefully,
+	@# this will get us some cached layers
+	docker pull $(DOCKER_ACCOUNT)/$(CONTAINER_NAME):$(shell git describe --tags --abbrev=0) || /bin/true
 
 
 .PHONY: test
@@ -63,11 +61,21 @@ else
 endif
 
 
+.PHONY: push
+push:
+ifdef CI
+	@# we assume that the CI server is always linux/amd64
+	docker push $(CONTAINER)
+else
+	@# on mac, we need a cross-platform build
+	docker buildx build --platform linux/amd64 --push -t $(CONTAINER) .
+endif
+
+
 .PHONY: deploy
 deploy:
 ifdef CI
 	terraform init -input=false
-	@# use production for tagged commits
 	if $(shell git describe --exact-match --tags HEAD) ; then \
 		terraform workspace select production \
 	fi
