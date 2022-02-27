@@ -3,6 +3,7 @@
 
 services:
   web:
+    image: jdevries3133/fast_grader_django:${TAG}
     build: .
     ports:
       - "8000:8000"
@@ -10,9 +11,6 @@ services:
       - db
     volumes:
       - .:/src
-    entrypoint:
-      - sh
-      - entrypoint_dev.sh
     environment:
       POSTGRES_USER: app
       POSTGRES_PASSWORD: app

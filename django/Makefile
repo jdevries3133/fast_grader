@@ -25,7 +25,8 @@
 DOCKER_ACCOUNT=jdevries3133
 CONTAINER_NAME=fast_grader_django
 
-TAG?=0.0.10-$(shell git rev-parse HEAD)
+TAG?=$(shell git describe --tags)
+
 
 # assuming the use of Docker hub, these constants need not be changed
 CONTAINER=$(DOCKER_ACCOUNT)/$(CONTAINER_NAME):$(TAG)
@@ -37,15 +38,22 @@ all: test push deploy
 
 .PHONY: push
 push:
+ifdef CI
+
+else
 	docker buildx build --platform linux/amd64 --push -t $(CONTAINER) .
+endif
 
 
 .PHONY: test
 test:
-	# the docker-compose and BuildKit integration is broken, so we need to
-	# disable it for now. This also causes caching to become less effective,
-	# so uncomment this override whenever the integration is fixed
-	COMPOSE_DOCKER_CLI_BUILD=0 docker-compose up -d
+	@# the docker-compose and BuildKit integration is broken, so we need to
+	@# disable it for now. This also causes caching to become less effective,
+	@# so uncomment this override whenever the integration is fixed
+	COMPOSE_DOCKER_CLI_BUILD=0 \
+	TAG=$(TAG) \
+		docker-compose up -d
+
 	@# don't ask me why docker-compose uses different naming conventions on
 	@# mac vs linux :/
 ifdef CI
@@ -59,6 +67,10 @@ endif
 deploy:
 ifdef CI
 	terraform init -input=false
+	@# use production for tagged commits
+	if $(shell git describe --exact-match --tags HEAD) ; then \
+		terraform workspace select production \
+	fi
 	terraform apply -auto-approve -input=false
 else
 	terraform apply

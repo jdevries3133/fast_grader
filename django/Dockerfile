@@ -58,4 +58,4 @@ ENV PATH=$PATH:/root/.local/bin
 COPY --from=prep-dependencies /src .
 
 
-CMD [ "sh", "/src/entrypoint_prod.sh" ]
+CMD [ "sh", "/src/scripts/entrypoint_prod.sh" ]

@@ -1,3 +1,5 @@
 #!/bin/sh
 
-echo '{"sha": "'"$(git rev-parse HEAD)"'"}'
+# terraform programs must output valid JSON
+
+echo '{"output": "'"$(git describe --tags)"'"}'
