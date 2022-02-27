@@ -45,6 +45,7 @@ setup:
 
 .PHONY: test
 test:
+	git describe --tags
 	@# the docker-compose and BuildKit integration is broken, so we need to
 	@# disable it for now. This also causes caching to become less effective,
 	@# so uncomment this override whenever the integration is fixed
