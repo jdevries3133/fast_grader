@@ -42,14 +42,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
       with:
-        fetch-depth: 20
-    - name: Find Tag
-      id: tagger
-      uses: jimschubert/query-tag-action@v1
-      with:
-        abbrev: 7
-        include: 'v*'
-        commit-ish: 'HEAD~'
+        fetch-depth: 0
 
     - name: setup Docker buildx
       id: buildx
