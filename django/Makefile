@@ -76,7 +76,7 @@ endif
 deploy:
 	terraform init -input=false
 	@# if the current commit is tagged, we will deploy to production
-	if [[ $(git describe --tags) == $(git describe --tags --abbrev=0) ]] ; then \
+	if [[ $(shell git describe --tags) == $(shell git describe --tags --abbrev=0) ]] ; then \
 		terraform workspace select production; \
 	fi
 	terraform apply -auto-approve
