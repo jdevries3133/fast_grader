@@ -21,6 +21,7 @@
 # other rules to be dependent on the build rule. Just keep in mind that if you
 # *never* have run `make build` then the other rules won't work!
 
+SHELL=/bin/bash
 
 DOCKER_ACCOUNT=jdevries3133
 CONTAINER_NAME=fast_grader_django
