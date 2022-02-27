@@ -33,14 +33,14 @@ CONTAINER=$(DOCKER_ACCOUNT)/$(CONTAINER_NAME):$(TAG)
 
 
 .PHONY: all
-all: test push deploy
+all: setup test push deploy
 
 
 .PHONY: setup
 setup:
 	@# this attempts to pull the container of the last major version. Hopefully,
 	@# this will get us some cached layers
-	docker pull $(DOCKER_ACCOUNT)/$(CONTAINER_NAME):$(shell git describe --tags --abbrev=0) || /bin/true
+	docker pull $(DOCKER_ACCOUNT)/$(CONTAINER_NAME):$(shell git describe --tags --abbrev=0) || true
 
 
 .PHONY: test
