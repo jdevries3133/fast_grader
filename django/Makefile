@@ -21,31 +21,63 @@
 # other rules to be dependent on the build rule. Just keep in mind that if you
 # *never* have run `make build` then the other rules won't work!
 
+SHELL=/bin/bash
 
 DOCKER_ACCOUNT=jdevries3133
 CONTAINER_NAME=fast_grader_django
 
-TAG?=$(shell cat VERSION)
+TAG?=$(shell git describe --tags)
+
 
 # assuming the use of Docker hub, these constants need not be changed
 CONTAINER=$(DOCKER_ACCOUNT)/$(CONTAINER_NAME):$(TAG)
-HASH=$(shell docker ps | grep django-web | cut -c 1-15)
 
 
 .PHONY: all
-all: test push deploy
+all: setup test push deploy
 
 
-.PHONY: push
-push:
-	docker buildx build --platform linux/amd64 --push -t $(CONTAINER) .
+.PHONY: setup
+setup:
+	@# this attempts to pull the container of the last major version. Hopefully,
+	@# this will get us some cached layers
+	docker pull $(DOCKER_ACCOUNT)/$(CONTAINER_NAME):$(shell git describe --tags --abbrev=0) || true
 
 
 .PHONY: test
 test:
-	docker exec $(HASH) pytest
+	@# the docker-compose and BuildKit integration is broken, so we need to
+	@# disable it for now. This also causes caching to become less effective,
+	@# so uncomment this override whenever the integration is fixed
+	COMPOSE_DOCKER_CLI_BUILD=0 \
+	TAG=$(TAG) \
+		docker-compose up -d
+
+	@# don't ask me why docker-compose uses different naming conventions on
+	@# mac vs linux :/
+ifdef CI
+	docker exec django_web_1 pytest
+else
+	docker exec django-web-1 pytest
+endif
+
+
+.PHONY: push
+push:
+ifdef CI
+	@# we assume that the CI server is always linux/amd64
+	docker push $(CONTAINER)
+else
+	@# on mac, we need a cross-platform build
+	docker buildx build --platform linux/amd64 --push -t $(CONTAINER) .
+endif
 
 
 .PHONY: deploy
 deploy:
+	terraform init -input=false
+	@# if the current commit is tagged, we will deploy to production
+	if [[ $(shell git describe --tags) == $(shell git describe --tags --abbrev=0) ]] ; then \
+		terraform workspace select production; \
+	fi
 	terraform apply -auto-approve

@@ -31,8 +31,6 @@ COPY . .
 # Django startup will fail if these environment variables are undefined. Build
 # args are unset after build time, so their values don't matter
 ARG DJANGO_SECRET="anything"
-ARG GOOGLE_CLIENT_ID="anything"
-ARG GOOGLE_CLIENT_SECRET="anything"
 
 RUN python3 manage.py tailwind install
 RUN python3 manage.py tailwind build
@@ -60,4 +58,4 @@ ENV PATH=$PATH:/root/.local/bin
 COPY --from=prep-dependencies /src .
 
 
-CMD [ "sh", "/src/entrypoint_prod.sh" ]
+CMD [ "sh", "/src/scripts/entrypoint_prod.sh" ]

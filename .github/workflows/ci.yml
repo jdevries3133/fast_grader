@@ -1,0 +1,58 @@
+# Copyright (C) 2021 John DeVries
+
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+
+# ---
+# This monolithic action does a bunch of things:
+#
+# - build the django app container
+# - run unit tests against the container
+# - push the container to docker hub
+# - deploy the development infrastructure to minikube
+# - run system integration tests against this ephemeral system
+# - deploy to staging with terraform
+
+
+name: CI/CD
+
+on: push
+
+jobs:
+  django-deploy:
+
+    name: Test, push, deploy
+    runs-on: ubuntu-latest
+    environment: Django Deployment
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+
+    - name: Login to Docker Hub
+      uses: docker/login-action@v1
+      with:
+        username: jdevries3133
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+    - name: Test, push, and deploy via `make all`
+      working-directory: ./django
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        TF_VAR_google_client_secret: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+      run: |
+        mkdir ~/.kube
+        echo "${{ secrets.KUBE_CONFIG}}" > ~/.kube/config
+        make
