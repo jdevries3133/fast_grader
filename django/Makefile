@@ -45,8 +45,6 @@ setup:
 
 .PHONY: test
 test:
-	git log | cat
-	git branch | cat
 	git describe --tags
 	@# the docker-compose and BuildKit integration is broken, so we need to
 	@# disable it for now. This also causes caching to become less effective,
