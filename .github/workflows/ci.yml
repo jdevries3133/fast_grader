@@ -47,6 +47,7 @@ jobs:
       id: tagger
       uses: jimschubert/query-tag-action@v1
       with:
+        abbrev: 7
         include: 'v*'
         commit-ish: 'HEAD~'
 
