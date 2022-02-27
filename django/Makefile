@@ -45,7 +45,6 @@ setup:
 
 .PHONY: test
 test:
-	git describe --tags
 	@# the docker-compose and BuildKit integration is broken, so we need to
 	@# disable it for now. This also causes caching to become less effective,
 	@# so uncomment this override whenever the integration is fixed
@@ -75,13 +74,8 @@ endif
 
 .PHONY: deploy
 deploy:
-ifdef CI
 	terraform init -input=false
-	if $(shell git describe --exact-match --tags HEAD) ; then \
-		terraform workspace select production \
-	fi
-	terraform apply -auto-approve -input=false
-else
-	terraform apply
-endif
-
+	(git describe --exact-match && \
+		terraform workspace select production) || \
+		true
+	terraform apply -auto-approve

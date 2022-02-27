@@ -7,6 +7,9 @@ services:
     build: .
     ports:
       - "8000:8000"
+    entrypoint:
+      - sh
+      - scripts/entrypoint_dev.sh
     links:
       - db
     volumes:
@@ -19,8 +22,6 @@ services:
       DJANGO_SECRET: whatever
       DJANGO_DEBUG: "yes indeed"
       DJANGO_SETTINGS_MODULE: fast_grader.settings.development
-
-      # can be provided via a `.env` file
       GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
       GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
   db:
