@@ -41,7 +41,7 @@ if SECRET_KEY is None:
     raise ValueError("DJANGO_SECRET not defined in the environment")
 
 
-ALLOWED_HOSTS = ["classfast.app"]
+ALLOWED_HOSTS = ["classfast.app", "beta.classfast.app"]
 
 
 CORS_ALLOW_ALL_ORIGINS = True
