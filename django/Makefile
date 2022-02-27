@@ -75,7 +75,8 @@ endif
 .PHONY: deploy
 deploy:
 	terraform init -input=false
-	(git describe --exact-match && \
-		terraform workspace select production) || \
-		true
+	@# if the current commit is tagged, we will deploy to production
+	if [[ $(git describe --tags) == $(git describe --tags --abbrev=0) ]] ; then \
+		terraform workspace select production; \
+	fi
 	terraform apply -auto-approve
