@@ -41,6 +41,8 @@ jobs:
     environment: Django Deployment
     steps:
     - uses: actions/checkout@v2
+      with:
+        fetch-depth: 20
 
     - name: setup Docker buildx
       id: buildx
