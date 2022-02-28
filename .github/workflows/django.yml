@@ -25,7 +25,7 @@
 # - deploy to staging with terraform
 
 
-name: CI/CD for Django web appliication
+name: CI/CD for Django web application
 
 on:
   push:
