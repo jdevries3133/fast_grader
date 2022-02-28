@@ -55,5 +55,4 @@ This is a monorepo with a variety of fun inside:
 | ----------- | ----------------------------------------------------------------------------------------------------------------------------------- |
 | ./mailu     | Our config for [mailu](https://mailu.io), a docker-compose based fully-featured email service which we host at `mail.classfast.app` |
 | ./django    | The prototype Django application, which we are gradually eliminating                                                                |
-| ./remix     | The new [remix.run](https://remix.run) application, which we are gradually building out                                             |
 | ./extension | The browser extension which facilitates "manual" grade syncing in Google Classroom via DOM manipulation                             |
