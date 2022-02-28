@@ -2,7 +2,7 @@ terraform {
 
   backend "s3" {
     bucket = "my-sites-terraform-remote-state"
-    key    = "fast_grader--${terraform.workspace}"
+    key    = "fast_grader"
     region = "us-east-2"
   }
 
