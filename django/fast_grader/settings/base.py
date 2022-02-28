@@ -173,6 +173,10 @@ DATABASES = {
 ACCOUNT_LOGOUT_REDIRECT_URL = "/accounts/login"
 
 
+if not DEBUG:
+    ACCOUNT_DEFAULT_HTTP_PROTOCOL = "https"
+
+
 AUTHENTICATION_BACKENDS = [
     "django.contrib.auth.backends.ModelBackend",
     "allauth.account.auth_backends.AuthenticationBackend",
