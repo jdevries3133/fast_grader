@@ -44,7 +44,7 @@ if SECRET_KEY is None:
 ALLOWED_HOSTS = ["classfast.app", "beta.classfast.app"]
 
 
-CSRF_TRUSTED_ORIGINS = ["https://classfast.app/", "https://beta.classfast.app"]
+CSRF_TRUSTED_ORIGINS = ["https://classfast.app", "https://beta.classfast.app"]
 
 
 CORS_ALLOW_ALL_ORIGINS = True
