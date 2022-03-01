@@ -1,4 +1,10 @@
+import logging
+
+
 from allauth.socialaccount.adapter import DefaultSocialAccountAdapter
+
+
+logger = logging.getLogger(__name__)
 
 
 class FastGraderSocialAccountAdapter(DefaultSocialAccountAdapter):

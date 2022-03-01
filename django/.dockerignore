@@ -27,3 +27,5 @@ terraform.tfstate
 terraform.tfstate.backup
 
 Dockerfile
+
+secret.auto.tfvars

@@ -44,7 +44,11 @@ if SECRET_KEY is None:
 ALLOWED_HOSTS = ["classfast.app", "beta.classfast.app"]
 
 
+CSRF_TRUSTED_ORIGINS = ["https://classfast.app/", "https://beta.classfast.app"]
+
+
 CORS_ALLOW_ALL_ORIGINS = True
+
 
 CORS_ALLOW_HEADERS = [
     "accept",
@@ -125,6 +129,7 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "django_browser_reload.middleware.BrowserReloadMiddleware",
+    "fast_grader.middleware.log_headers",
 ]
 
 
@@ -278,6 +283,10 @@ MEDIA_ROOT = Path(BASE_DIR, "media_root")
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+
+# TODO(#21): restore email
+EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 
 
 # see Python's logging levels for valid strings to use
