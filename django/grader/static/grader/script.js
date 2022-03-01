@@ -184,11 +184,20 @@ async function getSubmissionDetails() {
     state.assignmentData.submissions[state.currentlyViewingIndex] =
       await res.json();
     removeLoading();
+    return true;
   } else {
-    removeLoading();
-    indicateFailure(
-      "Could not get details for this submission. Please try again."
-    );
+    // TODO: handle error of {'message': 'not a google docs/slides based assignment'}
+    const data = await res.json();
+    if (data.message) {
+      removeLoading();
+      indicateFailure(data.message);
+    } else {
+      removeLoading();
+      indicateFailure(
+        "Could not get details for this submission. Please try again."
+      );
+    }
+    return false;
   }
 }
 
@@ -244,8 +253,10 @@ async function updateStateWithData() {
     const data = await fetchSession();
     state.assignmentData = data;
     state.ready = true;
-    await checkSubmissionDetails();
-    indicateSuccess("Your assignment data was loaded.");
+    const result = await checkSubmissionDetails();
+    if (result) {
+      indicateSuccess("Your assignment data was loaded.");
+    }
   } catch (e) {
     indicateFailure("Your assignment data failed to load; please try again!");
     console.error("Failed due to error: ", e);

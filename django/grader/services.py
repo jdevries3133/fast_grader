@@ -43,6 +43,14 @@ GOOGLE_CLIENT_SECRET = settings.SOCIALACCOUNT_PROVIDERS["google"]["APP"]["secret
 logger = logging.getLogger(__name__)
 
 
+class NotGoogleDriveAssignment(ValueError):
+    """If the assignment has no google drive attachments, it can't be graded
+    with this app, so we will pass an exception up to callers of this module.
+    """
+
+    ...
+
+
 def _get_google_api_service(*, user: User, service: str, version: str):
     qs = SocialToken.objects.filter(
         account__user=user,
@@ -241,7 +249,10 @@ def concatenate_attachments(
 
     for a in attachments:
         # header
-        header = [a.name, "=" * len(a.name)]
+        if a.name is not None:
+            header = [a.name, "=" * len(a.name)]
+        else:
+            header = ["No Name", "======="]
         try:
             data = (
                 service.files()  # type: ignore
@@ -300,6 +311,10 @@ def _update_teacher_template(
         )
         for i in assignment_data.get("materials", {})
     ]
+
+    if not any(a.id_ for a in attachments):
+        raise NotGoogleDriveAssignment
+
     template_content = concatenate_attachments(user=user, attachments=attachments)
 
     was_created = False

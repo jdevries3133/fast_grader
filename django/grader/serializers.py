@@ -18,7 +18,7 @@ import logging
 from django.core.exceptions import ValidationError
 from rest_framework import serializers
 
-from grader.services import update_submission
+from grader.services import NotGoogleDriveAssignment, update_submission
 
 from .models import GradingSession, AssignmentSubmission
 
@@ -51,7 +51,17 @@ class AssignmentSubmissionSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         # TODO: this self-updating behavior should be in the model
         if instance:
-            update_submission(submission=instance)
+            try:
+                update_submission(submission=instance)
+            except NotGoogleDriveAssignment as e:
+                raise serializers.ValidationError(
+                    {
+                        "message": (
+                            "There are no google docs or slides attached "
+                            "to this assignment. Please try another assignment."
+                        )
+                    }
+                ) from e
 
         ret = super().to_representation(instance)
 

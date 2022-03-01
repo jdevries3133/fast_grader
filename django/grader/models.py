@@ -55,9 +55,6 @@ class GradingSession(models.Model):
     max_grade = models.IntegerField()
     teacher_template = models.TextField(blank=True)
 
-    # TODO: the first thing to do here is definitevely determine how sync
-    # state will be handled (with an enum probably), then to update everything
-    # else.
     class SyncState(models.TextChoices):
         UNSYNCED = "U", _("UNSYNCED")
         SYNCED = "S", _("SYNCED")
