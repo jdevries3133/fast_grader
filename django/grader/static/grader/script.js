@@ -64,6 +64,22 @@ const state = {
  * utils
  */
 
+function min(...args) {
+  let ret = args[0];
+  args.forEach((arg) => {
+    if (arg < ret) {
+      ret = arg;
+    }
+  });
+  return ret;
+}
+
+async function wait(ms) {
+  return new Promise((res) => {
+    setTimeout(res, ms);
+  });
+}
+
 /**
  * Hack to force a string to be copied.
  */
@@ -104,7 +120,6 @@ function getModal(containerElement, innerHTML) {
     "justify-center"
   );
   el.innerHTML = `
-    <div class="modal-overlay blur-sm absolute w-full h-full bg-gray-900 opacity-50"></div>
     <div class="container w-full h-full flex items-center flex-col justify-center">
         ${innerHTML}
     </div>
@@ -167,93 +182,59 @@ async function fetchSession() {
 }
 
 /**
- * Get the detailed submission resource for the current submission.
+ * fetch submission details as needed for the next 5 items in
+ * state.assignmentData.submissions. If objects have already been fetched,
+ * as indicated by the type of the item being an object and not a number,
+ * it will not be fetched again.
+ *
+ * Initially, all of the members of state.assignmentData.submissions are
+ * numbers, representing the pk for a given submission.
+ *
+ * @returns an array of promises for unresolved requests
+ *
  */
 async function getSubmissionDetails() {
-  const removeLoading = indicateLoading();
-  // be flexible depending on whether this slot in the array is literally just
-  // the pk, or it looks more like { pk: number }
-  let pk = state.assignmentData.submissions[state.currentlyViewingIndex];
-  if (typeof pk !== "number" && "pk" in pk) {
-    let { pk } = pk;
+  let i = state.currentlyViewingIndex;
+  let LOOK_AHEAD = i + 4;
+  const P = [];
+  while (i < LOOK_AHEAD && i < state.assignmentData.submissions.length) {
+    if (typeof state.assignmentData.submissions[i] === "number") {
+      const pk = state.assignmentData.submissions[i];
+      P.push([
+        pk,
+        fetch(
+          `/grader/assignment_submission/${pk}/?diff=${state.viewDiffOnly}`
+        ),
+      ]);
+    }
+    i++;
   }
-  const res = await fetch(
-    `/grader/assignment_submission/${pk}/?diff=${state.viewDiffOnly}`
-  );
-  if (res.ok) {
+  // we only await the first promise, which is the one that will be needed to
+  // render the UI. The rest can take their time resolving.
+  const res = await P[0][1];
+  if (res && res.ok) {
     state.assignmentData.submissions[state.currentlyViewingIndex] =
       await res.json();
-    removeLoading();
-    return true;
-  } else {
-    // TODO: handle error of {'message': 'not a google docs/slides based assignment'}
+  } else if (res) {
     const data = await res.json();
     if (data.message) {
-      removeLoading();
       indicateFailure(data.message);
-    } else {
-      removeLoading();
-      indicateFailure(
-        "Could not get details for this submission. Please try again."
-      );
-    }
-    return false;
-  }
-}
-
-/**
- * Wrapper around getSubmissionDetails which checks if the detailed submission
- * resource has been fetched. After the main init function, items in the array
- * `state.assignmentData.submissions` will look like this:
- *   [
- *     { pk: number },
- *     ...
- *   ]
- *
- * Therefore, this function checks for the presence of the other fields:
- * - `student_name`
- * - `grade`
- * - `comment`
- * - `submission` (text content)
- * - etc.
- *
- * If required fields are absent, `getSubmissionDetails` is fired, which
- * will get the full detailed resource from the backend.
- */
-async function checkSubmissionDetails() {
-  // early return if the current item is not defined; i.e., an empty array was
-  // returned by the API
-  if (!state.assignmentData.submissions[state.currentlyViewingIndex]) return;
-  const submission_fields = [
-    "pk",
-    "api_student_profile_id",
-    "api_student_submission_id",
-    "profile_photo_url",
-    "submission",
-    "student_name",
-    "grade",
-  ];
-  for (const field of submission_fields) {
-    if (
-      typeof state.assignmentData.submissions[state.currentlyViewingIndex] ===
-        "number" ||
-      !(field in state.assignmentData.submissions[state.currentlyViewingIndex])
-    ) {
-      return getSubmissionDetails();
+      return false;
     }
   }
+  return P.slice(1);
 }
 
 /**
  * Populate state.assignmentData.submissions
  */
-async function updateStateWithData() {
+async function initSubmissionData() {
   const removeLoading = indicateLoading();
   try {
     const data = await fetchSession();
     state.assignmentData = data;
     state.ready = true;
-    const result = await checkSubmissionDetails();
+    const result = await getSubmissionDetails();
     if (result) {
       indicateSuccess("Your assignment data was loaded.");
     }
@@ -268,7 +249,22 @@ async function updateStateWithData() {
  * Save the current submission object individually. Should be fired after
  * any change to ensure there are no out-of-sync changes.
  */
-async function saveSubmission() {
+async function saveSubmission(retries = 0) {
+  // race condition: while quickly moving through submissions, we might try
+  // to save the submission before it is fetched, causing `pk` to be undefined,
+  // and the submission resource not to be here in the first place.
+  if (
+    typeof state.assignmentData.submissions[state.currentlyViewingIndex] ===
+    "number"
+  ) {
+    await wait(100);
+    if (retries < 10) {
+      return saveSubmission(retries + 1);
+    } else {
+      throw new Error("failed to save submission");
+    }
+  }
+
   // this could change while we await other stuff, so we'll grab out own copies
   // to make sure we are async safe
   const index = state.currentlyViewingIndex;
@@ -371,6 +367,7 @@ function applyBlur() {
  * @returns a function that will return the UI to the original state
  */
 function indicateLoading() {
+  state.shortcutListenerActive = false;
   const INDICATOR_ID = "loadingIndicator";
   function isIndicatorInDomAlready() {
     return !!document.getElementById(INDICATOR_ID);
@@ -380,12 +377,12 @@ function indicateLoading() {
   }
   applyBlur();
   const innerHTML = `
-  <div class="z-50 mb-4 p-4 rounded-lg bg-gray-200">
+  <div class="z-50 mb-4 p-4 rounded-lg bg-gray-200 shadow-lg">
     <h1>Please wait</h1>
-    <p>Each student submission takes a while the first time, and is lightning fast thereafter.</p>
-    <p>Don't worry, optimizations are coming soon!</p>
+    <div class="w-full flex items-center justify-center">
+    <div id="loadingSpinner" class="lds-roller"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
+    </div>
   </div>
-  <div id="loadingSpinner" class="lds-roller"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
   `;
   const container = getModal("div", innerHTML);
   container.id = INDICATOR_ID;
@@ -394,6 +391,7 @@ function indicateLoading() {
     const el = document.getElementById(INDICATOR_ID);
     el && el.remove();
     removeBlur();
+    state.shortcutListenerActive = true;
   };
 }
 
@@ -520,22 +518,31 @@ async function switchStudent() {
   switch (state.shiftHeld) {
     case false:
       newIndex = state.currentlyViewingIndex + 1;
-      if (newIndex < state.assignmentData.submissions.length) {
-        await saveSubmission();
-        state.currentlyViewingIndex = newIndex;
-        await checkSubmissionDetails();
-        updateView();
-      }
       break;
     case true:
       newIndex = state.currentlyViewingIndex - 1;
-      if (newIndex >= 0) {
-        await saveSubmission();
-        state.currentlyViewingIndex = newIndex;
-        await checkSubmissionDetails();
-        updateView();
-      }
       break;
+  }
+  if (newIndex >= 0 && newIndex < state.assignmentData.submissions.length) {
+    const removeLoading = indicateLoading();
+
+    // TODO(optimization): only save changed submissions
+    saveSubmission();
+
+    state.currentlyViewingIndex = newIndex;
+    const promises = await getSubmissionDetails();
+    updateView();
+    removeLoading();
+
+    // now that things are interactive again, resolve promises for the
+    // look-ahead requests and put the data into state
+    promises.forEach(async (item) => {
+      const [position, promise] = item;
+      const res = await promise;
+      if (res.ok) {
+        state.assignmentData.submissions[position] = await res.json();
+      }
+    });
   }
 }
 
@@ -548,7 +555,7 @@ async function handleDiffSelectSlider() {
   const newState = !inputEl.checked;
   state.viewDiffOnly = newState;
   inputEl.checked = newState;
-  await updateStateWithData();
+  await initSubmissionData();
   updateView();
 }
 
@@ -611,7 +618,7 @@ function handleKeyUp(e) {
  * configuration
  */
 async function init() {
-  await updateStateWithData();
+  await initSubmissionData();
   updateView();
 
   document.body.addEventListener("keypress", handleKeyPress);
