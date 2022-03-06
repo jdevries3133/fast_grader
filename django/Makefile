@@ -68,7 +68,8 @@ ifdef CI
 	@# we assume that the CI server is always linux/amd64
 	docker push $(CONTAINER)
 else
-	@# on mac, we need a cross-platform build
+	@# on mac, we need a cross-platform build. We could do this in CI too, but
+	@# caching breaks when we switch from normal `docker build` to BuildKit
 	docker buildx build --platform linux/amd64 --push -t $(CONTAINER) .
 endif
 
@@ -76,8 +77,10 @@ endif
 .PHONY: deploy
 deploy:
 	terraform init -input=false
+
 	@# if the current commit is tagged, we will deploy to production
 	if [[ $(shell git describe --tags) == $(shell git describe --tags --abbrev=0) ]] ; then \
 		terraform workspace select production; \
 	fi
+
 	terraform apply -auto-approve
