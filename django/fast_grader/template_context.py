@@ -1,9 +1,14 @@
+import os
+
+
 from django.conf import settings
 
 
-def debug_context(_):
-    return {"debug": settings.DEBUG}
+def app_context(_):
+    """Some generic context used throughout various templates."""
 
-
-def logrocket_context(_):
-    return {"enable_logrocket": settings.ENABLE_LOGROCKET}
+    return {
+        "debug": settings.DEBUG,
+        "enable_logrocket": settings.ENABLE_LOGROCKET,
+        "is_production": os.getenv("IS_PRODUCTION") == "true",
+    }

@@ -19,7 +19,7 @@ from django.urls import path, include
 from django.contrib.sitemaps.views import sitemap
 
 from .sitemaps import StaticViewSitemap
-from .views import StaticPageView
+from .views import StaticPageView, beta_welcome
 
 
 sitemaps = {"static": StaticViewSitemap}
@@ -38,6 +38,7 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     # static-ish pages that are core to this site
     path("", StaticPageView.as_view(template_name="core/index.html"), name="home"),
+    path("welcome/", beta_welcome, name="beta_welcome"),
     path("help/", StaticPageView.as_view(template_name="core/help.html"), name="help"),
     path(
         "about/", StaticPageView.as_view(template_name="core/about.html"), name="about"

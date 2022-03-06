@@ -13,8 +13,10 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import os
 
 from django.views.generic import TemplateView
+from django.shortcuts import redirect, render
 
 
 class StaticPageView(TemplateView):
@@ -31,3 +33,14 @@ class StaticPageView(TemplateView):
             self.extra_context = {"enable_logrocket": False}
 
         return super().get_context_data(*a, **kw)
+
+
+def beta_welcome(request):
+    """Any links from the main site to the beta site lands on this page. If we
+    are running in production (i.e., someone visists https://classfast.app/welcome),
+    we just redirect to the home page.
+    """
+    if os.getenv("IS_PRODUCTION") == "true":
+        return redirect("/")
+
+    return render(request, "core/beta_welcome.html")

@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+
+{% load account socialaccount %}
+
+
+{% block content %}
+
+<div class="prose m-2">
+  <h1>Welcome to Beta!</h1>
+  <p>
+    On fast grader beta, you'll find the lastest and greatest features that we
+    have to offer, with updates often being applied multiple times per day!
+    We're very grateful to anyone with such an interest in out idea that they'd
+    like to use this site. Your usage of this site will be very useful towards
+    improving the whole platform, as we'll be able to see what works and what
+    doesn't, as well as recieving direct feedback from you!
+  </p>
+  <p>
+    You'll notice that when you log in to this website, none of your grading
+    data from the main site is here, and any grading you do here will not sync
+    with the main site. This is expected behavior, and it's necessary for us
+    to ensure the integrity of data across both sites, to be able to roll out
+    new features on this site faster.
+  </p>
+  <p>
+    Finally, keep in mind that the browser extension you're using should match
+    the version of the site you are using, because you'll find that there are
+    two extensions on the Chrome Web Store: one for the main site just called,
+    "Fast Grader Sync Extension", and a beta version, called, "BETA: Fast Grader
+    Sync Extension."
+  </p>
+  <p>
+    Since the sites are separate, each of those respective browser extensions
+    will only talk to the sites that they are associated with. Overall, we
+    feel that the best user experience will be achieved by choosing one site
+    and more or less sticking with it for everything. If you trust us, want the
+    latest and greatest, want to help us, and like to live life on the edge,
+    then you should always use the Beta site, and never use the regular site.
+    On the other hand, if want to avoid intermittent outages as much as possible,
+    and don't like being a guinea pig, feel free to go back to the main site!
+  </p>
+  <p>
+    If you do choose to stick with the beta site, and we hope you do, click
+    on the button below to log in!
+  </p>
+</div>
+  <div class="m-2 h-16 w-52">
+    <a href="{% provider_login_url 'google' %}">
+      {% include 'account/sign_in_with_google.html' %}
+    </a>
+  </div>
+
+{% endblock %}
+
+
+{% comment %}
+vi:filetype=htmldjango
+{% endcomment %}

@@ -58,6 +58,7 @@ module "basic-deployment" {
     DJANGO_SETTINGS_MODULE = "fast_grader.settings.production"
     GOOGLE_CLIENT_ID       = "850669494212-rbi5f45edqpnru9a7gs1avgb480kr92b.apps.googleusercontent.com"
     GOOGLE_CLIENT_SECRET   = var.google_client_secret
+    IS_PRODUCTION          = terraform.workspace == "production" ? "true" : "false"
   }
 }
 

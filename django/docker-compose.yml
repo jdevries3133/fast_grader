@@ -24,6 +24,7 @@ services:
       DJANGO_SETTINGS_MODULE: fast_grader.settings.development
       GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
       GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
+      IS_PRODUCTION: ${IS_PRODUCTION}
   db:
     image: postgres:14
     environment:
