@@ -1,13 +1,15 @@
 {
   "name": "fast_grader_extension",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "Browser extension to sync grades that were input on https://classfast.app/",
   "scripts": {
     "dist": "rm -rf dist && npm run build && npm run tailwind-build",
-    "build": "webpack --config webpack.prod.js",
-    "dev": "webpack --watch --config webpack.dev.js",
-    "tailwind-build": "npx tailwindcss -c ./tailwind.config.js -i ./src/styles.css -o ./dist/styles.css",
-    "tailwind-dev": "npx tailwindcss -c ./tailwind.config.js -i ./src/styles.css -o ./dist/styles.css --watch",
+    "dev": "concurrently \"yarn dev:webpack\" \"yarn dev:tailwind\"",
+    "build": "yarn build:tailwind && yarn build:webpack",
+    "build:webpack": "webpack --config webpack.prod.js",
+    "build:tailwind": "npx tailwindcss -c ./tailwind.config.js -i ./src/styles.css -o ./dist/styles.css",
+    "dev:webpack": "webpack --watch --config webpack.dev.js",
+    "dev:tailwind": "npx tailwindcss -c ./tailwind.config.js -i ./src/styles.css -o ./dist/styles.css --watch",
     "test": "jest"
   },
   "repository": {
@@ -55,6 +57,7 @@
   },
   "dependencies": {
     "@babel/runtime": "^7.16.0",
+    "concurrently": "^7.0.0",
     "serialize-error": "^8.1.0",
     "type-fest": "^0.21.3"
   }
