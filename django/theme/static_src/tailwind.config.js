@@ -41,15 +41,22 @@ module.exports = {
   darkMode: "media",
   theme: {
     colors: {
+      ...colors,
       /**
        * Interact with color scheme:
        * https://coolors.co/1ca665-f5ba09-7f6a93-37392e-eee5e5
        */
-      green: "hsl(152, 71%, 38%)",
-      yellow: "hsl(45, 93%, 50%)",
-      orange: colors.orange,
-      purple: "hsl(271, 16%, 50%)",
-      ...colors,
+      blue: {
+        100: "rgb(177 221 255)",
+        200: "rgb(123 189 240)",
+        300: "rgb(86 181 254)",
+        400: "rgb(0 144 255)",
+        500: "rgb(23 124 204)",
+        600: "#rgb(33 114 178)",
+        700: "#3f7cac",
+        800: "rgb(0 74 133)",
+        900: "rgb(0 60 109)",
+      },
     },
     fontFamily: {
       sans: [
