@@ -94,25 +94,9 @@ module.exports = {
       },
     },
     fontFamily: {
-      // TODO: deprecated; remove when possible
-      sans: [
-        "-apple-system",
-        "BlinkMacSystemFont",
-        "Segoe UI",
-        "Roboto",
-        "Helvetica",
-        "Arial",
-        "sans-serif",
-        "Apple Color Emoji",
-        "Segoe UI Emoji",
-        "Segoe UI Symbol",
-      ],
-      mono: ["Inconsolata", "Consolas", "monospace"],
-      serif: ["Roboto Slab", "Georgia", "serif"],
-
       // new fonts
       brand: ["IbmPlexSans", ...defaultTheme.fontFamily.sans],
-      copy: ["Montserrat", ...defaultTheme.fontFamily.sans],
+      sans: ["Montserrat", ...defaultTheme.fontFamily.sans],
       accent: ["Montserrat", ...defaultTheme.fontFamily.sans],
       mono: ["Inconsolata", "Consolas", "monospace"],
     },

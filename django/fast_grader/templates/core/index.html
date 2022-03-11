@@ -9,31 +9,35 @@
 {% include 'core/navigation.html' %}
 
 {# main landing section with video #}
-<div class="flex flex-col items-center justify-center min-h-screen pb-8 m-auto bg-gradient-to-tr from-lime-100 via-green-100 to-lime-200 bg-blur md:pt-8 md:px-4 landing-page-grid">
+<div class="flex flex-col items-center justify-center min-h-screen py-12 m-auto bg-gradient-to-tr from-blue-100 via-purple-100 to-dew-100 bg-blur md:pt-8 md:px-4 landing-page-grid">
 
   <div class="2xl:justify-self-center">
     {% include 'core/partials/logo.html' %}
   </div>
 
   <div data-testid="hero text" class="flex flex-col items-center justify-center flex-grow lg:pr-12 lg:items-start md:justify-self-start 2xl:justify-self-center 2xl:items-center gap-2 2xl:row-start-2 2xl:col-span-1 md:col-span-2">
-    <h1 class="font-serif text-2xl lg:text-4xl 2xl:text-5xl">give more feedback</h1>
-    <h1 class="font-serif text-2xl lg:text-4xl">be data driven</h1>
-    <h2 class="font-serif text-lg lg:text-2xl">do more grading</h1>
-    <h2 class="font-serif text-lg lg:text-2xl">in less time</h1>
+    <h1 class="font-brand text-2xl lg:text-4xl 2xl:text-5xl">give more feedback</h1>
+    <h1 class="font-brand text-2xl lg:text-4xl">be data driven</h1>
+    <h2 class="font-brand text-lg lg:text-2xl">do more grading</h1>
+    <h2 class="font-brand text-lg lg:text-2xl">in less time</h1>
   </div>
 
-  <video muted controls loop aria-label="demo video" autoplay class="max-h-screen p-2 md:col-span-2 2xl:col-span-2 2xl:row-span-3">
-    <source src="{% static 'landing_page/demo.mp4' %}" type="video/mp4"></source>
-  </video>
+  <div class="flex items-center justify-center max-h-screen p-2 md:col-span-2 2xl:col-span-2 2xl:row-span-3">
+    <a class="link" href="{% static 'landing_page/demo.mp4' %}"><h1>Watch old demo video; new one coming soon!</h1></a>
+  </div>
+  <!-- TODO: recreate video after redesign -->
+  <!-- <video muted controls loop aria-label="demo video" autoplay class="max-h-screen p-2 md:col-span-2 2xl:col-span-2 2xl:row-span-3"> -->
+  <!--   <source src="{% static 'landing_page/demo.mp4' %}" type="video/mp4"></source> -->
+  <!-- </video> -->
 
-  <div class="flex md:flex-col justify-self-center items-center justify-center 2xl:row-start-3">
+  <div class="flex md:flex-col justify-self-center justify-center 2xl:row-start-3">
     <a href="{% url 'grader' %}">
-      <button class="p-4 text-xl shadow-md lg:text-3xl lg:p-6 2xl:p-10 md:p-4 md:text-2xl transition bg-gradient-to-r align-self-center from-purple-300 to-green-300 hover:shadow-none hover:text-white">
+      <button class="p-4 md:w-full text-xl shadow-md lg:text-3xl lg:p-6 2xl:p-10 md:p-4 md:text-2xl transition bg-gradient-to-r align-self-center from-purple-300 to-dew-300 hover:shadow-none hover:text-white">
         Start Grading
       </button>
       {% if is_production %}
         <a href="https://beta.classfast.app/welcome">
-          <button class="flex items-center p-3 bg-purple-300 shadown hover:shadow-none hover:bg-purple-200 focus:bg-purple-200">
+          <button class="md:w-full flex items-center justify-center p-3 bg-purple-300 shadown hover:shadow-none hover:bg-purple-200 focus:bg-purple-200">
             <span class="font-light">Try the Beta!</span>
               <svg aria-labelledby="beta" xmlns="http://www.w3.org/2000/svg" class="inline w-8 h-8 text-lime-800" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
@@ -48,13 +52,13 @@
 
 
 {# features spec #}
-<div class="relative flex flex-col items-center justify-center pt-2 bottom-2 sm:p-4 md:p-8 lg:p-12 xl:p-20 backdrop-filter backdrop-blur-xl bg-gradient-to-br from-orange-100 via-yellow-100 to-orange-100">
-  <h1 class="flex-shrink font-serif text-center lg:text-5xl xl:text-7xl lg:mb-8 xl:mb-12">⚡️ Grade Like Lightning 🌩</h1>
+<div class="flex flex-col items-center justify-center py-12 backdrop-filter backdrop-blur-xl bg-gradient-to-br from-yellow-100 via-dew-100 to-yellow-200">
+  <h1 class="flex-shrink font-brand text-center lg:text-5xl xl:text-7xl lg:mb-8 xl:mb-12">⚡️ Grade Like Lightning 🌩</h1>
 
   <div class="flex-grow lg:grid lg:grid-cols-3 grid-rows-7">
 
-    <div class="flex flex-col items-center max-w-md p-2 m-2 m-3 shadow-md row-span-3 bg-gradient-to-tr from-lime-100 to-lime-200 rounded-md">
-      <h3 class="text-center">Go Faster</h3>
+    <div class="flex flex-col items-center max-w-md p-2 m-2 m-3 shadow row-span-3 bg-gradient-to-tr from-blue-100 to-blue-200 rounded-md">
+      <h2 class="text-center">Go Faster</h2>
       <p>Keyboard shortcuts change grading from a slog to a dance!</p>
       <img
         alt="image of keyboard and other items on desk"
@@ -63,8 +67,8 @@
         />
     </div>
 
-    <div class="max-w-md p-2 m-2 m-3 shadow-md bg-gradient-to-tr row-start-2 row-span-3 from-green-100 to-green-200 col-start-2 rounded-md">
-      <h3 class="text-center">Cut to the Chase</h3>
+    <div class="max-w-md p-2 m-2 m-3 shadow bg-gradient-to-tr row-start-2 row-span-3 from-dew-100 to-dew-200 col-start-2 rounded-md">
+      <h2 class="text-center">Cut to the Chase</h2>
       <p>
         Docs and slides are exported to plain text, so you can see more at a
         glance and spend less time waiting for loading between assignment
@@ -77,8 +81,8 @@
         />
     </div>
 
-    <div class="max-w-md p-2 m-2 m-3 shadow-md bg-gradient-to-tr from-emerald-100 to-emerald-200 row-span-3 row-start-4 col-start-3 rounded-md">
-      <h3 class="text-center">Differences Only</h3>
+    <div class="max-w-md p-2 m-2 m-3 shadow bg-gradient-to-tr from-purple-100 to-purple-200 row-span-3 row-start-4 col-start-3 rounded-md">
+      <h2 class="text-center">Differences Only</h2>
       <p>
         See only the most relevant information: exactly what the student added
         in green, and what they deleted in red.
@@ -91,40 +95,21 @@
     </div>
   </div>
 
-</div>
 
-<div class="text-center">
-  <h3 class="text-black">What Next?</h3>
-  <div class="flex flex-col items-center justify-center gap-2 sm:flex-row">
+  <div class="text-center mt-3 lg:mt-20">
+    <h3 class="text-black">Start Grading Now</h3>
+    <div class="flex flex-col items-center justify-center gap-2 sm:flex-row">
 
-    <div class="w-52 h-14">
-    <a href="{% provider_login_url 'google' %}">
-      {% include 'account/sign_in_with_google.html' %}
-    </a>
-    </div>
-
-    <div class="h-14">
-      <a href="{% url 'grader' %}">
-        <button class="h-full m-0 hover:bg-green-200">
-          <span id="fdsafwea__startGrading">Start Grading</span>
-          <svg aria-labelledby="fdsafwea__startGrading" xmlns="http://www.w3.org/2000/svg" class="inline h-8" viewBox="0 0 20 20" fill="currentColor">
-            <path fill-rule="evenodd" d="M10.293 15.707a1 1 0 010-1.414L14.586 10l-4.293-4.293a1 1 0 111.414-1.414l5 5a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0z" clip-rule="evenodd" />
-            <path fill-rule="evenodd" d="M4.293 15.707a1 1 0 010-1.414L8.586 10 4.293 5.707a1 1 0 011.414-1.414l5 5a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0z" clip-rule="evenodd" />
-          </svg>
-        </button>
+      <div class="w-58 h-14">
+      <a href="{% provider_login_url 'google' %}">
+        {% include 'account/sign_in_with_google.html' %}
       </a>
+      </div>
     </div>
   </div>
+
 </div>
 
-
-{# TODO: paid services overview #}
-<!-- <div class="h-full"> -->
-<!-- </div> -->
-
-{# TODO: development roadmap #}
-<!-- <div class="h-full"> -->
-<!-- </div> -->
 
 
 {% include 'core/footer.html' %}

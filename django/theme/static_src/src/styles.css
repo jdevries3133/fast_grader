@@ -16,7 +16,7 @@
   }
 
   button {
-    @apply font-bold p-1 m-1 rounded shadow-lg transition bg-blue-300;
+    @apply font-medium p-1 m-1 rounded shadow-lg transition bg-blue-300;
     @apply hover:shadow-none hover:bg-blue-400;
   }
 
@@ -211,4 +211,8 @@
   100% {
     transform: rotate(360deg);
   }
+}
+
+.footer-link {
+  @apply text-yellow-200 underline visited:text-purple-200;
 }
