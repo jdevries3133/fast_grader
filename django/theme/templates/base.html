@@ -40,7 +40,6 @@
     {% else %}
       <script src="https://unpkg.com/htmx.org@1.6.0"></script>
     {% endif %}
-    <script src="https://unpkg.com/hyperscript.org@0.8.2"></script>
     <script>
       // htmx init script for csrf
       document.addEventListener('DOMContentLoaded', () => {
@@ -48,10 +47,12 @@
           event.detail.headers['X-CSRFToken'] = '{{ csrf_token }}';
         })
       })
+
     </script>
 
-
     {% tailwind_css %}
+
+    {% include 'fonts.html' %}
   </head>
 
   <body class="bg-gray-100">
