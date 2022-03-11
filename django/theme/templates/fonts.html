@@ -1,0 +1,45 @@
+{% load static %}
+
+<style>
+{# font weights come from here: https://tailwindcss.com/docs/font-weight #}
+{# to be compatible with tailwind #}
+  @font-face {
+    font-family: IbmPlexSans;
+    src: url("{% static 'font/ibm-plex-sans/bold.ttf' %}");
+    font-weight: 700;
+  }
+  @font-face {
+    font-family: IbmPlexSans;
+    src: url("{% static 'font/ibm-plex-sans/extraLight.ttf' %}");
+    font-weight: 200;
+  }
+  @font-face {
+    font-family: IbmPlexSans;
+    src: url("{% static 'font/ibm-plex-sans/light.ttf' %}");
+    font-weight: 300;
+  }
+  @font-face {
+    font-family: IbmPlexSans;
+    src: url("{% static 'font/ibm-plex-sans/medium.ttf' %}");
+    font-weight: 500;
+  }
+  @font-face {
+    font-family: IbmPlexSans;
+    src: url("{% static 'font/ibm-plex-sans/regular.ttf' %}");
+    font-weight: 400;
+  }
+  @font-face {
+    font-family: IbmPlexSans;
+    src: url("{% static 'font/ibm-plex-sans/semiBold.ttf' %}");
+    font-weight: 600;
+  }
+  @font-face {
+    font-family: IbmPlexSans;
+    src: url("{% static 'font/ibm-plex-sans/thin.ttf' %}");
+    font-weight: 100;
+  }
+</style>
+
+{% comment %}
+vi:filetype=htmldjango
+{% endcomment %}
