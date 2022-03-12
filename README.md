@@ -7,7 +7,7 @@ CI/CD pipeline now 🙃
 
 [![Node.js CI](https://github.com/jdevries3133/fast_grader/actions/workflows/extension.yml/badge.svg)](https://github.com/jdevries3133/fast_grader/actions/workflows/extension.yml)
 
-![Fast Grader Logo](./django/fast_grader/static/logo.png)
+<img style="height: 200px" src="./django/fast_grader/static/brand/logo.webp" />
 
 **Grading in Online Assignments is not Fun**
 
