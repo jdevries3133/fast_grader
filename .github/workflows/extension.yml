@@ -4,7 +4,7 @@ on:
   push:
     paths: [
       "./extension/**",
-      ".github/workflows/extension.yml
+      ".github/workflows/extension.yml"
     ]
 
 
