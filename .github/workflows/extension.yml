@@ -27,6 +27,6 @@ jobs:
       - name: Install dependencies
         working-directory: ./extension
         run: |
-          yarn ci
+          yarn install
           yarn test
 
