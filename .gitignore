@@ -23,3 +23,6 @@ static_root
 .terraform
 *.tfstate*
 secret.auto.tfvars
+
+# mkdocs
+site

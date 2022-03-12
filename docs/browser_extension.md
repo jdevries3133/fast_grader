@@ -1,7 +1,6 @@
-Browser extension companion of the [fast grader for Google
-Classroom.](https://classfast.app/)
+# Browser Extension
 
-This project is not deployed yet.
+The browser extension is a close companion of the main app.
 
 # Development
 
@@ -9,7 +8,7 @@ Webpack will build the extension into `./dist`. For development, you can load
 the extension "unpacked" into the browser by smiply pointing your browser
 towards that directory.
 
-This project includes the following `npm run <cmd>` scripts:
+This project includes the following scripts:
 
 | `<cmd>`          | action                                                                               |
 | ---------------- | ------------------------------------------------------------------------------------ |
