@@ -24,6 +24,6 @@ jobs:
       - name: Install dependencies
         working-directory: ./extension
         run: |
-          npm ci
-          npm run test
+          yarn ci
+          yarn test
 
