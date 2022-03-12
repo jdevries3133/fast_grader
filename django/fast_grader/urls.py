@@ -59,6 +59,9 @@ urlpatterns = [
         {"sitemaps": sitemaps},
         name="django.contrib.sitemaps.views.sitemap",
     ),
-    path('design_system', StaticPageView.as_view(template_name="design/design_system.html")),
+    path(
+        "design_system",
+        StaticPageView.as_view(template_name="design/design_system.html"),
+    ),
     path("__reload__/", include("django_browser_reload.urls")),
 ]

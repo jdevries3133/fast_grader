@@ -8,11 +8,12 @@
 {% block extra_header %}
 <div class="md:inline-block">
   <a href="{% url 'help' %}">
-    <button id="fjdka__getHelp" class="flex items-center p-4 m-auto bg-purple-300">
+    <button id="fjdka__getHelp" class="flex text-white font-normal rounded-lg items-center p-4 m-auto bg-purple-700">
       <svg aria-labelledby="fjdka__getHelp" xmlns="http://www.w3.org/2000/svg" class="inline w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
       </svg>
-      Get Help</button>
+      <span class="ml-2">Get Help</span>
+    </button>
   </a>
 </div>
 {% endblock %}
@@ -46,7 +47,7 @@
 
 <div class="w-full h-full p-1 m-1 lg:p-4 lg:m-4 lg:grid lg:gap-1 lg:grid-cols-3">
 
-  <div class="container flex flex-col gap-1">{# begin side panel #}
+  <aside class="container flex flex-col gap-1">{# begin side panel #}
 
     {# header and cls / assgt selection #}
     <div class="lg:bg-gray-300 lg:rounded-xl lg:mb-4 lg:mr-4 lg:p-3">
@@ -73,8 +74,8 @@
     </div>
 
 
-    {# Interaction Feedback Panel #}
-    <div class="w-full h-full p-1 border-2 border-gray-200 overflow-clip bg-gradient-to-tr from-gray-100 via-green-100 to-white col-auto">
+    {# Control panel #}
+    <div id="controlPanel" class="w-full h-full p-1 border-2 border-gray-200 overflow-clip bg-gradient-to-tr from-gray-100 via-dew-100 to-white col-auto blur-sm">
       <div class="sticky top-0">
         <div>
           <h3 class="text-black">Student <span class="font-mono" id="grProgress"></span></h3>
@@ -105,11 +106,9 @@
             <p>s</p>
           </div>
         </div>
-
-
       </div>
     </div>
-  </div> {# end side panel #}
+  </aside> {# end side panel #}
 
 
   {# Student Content Panel #}

@@ -340,7 +340,7 @@ async function updateView() {
       ${
         // coloring for diff view
         state.viewDiffOnly && chunk[0] === "+"
-          ? "bg-green-100 rounded"
+          ? "bg-dew-100 rounded"
           : chunk[0] === "-"
           ? "bg-red-100 rounded"
           : "rounded"
@@ -352,13 +352,13 @@ async function updateView() {
 }
 
 function removeBlur() {
-  const container = document.getElementById("toolContainer");
-  container.classList.remove("blur-sm");
+  document.getElementById("toolContainer").classList.remove("blur-sm");
+  document.getElementById("controlPanel").classList.remove("blur-sm");
 }
 
 function applyBlur() {
-  const container = document.getElementById("toolContainer");
-  container.classList.add("blur-sm");
+  document.getElementById("toolContainer").classList.add("blur-sm");
+  document.getElementById("controlPanel").classList.add("blur-sm");
 }
 
 /**
@@ -405,14 +405,14 @@ function indicateSuccess(msg, clearAfterSeconds = 3) {
   const statBar = document.getElementById("status");
   statBar.innerHTML = `
   ${statBar.innerHTML}
-  <div id="${id}" class="m-1 lg:m-3 p-1 lg:p-3 bg-green-200 rounded w-full flex flex-row items-center">
-    <p class="text-md text-green-900 flex-grow">
+  <div id="${id}" class="m-1 lg:m-3 p-1 lg:p-3 bg-dew-200 rounded w-full flex flex-row items-center">
+    <p class="text-md text-dew-900 flex-grow">
       Success: ${msg}
     </p>
     <button
       id="closeStatus"
       onClick="document.getElementById('${id}').remove();"
-      class="text-lg text-black focus:ring hover:bg-red-200 p-2 bg-grey-100">
+      class="text-lg text-black focus:ring hover:bg-red-200 p-2 bg-gray-300">
         x
       </button>
   </div>
@@ -434,7 +434,7 @@ function indicateFailure(msg, clearAfterSeconds = null) {
   const statBar = document.getElementById("status");
   statBar.innerHTML = `
   <div id="${id}" class="m-1 lg:m-3 p-1 lg:p-3 bg-red-200 rounded w-full flex flex-row items-center">
-    <p class="text-md text-green-900 flex-grow">
+    <p class="text-md text-dew-900 flex-grow">
       Failure: ${msg}
     </p>
     <button

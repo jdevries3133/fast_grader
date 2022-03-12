@@ -16,7 +16,7 @@
   }
 
   button {
-    @apply font-medium p-1 m-1 rounded shadow-lg transition bg-blue-300;
+    @apply font-medium p-1 m-1 rounded shadow-lg transition bg-blue-300 no-underline;
     @apply hover:shadow-none hover:bg-blue-400;
   }
 
@@ -215,4 +215,25 @@
 
 .footer-link {
   @apply text-yellow-200 underline visited:text-purple-200;
+}
+
+@keyframes blink {
+  from {
+    opacity: 100;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+#grGrade:after {
+  @apply relative inline-block bg-gray-600 transition;
+  content: "";
+  top: 1px;
+  height: 15px;
+  width: 2px;
+  margin-left: 1px;
+  animation-name: blink;
+  animation-duration: 1300ms;
+  animation-iteration-count: infinite;
 }

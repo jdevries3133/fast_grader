@@ -7,33 +7,13 @@
 
 {% block content %}
 
-<div class="flex flex-col items-center justify-center w-full pt-16 gap-6 md:flex-row h-5/6">
-  <div class="max-w-md p-2 m-2 text-center bg-yellow-100 rounded-lg md:p-4">
-    <h1>Please Note!</h1>
-    <p class="my-2 text-justify">
-      fast grader is a new and growing tool. Please see our
-      <a class="link" href="{% url 'privacy_policy' %}">
-        privacy policy
-      </a>
-      and
-      <a class="link" href="{% url 'terms_of_service' %}">
-        terms of service.</a>
-      Note that basic features, like syncing grades and comments with Google
-      Classroom, are still in the works!
-    </p>
-    <p class="my-2 text-justify">
-      Also, the app is currently going through a 4-6 week verification process
-      with Google. Until then, Google will show you a very freaky warning
-      screen, which you can click past if you wish. If you have any specific
-      concerns, please email me at
-      <a
-        class="link"
-        href="mailto:jackdevriesmusic@gmail.com">jackdevriesmusic@gmail.com!</a>
-    </p>
-  </div>
+<div class="text-center">
+<h1 class="font-bold">Login</h1>
+<div class="m-3 flex flex-col items-center justify-center w-full gap-6 md:flex-row">
   <a href="{% provider_login_url 'google' %}">
     {% include 'account/sign_in_with_google.html' %}
   </a>
+</div>
 </div>
 
 

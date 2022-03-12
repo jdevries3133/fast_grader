@@ -40,6 +40,7 @@ COPY theme theme
 
 RUN python3 manage.py tailwind install
 RUN python3 manage.py tailwind build
+RUN cat theme/static/css/dist/styles.css
 RUN python3 manage.py collectstatic --no-input
 
 

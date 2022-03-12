@@ -2,7 +2,7 @@
     <div class="shadow">                           {# Inner Wrapper #}
 
       {# Assignment Name: Top card section #}
-      <div class="p-2 bg-green-200 rounded-t col-span-3">
+      <div class="p-2 bg-dew-200 rounded-t col-span-3">
         <h4 class="text-gray-700 text-md">Assignment Name</h4>
         <p class="text-lg">{{ sub.assignment_name }}</p>
       </div>
@@ -39,7 +39,7 @@
       <div id="cardContainer__{{ sub.pk }}" class="flex flex-row p-2 bg-yellow-300 rounded-b">
         {# Resume Grading #}
         <a href="{% url 'resume_grading' sub.pk %}"> 
-          <button class="p-2 bg-green-100 rounded shadow md:m-2 text-grey-800 hover:bg-green-200 focus:ring-green-400">
+          <button class="p-2 bg-dew-100 rounded shadow md:m-2 text-grey-800 hover:bg-dew-200 focus:ring-dew-400">
             Resume Grading
           </button>
         </a>

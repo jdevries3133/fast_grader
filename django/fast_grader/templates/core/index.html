@@ -22,13 +22,9 @@
     <h2 class="font-brand text-lg lg:text-2xl">in less time</h1>
   </div>
 
-  <div class="flex items-center justify-center max-h-screen p-2 md:col-span-2 2xl:col-span-2 2xl:row-span-3">
-    <a class="link" href="{% static 'landing_page/demo.mp4' %}"><h1>Watch old demo video; new one coming soon!</h1></a>
-  </div>
-  <!-- TODO: recreate video after redesign -->
-  <!-- <video muted controls loop aria-label="demo video" autoplay class="max-h-screen p-2 md:col-span-2 2xl:col-span-2 2xl:row-span-3"> -->
-  <!--   <source src="{% static 'landing_page/demo.mp4' %}" type="video/mp4"></source> -->
-  <!-- </video> -->
+  <video muted controls loop aria-label="demo video" autoplay class="max-h-screen p-2 md:col-span-2 2xl:col-span-2 2xl:row-span-3">
+    <source src="{% static 'landing_page/demo.mp4' %}" type="video/mp4"></source>
+  </video>
 
   <div class="flex md:flex-col justify-self-center justify-center 2xl:row-start-3">
     <a href="{% url 'grader' %}">

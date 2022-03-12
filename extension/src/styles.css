@@ -3,43 +3,33 @@
 @tailwind utilities;
 
 @layer base {
-  @font-face {
-    font-family: "Inconsolata";
-    src: url("/fonts/inconsolata.ttf");
-  }
-
-  @font-face {
-    font-family: "Roboto Slab";
-    src: url("/fonts/roboto_slab.ttf");
-  }
-
-  body {
-    min-height: 14rem;
-    min-width: 24rem;
-  }
-
   h1 {
-    @apply text-3xl;
+    @apply text-3xl font-brand;
   }
 
   h2 {
-    @apply text-2xl;
+    @apply text-2xl font-brand;
   }
 
   h3 {
-    @apply text-xl;
-    @apply text-gray-500;
+    @apply text-xl text-gray-500 font-brand;
   }
 
   button {
-    @apply rounded;
-    @apply shadow;
-    @apply bg-green-100;
-    @apply p-1;
-    @apply transition;
-    @apply m-1;
-    @apply hover:shadow-none;
+    @apply font-medium p-1 m-1 rounded shadow-lg transition bg-blue-300;
+    @apply hover:shadow-none hover:bg-blue-400;
   }
+
+  button.secondary {
+    @apply p-1 m-1 rounded shadow transition;
+    @apply border-2 border-blue-500 font-normal bg-transparent text-gray-700;
+    @apply hover:shadow-none hover:bg-blue-100;
+  }
+}
+
+.popup {
+  width: 400px;
+  height: 300px;
 }
 
 @media (min-width: 768px) {

@@ -7,9 +7,9 @@
   </div>
   <div class="inline">
     <button
+      class="inline p-2 m-1 bg-dew-100 hover:bg-dew-200 syncSessionButton"
       hx-get="{% abs_url 'ext_syncing_active' session.assignment_name %}"
       hx-target="body"
-      class="inline p-2 m-1 bg-green-100 syncSessionButton"
       data-pk="{{ session.pk}}">
       {% if session.last_synced %}
         Re-Sync
@@ -18,9 +18,9 @@
       {% endif %}
     </button>
     <button
+      class="inline p-2 m-1 bg-yellow-100 hover:bg-yellow-200"
       hx-target="body"
-      hx-get="{% abs_url 'ext_session_detail' session.pk %}"
-      class="inline p-2 m-1 bg-yellow-100">
+      hx-get="{% abs_url 'ext_session_detail' session.pk %}">
         Details
     </button>
   </div>

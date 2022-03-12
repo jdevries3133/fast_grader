@@ -11,7 +11,7 @@
   </div>
 {% endif %}
 
-<button rol="button" aria-label="toggle sidebar" id="navHamburger" class="fixed top-0 right-0 z-50 m-0 bg-gray-100 shadow-xl transition hover:shadow-none hover:bg-gray-200 focus:ring-0 md:right-2 md:top-2">
+<button aria-label="toggle sidebar" id="navHamburger" class="fixed top-0 right-0 z-50 m-0 bg-gray-100 shadow transition hover:shadow-none hover:bg-gray-200 focus:ring-0 md:right-2 md:top-2">
   <svg viewBox="0 0 100 80" width="40" height="40" aria-label="hamburger menu icon">
     <rect width="100" height="10"></rect>
     <rect y="34" width="100" height="10"></rect>
@@ -27,7 +27,7 @@
           <p class="ml-3">Logged in as {{ user.username }}</p>
           <form method="post" action="{% url 'account_logout' %}">
             {% csrf_token %}
-            <button type="submit" class="block p-2 text-gray-800 bg-indigo-100 rounded shadow hover:shadow-none md:m-2 hover:bg-indigo-200 focus:ring-indigo-400">
+            <button type="submit" class="block p-2 text-gray-800 bg-blue-100 rounded shadow hover:shadow-none md:m-2 hover:bg-blue-200 focus:ring-blue-400">
               Log Out
             </button>
           </form>

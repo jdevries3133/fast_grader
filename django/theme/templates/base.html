@@ -59,9 +59,12 @@
     {% block body %}
 
     {% include 'core/navigation.html' %}
-    {% include 'core/partials/logo.html' %}
 
-    {% block extra_header %}{% endblock %}
+    <header class="flex items-center bg-yellow-200 rounded-b-3xl">
+      {% include 'core/partials/logo.html' %}
+      {% block extra_header %}{% endblock %}
+    </header>
+
 
     <div class="flex flex-col min-h-screen">
       <div class="flex-grow">

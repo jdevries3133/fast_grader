@@ -6,12 +6,9 @@
  */
 
 const defaultTheme = require("tailwindcss/defaultTheme");
-const colors = require("tailwindcss/colors");
 
 module.exports = {
-  mode: "jit",
-
-  purge: [
+  content: [
     /**
      * HTML. Paths to Django template files that will contain Tailwind CSS
      * classes.
@@ -36,18 +33,16 @@ module.exports = {
      * JS: If you use Tailwind CSS in JavaScript, uncomment the following lines and make sure
      * patterns match your project structure.
      */
-    "../../**/*.js",
+    "../../grader/**/*.js",
   ],
   darkMode: "media",
   theme: {
     colors: {
-      // TODO: remove the default colors after it won't cause breakage!
-
-      // default theme has transparent but colors don't?? Colors have 'lime'
-      // but defaultTheme doesn't?? weird...
-      ...colors,
-      ...defaultTheme.colors,
-      // TODO: change all to hsl
+      inherit: "inherit",
+      current: "currentColor",
+      transparent: "transparent",
+      black: "#000",
+      white: "#fff",
       blue: {
         100: "rgb(177 221 255)",
         200: "rgb(123 189 240)",
@@ -92,6 +87,31 @@ module.exports = {
         800: "hsl(264deg 55% 30%)", // this is 'spanish violet'
         900: "#351431", // this is 'dark purple'
       },
+      // gray is actually "zinc" from the default tailwind color pallate
+      gray: {
+        50: "#fafafa",
+        100: "#f4f4f5",
+        200: "#e4e4e7",
+        300: "#d4d4d8",
+        400: "#a1a1aa",
+        500: "#71717a",
+        600: "#52525b",
+        700: "#3f3f46",
+        800: "#27272a",
+        900: "#18181b",
+      },
+      red: {
+        50: "#fef2f2",
+        100: "#fee2e2",
+        200: "#fecaca",
+        300: "#fca5a5",
+        400: "#f87171",
+        500: "#ef4444",
+        600: "#dc2626",
+        700: "#b91c1c",
+        800: "#991b1b",
+        900: "#7f1d1d",
+      },
     },
     fontFamily: {
       // new fonts
@@ -100,28 +120,13 @@ module.exports = {
       accent: ["Montserrat", ...defaultTheme.fontFamily.sans],
       mono: ["Inconsolata", "Consolas", "monospace"],
     },
+  },
+  extend: {
     screens: {
       xs: "450px",
-      ...defaultTheme.screens,
-    },
-    extend: {
-      borderRadius: {
-        "4xl": "2rem",
-      },
-    },
-  },
-  variants: {
-    extend: {
-      borderColor: ["focus-visible"],
-      opacity: ["disabled"],
     },
   },
   plugins: [
-    /**
-     * '@tailwindcss/forms' is the forms plugin that provides a minimal styling
-     * for forms. If you don't like it or have own styling for forms,
-     * comment the line below to disable '@tailwindcss/forms'.
-     */
     require("@tailwindcss/forms"),
     require("@tailwindcss/typography"),
     require("@tailwindcss/line-clamp"),

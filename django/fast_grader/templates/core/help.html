@@ -3,17 +3,17 @@
 {% block title %}Fast Grader Help Page{% endblock %}
 
 {% block content %}
-<div class="container p-2 pt-8 bg-gray-100 rounded lg:rounded lg:m-4 lg:p-4 max-w-prose">
-  <h1 class="mb-3">Help</h1>
+<div class="prose p-2 pt-8 bg-gray-100 rounded lg:rounded lg:m-4 lg:p-4 max-w-prose">
+  <h1>Help</h1>
 
-  <details class="mb-6">
+  <details>
     <summary class="cursor-pointer">
-      <h3 class="mb-4 inline">How do I get grades into Google Classroom?</h3>
-      <a href="https://chrome.google.com/webstore/detail/grade-sync-for-fast-grade/abjpdpjdpbcnpflodcknkiebmnglgikp">
+      <h3 class="inline">How do I get grades into Google Classroom?</h3>
+      <a class="no-underline" href="https://chrome.google.com/webstore/detail/grade-sync-for-fast-grade/abjpdpjdpbcnpflodcknkiebmnglgikp">
         <button class="block">Install Grade Sync Extension</button>
       </a>
     </summary>
-    <p class="m-2">
+    <p>
       When you finish a grading session, grades are only saved to our platform.
       To sync them with google classroom, use the
       <a
@@ -22,22 +22,21 @@
       >Grade Sync for Fast Grader</a>
       browser extension for Chrome.
     </p>
-    <p class="m-2">
+    <p>
       This browser extension will open up Google Classroom in your browser, and
-      input the grades for you. Note that this is still experimental. Take a
-      second to check that the grades are accurate! Again, remember that the
-      current incarnation of this web app is a prototype. I use it for my
-      grading and find it very useful, but it is rough around the edges. Use it
-      where you feel comfortable, and please reach out if you need help! My
-      email is <a class="link" href="mailto:jack@mail.classfast.app">jack@mail.classfast.app</a>
+      input the grades for you. This tool is very new, free, and open source,
+      so please take a second to double check the grades and kindly report any
+      bugs according to the directions below! Or, feel free to reach the
+      developer directly at
+        <a class="link" href="mailto:jack@mail.classfast.app">jack@mail.classfast.app</a>
     </p>
   </details>
 
-  <details class="mb-6">
+  <details>
     <summary class="cursor-pointer">
-      <h3 id="diffing" class="inline mb-4">What does the "View Differences Only" Switch Do?</h3>
+      <h3 class="inline" id="diffing">What does the "View Differences Only" Switch Do?</h3>
     </summary>
-    <p class="m-2">
+    <p>
       The "View Differences Only" button causes the website to grab the
       student's submission content, and the content of your original
       attachments on the assignment. Then, it produces a view of the
@@ -45,12 +44,7 @@
       bloat out of your grading process, and just see what the student
       <i>actually did.</i>
     </p>
-    <p class="m-2">
-      It isn't perfect, yet. For example, it doesn't do you much good at
-      finding small changes in long runs of text, but the finer details of this
-      feature will be improved in the future.
-    </p>
-    <p class="m-2">
+    <p>
       Overall, it's really great for putting the focus on what changes the
       student made, which can turn a 3-page document, or a 10-slide Google
       Slide into a tiny text summary that fits on just one screen. By viewing
@@ -61,11 +55,11 @@
 
   </details>
 
-  <details class="mb-6">
+  <details>
     <summary class="cursor-pointer">
-      <h3 class="inline mb-4">What is in the feature roadmap?</h3>
+      <h3 class="inline">What is in the feature roadmap?</h3>
     </summary>
-    <p class="m-2">
+    <p>
       The website as you see it now should be seen as a prototype. Right now,
       we are working on a redesign of the whole system, now that we have a good
       understanding of the problem, and a better idea of how to solve it. We will
@@ -73,8 +67,8 @@
       reach out and email me at
       <a class="link" href="mailto:jack@mail.classfast.app">jack@mail.classfast.app!</a>
     </p>
-    <h4 class="m-2 text-lg text-bold">Coming Soon</h4>
-    <ul class="ml-8 list-disc">
+    <h4>Coming Soon</h4>
+    <ul class="list-disc">
       <li>
         New brand, new frontend, improved user interface and user experiences
       </li>
@@ -99,14 +93,14 @@
     </ul>
   </details>
 
-  <details class="mb-6">
+  <details>
     <summary class="cursor-pointer">
-      <h3 class="mt-4 mb-4 inline">How do I report a bug?</h3>
-        <a href="https://github.com/jdevries3133/fast_grader/issues/new">
+      <h3 class="inline">How do I report a bug?</h3>
+        <a class="no-underline bg-yellow-600" href="https://github.com/jdevries3133/fast_grader/issues/new">
           <button class="block">Submit Bug Report</button>
         </a>
     </summary>
-  <p class="m-2">
+  <p>
     Bug reports are extremely appreciated! Click the button above to submit a
     bug report on GitHub. Or, send me a personal email at
     <a
@@ -114,17 +108,17 @@
       href="mailto:jack@mail.classfast.app">jack@mail.classfast.app</a>
   </p>
   </details>
-  <details class="mb-6">
+  <details>
     <summary class="cursor-pointer">
       <h3 class="inline mt-4 mb-4">How do I request a new feature?</h3>
-      <a href="https://github.com/jdevries3133/fast_grader/issues/new">
-        <button class="block bg-blue-200 focus:ring-blue-400">Make a Feature Request</button>
+      <a class="no-underline" href="https://github.com/jdevries3133/fast_grader/issues/new">
+        <button class="block bg-blue-200 focus:ring-blue-400 no-underline">Make a Feature Request</button>
       </a>
     </summary>
-    <p class="m-2">
+    <p>
       Use the same process as submitting a bug report! Open up an issue on the
       GitHub repository, or 
-      <a 
+      <a
         class="link"
         href="mailto:jack@mail.classfast.app">send me an email!</a>
     </p>
@@ -133,8 +127,20 @@
 </div>
 
 <script>
+  // open up the first fold
   const el = document.querySelector('details')
   el.open = true;
+
+  // whenever a detail is clicked, close all the other details
+  document.querySelectorAll('details').forEach(function(detail) {
+      const onClick = function(e) {
+          document.querySelectorAll('details').forEach(function(detail) {
+              detail.open = false
+            })
+          e.target.element.open = true
+        }
+      detail.addEventListener('click', onClick)
+    })
 </script>
 
 {% endblock %}

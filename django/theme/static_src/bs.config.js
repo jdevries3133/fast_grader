@@ -21,6 +21,5 @@ module.exports = {
   open: false,
   reloadOnRestart: true,
   notify: false,
-  files: ["../static/css/dist/styles.css", ...tailwindConfig.purge],
+  files: ["../static/css/dist/styles.css", ...tailwindConfig.content],
 };
-
