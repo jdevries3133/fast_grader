@@ -1,0 +1,24 @@
+mailuVersion: 1.9
+
+hostnames:
+  - mail.classfast.app
+  - mail1.classfast.app
+
+domain: mail.classfast.app
+
+
+initialAccount:
+  domain: mail.classfast.app
+  username: jack
+
+persistence:
+  storageClass: openebs-device
+
+front:
+  nodeSelector:
+    kubernetes.io/hostname: big-boi
+
+certmanager:
+  issuerName: letsencrypt-prod
+  apiVersion: cert-manager.io/v1
+
