@@ -53,13 +53,7 @@ test:
 	TAG=$(TAG) \
 		docker-compose up -d
 
-	@# don't ask me why docker-compose uses different naming conventions on
-	@# mac vs linux :/
-ifdef CI
 	docker exec django_web_1 pytest
-else
-	docker exec django-web-1 pytest
-endif
 
 
 .PHONY: push
