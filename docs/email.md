@@ -8,31 +8,38 @@ We were using mailu, but it isn't portable to a kubernetes environment, so
 I am currently looking at [docker-mailserver](https://docker-mailserver.github.io/docker-mailserver/edge/)
 instead.
 
+## Kubernetes Integration (or lack thereof)
+
+Mailu runs in docker-compose on the main server, separately from the Kubernetes
+cluster. Mailu was created to run in docker-compose, and it's adaptation for
+Kubernetes seems fraught and somewhat unmaintained compared to the main
+docker-compose distribution.
+
+Instead of trying to run mailu in kubernetes, traffic is routed through the
+kubernetes cluster with the help of [the microk8s metallb
+add-on.](https://microk8s.io/docs/addon-metallb)
+
 ## Architecture
 
 ```
-all traffic
-      │
-      │
-      │
-      │
+mail.classfast.app DNS rules
       │
       ▼
- mail.classfast.app
 ┌───────────────────┐
-│ HAProxy at        │
-│ OSI layer 4       │ ◄────────── DNS, including reverse DNS via AWS,
-│                   │             can point to the proxy
+│ HAProxy at OSI    │
+│ layer 4 running on│
+│ AWS ec2 micro VM  │
 └─────┬─────────────┘
       │
-      │
+      ▼
+┌──────────────────────────────┐
+│ metallb ingress rule in main |
+│ cluster forwards traffic     |
+└─────┬────────────────────────┘
       │
       ▼
- mail-backend.classfast.app  ** DNS is used so that in case
-┌───────────────────┐        ** my apartment IP address changes,
-│ mailu app, on     │        ** I can just update the DNS registration
-│ same machine as   │        ** to maintain the connection between
-│ main site         │        ** the AWS proxy and apartment
-│                   │
-└───────────────────┘
+┌───────────────────────┐
+│ mailu app, on big-boi │
+│ host                  |
+└───────────────────────┘
 ```
