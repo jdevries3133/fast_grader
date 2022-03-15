@@ -302,7 +302,7 @@ LOGGING = {
     },
     "handlers": {
         "console_logger": {
-            "level": 0,
+            "level": LOG_LEVEL,
             "class": "logging.StreamHandler",
             "formatter": "verbose",
         },
