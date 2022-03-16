@@ -14,7 +14,6 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 from contextlib import contextmanager
-from types import SimpleNamespace
 from unittest.mock import patch
 
 from django.contrib.auth.models import User
