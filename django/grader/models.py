@@ -171,7 +171,8 @@ class AssignmentSubmission(models.Model):
             update_submission(submission=self)
 
         assert self.teacher_template
-        assert self.submission
+        if not self.submission:
+            return ["no attachments found"]
 
         return list(
             unified_diff(
