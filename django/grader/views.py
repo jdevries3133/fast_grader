@@ -411,8 +411,12 @@ class GradingSessionViewSet(ModelViewSet):
         return GradingSession.objects.filter(course__owner=self.request.user)
 
 
-class DeepAssignmentSubmissionViewSet(GradingSessionViewSet):
+class DeepAssignmentSubmissionViewSet(ModelViewSet):
+    permission_classes = [IsAuthenticated]
     serializer_class = DeepGradingSessionSerializer
+
+    def get_queryset(self):
+        return GradingSession.objects.filter(course__owner=self.request.user)
 
 
 class AssignmentSubmissionViewSet(ModelViewSet):
