@@ -408,7 +408,7 @@ class GradingSessionViewSet(ModelViewSet):
     serializer_class = GradingSessionSerializer
 
     def get_queryset(self):
-        return GradingSession.objects.filter(course__owner=self.request.user)  # type: ignore
+        return GradingSession.objects.filter(course__owner=self.request.user)
 
 
 class DeepAssignmentSubmissionViewSet(GradingSessionViewSet):
@@ -420,15 +420,15 @@ class AssignmentSubmissionViewSet(ModelViewSet):
     serializer_class = AssignmentSubmissionSerializer
 
     def get_queryset(self):
-        return AssignmentSubmission.objects.filter(assignment__course__owner=self.request.user)  # type: ignore
+        return AssignmentSubmission.objects.filter(assignment__course__owner=self.request.user)
 
 
 @login_required
 def session_detail(request, pk):
     """Traditional HTML view for showing the grades and comments inputted."""
     try:
-        obj = GradingSession.objects.get(pk=pk, course__owner=request.user)  # type: ignore
-    except GradingSession.DoesNotExist:  # type: ignore
+        obj = GradingSession.objects.get(pk=pk, course__owner=request.user)
+    except GradingSession.DoesNotExist:
         raise Http404("session does not exist") from None
 
     return render(request, "grader/session_detail.html", context={"session": obj})
@@ -438,8 +438,8 @@ class DeleteSession(View):
     def get(self, request, pk):
         """Serve the modal form to confirm session deletion."""
         try:
-            obj = GradingSession.objects.get(pk=pk, course__owner=request.user)  # type: ignore
-        except GradingSession.DoesNotExist:  # type: ignore
+            obj = GradingSession.objects.get(pk=pk, course__owner=request.user)
+        except GradingSession.DoesNotExist:
             raise Http404("session does not exist") from None
 
         return render(
@@ -451,8 +451,8 @@ class DeleteSession(View):
     def delete(self, request, pk):
         """Posted upon reciept of the modal form."""
         try:
-            obj = GradingSession.objects.get(pk=pk, course__owner=request.user)  # type: ignore
-        except GradingSession.DoesNotExist:  # type: ignore
+            obj = GradingSession.objects.get(pk=pk, course__owner=request.user)
+        except GradingSession.DoesNotExist:
             raise Http404("session does not exist") from None
 
         context = {"assignment_name": obj.assignment_name}
