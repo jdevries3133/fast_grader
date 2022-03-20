@@ -55,10 +55,6 @@ const state = {
         grade: null, // number!
         comment: "",
         submission: [""],
-        assignment: {
-          max_grade: 75,
-          teacher_template: null,
-        },
       },
     ],
   },
@@ -556,6 +552,12 @@ async function switchStudent() {
   }
 }
 
+function giveFullGrade() {
+  const current = state.assignmentData.submissions[state.currentlyViewingIndex];
+  current.grade = state.assignmentData.max_grade;
+  updateView();
+}
+
 /****************************************************************************
  * event handlers
  */
@@ -591,6 +593,9 @@ function handleKeyPress(e) {
     case "Enter":
       // next or prev student
       switchStudent();
+      break;
+    case ".":
+      giveFullGrade();
       break;
     default:
       if (e.keyCode >= 48 && e.keyCode <= 71) {
