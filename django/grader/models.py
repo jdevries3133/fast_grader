@@ -129,7 +129,7 @@ class AssignmentSubmission(models.Model):
     comment = models.TextField(blank=True)
 
     # submission content
-    submission = models.TextField(blank=True)
+    submission = models.TextField(default="no attachments found")
 
     # metadata
     last_updated = models.DateTimeField(auto_now=True)
@@ -171,7 +171,8 @@ class AssignmentSubmission(models.Model):
             update_submission(submission=self)
 
         assert self.teacher_template
-        assert self.submission
+        if not self.submission:
+            return ["no attachments found"]
 
         return list(
             unified_diff(

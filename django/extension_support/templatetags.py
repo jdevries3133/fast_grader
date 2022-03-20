@@ -19,7 +19,7 @@ def abs_url(context, view_name, *args, **kwargs):
     # I don't know why django isn't just handling this case. I think that Django
     # might be looking for a different header, and that proxy server reconfiguration
     # might do the trick, but this works too
-    if context['request'].META.get('HTTP_X_SCHEME') == 'https':
-        uri = uri.replace('http://', 'https://')
+    if context["request"].META.get("HTTP_X_SCHEME") == "https":
+        uri = uri.replace("http://", "https://")
 
     return uri
