@@ -24,7 +24,7 @@
             Grade
           </h4>
           {% if sub.is_graded %}
-            <p>{{ sub.average_grade }}</p>
+            <p>{{ sub.average_grade|floatformat }}</p>
           {% else %}
             <p>Ungraded</p>
           {% endif %}
