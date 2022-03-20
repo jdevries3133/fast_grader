@@ -6,6 +6,9 @@ const replace = require("buffer-replace");
 dotenv.config();
 
 const buildMode = process.env.DEPLOY_TARGET;
+
+console.log("\033[96mBuilding in " + buildMode + " mode\033[0m");
+
 const website =
   buildMode === "dev"
     ? "http://localhost:8000"

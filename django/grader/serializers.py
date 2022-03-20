@@ -96,6 +96,8 @@ class GradingSessionSerializer(serializers.ModelSerializer):
 
 
 class DeepGradingSessionSerializer(GradingSessionSerializer):
-    """Nested serializer that includes full AssignmentSubmissions"""
+    """Nested serializer that includes full AssignmentSubmissions. If submission
+    content isn't fresh in the database, this can trigger a lot of API calls
+    and be extremely slow due to the behavior of AssignmentSubmissionSerializer."""
 
     submissions = AssignmentSubmissionSerializer(many=True)
