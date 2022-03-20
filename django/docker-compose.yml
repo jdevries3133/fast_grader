@@ -22,6 +22,7 @@ services:
       DJANGO_SECRET: whatever
       DJANGO_DEBUG: "yes indeed"
       DJANGO_SETTINGS_MODULE: fast_grader.settings.development
+      DEBUGGING: ${DEBUGGING}
       GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
       GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
       IS_PRODUCTION: ${IS_PRODUCTION}
