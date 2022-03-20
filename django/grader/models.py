@@ -83,6 +83,10 @@ class GradingSession(models.Model):
             "details", "submissions/by-status/and-sort-first-name/all"
         )
 
+    @property
+    def is_synced(self):
+        return self.sync_state == self.SyncState.SYNCED
+
     def __str__(self):
         return self.assignment_name
 

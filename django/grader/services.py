@@ -377,9 +377,12 @@ def _update_submission(
     # update top-level submission fields
     submission.student_name = student_data.name
     submission._profile_photo_url = student_data.photo_url
-    submission.grade = submission_data.get("assignedGrade") or submission_data.get(
-        "draftGrade"
-    )
+    # only allow google classroom grades to overwrite our grades if the whole
+    # assignment is marked as synced
+    if submission.assignment.is_synced:
+        submission.grade = submission_data.get("assignedGrade") or submission_data.get(
+            "draftGrade"
+        )
 
     # diffs will be more accurate if we reorder student attachments to match
     # the order of teacher attachments. Note that student attachment names
