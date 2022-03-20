@@ -1,3 +1,5 @@
+//@ts-check
+
 /**
  * Copyright (C) 2021 John DeVries
  *
@@ -39,6 +41,7 @@ const state = {
 
   // all google classroom data
   assignmentData: {
+    pk: 1,
     // other misc data will get inserted here, like various id's, which will
     // ultimately be passed through to the backend
     submissions: [
@@ -47,10 +50,11 @@ const state = {
         // for a response, but it is a somewhat incomplete picture of the full
         // object coming back from the API. View the API data in the browsable
         // API at `/grader/assignment_data`
+        pk: 1,
         student_name: "...",
         grade: null, // number!
         comment: "",
-        submission: "",
+        submission: [""],
         assignment: {
           max_grade: 75,
           teacher_template: null,
@@ -200,26 +204,31 @@ async function getSubmissionDetails() {
   while (i < LOOK_AHEAD && i < state.assignmentData.submissions.length) {
     if (typeof state.assignmentData.submissions[i] === "number") {
       const pk = state.assignmentData.submissions[i];
-      P.push([
-        pk,
-        fetch(
+      P.push({
+        position: i,
+        promise: fetch(
           `/grader/assignment_submission/${pk}/?diff=${state.viewDiffOnly}`
         ),
-      ]);
+      });
+    } else {
+      // push a dummy promise as a placeholder, which will imediately resolve
+      P.push({ position: i, promise: Promise.resolve("ALREADY_FETCHED") });
     }
     i++;
   }
   // we only await the first promise, which is the one that will be needed to
   // render the UI. The rest can take their time resolving.
-  const res = await P[0][1];
-  if (res && res.ok) {
-    state.assignmentData.submissions[state.currentlyViewingIndex] =
-      await res.json();
-  } else if (res) {
-    const data = await res.json();
-    if (data.message) {
-      indicateFailure(data.message);
-      return false;
+  const res = await P[0].promise;
+  if (typeof res !== "string") {
+    if (res.ok) {
+      state.assignmentData.submissions[state.currentlyViewingIndex] =
+        await res.json();
+    } else {
+      const data = await res.json();
+      if (data.message) {
+        indicateFailure(data.message);
+        return false;
+      }
     }
   }
   return P.slice(1);
@@ -533,13 +542,14 @@ async function switchStudent() {
     const promises = await getSubmissionDetails();
     updateView();
     removeLoading();
+    if (!promises) return;
 
     // now that things are interactive again, resolve promises for the
     // look-ahead requests and put the data into state
     promises.forEach(async (item) => {
-      const [position, promise] = item;
+      const { position, promise } = item;
       const res = await promise;
-      if (res.ok) {
+      if (typeof res !== "string") {
         state.assignmentData.submissions[position] = await res.json();
       }
     });
@@ -552,8 +562,10 @@ async function switchStudent() {
 
 async function handleDiffSelectSlider() {
   const inputEl = document.getElementById("diffSelectInput");
+  //@ts-ignore
   const newState = !inputEl.checked;
   state.viewDiffOnly = newState;
+  //@ts-ignore
   inputEl.checked = newState;
   await initSubmissionData();
   updateView();
