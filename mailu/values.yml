@@ -1,0 +1,21 @@
+hostnames:
+  - mail.classfast.app
+  - mail1.classfast.app
+
+domain: mail.classfast.app
+
+initialAccount:
+  username: jack
+  domain: mail.classfast.app
+
+persistence:
+  storageClass: openebs-device
+
+roundcube:
+  enabled: true
+
+certmanager:
+  enabled: true
+  issuerType: ClusterIssuer
+  issuerName: letsencrypt-prod
+  apiVersion: cert-manager.io/v1
