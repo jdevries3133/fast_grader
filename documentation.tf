@@ -6,9 +6,6 @@ terraform {
     region = "us-east-2"
   }
 
-
-  # no remote state backend will be used, because this is for local development
-  # only
   required_providers {
     kubernetes = {
       source  = "hashicorp/kubernetes"
