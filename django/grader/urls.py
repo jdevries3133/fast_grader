@@ -29,6 +29,7 @@ from .views import (
     ChooseAssignmentView,
     GradingSessionViewSet,
     AssignmentSubmissionViewSet,
+    CourseViewSet,
 )
 
 urlpatterns = [
@@ -46,6 +47,7 @@ urlpatterns = [
 ]
 
 router = routers.SimpleRouter()
+router.register(r"course", CourseViewSet, "course_viewset")
 router.register(r"session_viewset", GradingSessionViewSet, "session_viewset")
 router.register(
     r"deep_session", DeepAssignmentSubmissionViewSet, "deep_session_viewset"

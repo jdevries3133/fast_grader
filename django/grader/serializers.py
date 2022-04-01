@@ -20,10 +20,16 @@ from rest_framework import serializers
 
 from grader.services import NotGoogleDriveAssignment, update_submission
 
-from .models import GradingSession, AssignmentSubmission
+from .models import CourseModel, GradingSession, AssignmentSubmission
 
 
 logger = logging.getLogger(__name__)
+
+
+class CourseSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CourseModel
+        fields = ("owner", "name", "api_course_id")
 
 
 class AssignmentSubmissionSerializer(serializers.ModelSerializer):

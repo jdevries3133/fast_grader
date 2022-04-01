@@ -41,6 +41,7 @@ from .services import (
 
 from .serializers import (
     AssignmentSubmissionSerializer,
+    CourseSerializer,
     DeepGradingSessionSerializer,
     GradingSessionSerializer,
 )
@@ -424,7 +425,9 @@ class AssignmentSubmissionViewSet(ModelViewSet):
     serializer_class = AssignmentSubmissionSerializer
 
     def get_queryset(self):
-        return AssignmentSubmission.objects.filter(assignment__course__owner=self.request.user)
+        return AssignmentSubmission.objects.filter(
+            assignment__course__owner=self.request.user
+        )
 
 
 @login_required
@@ -462,3 +465,11 @@ class DeleteSession(View):
         context = {"assignment_name": obj.assignment_name}
         obj.delete()
         return render(request, "grader/partials/session_deleted.html", context=context)
+
+
+class CourseViewSet(ModelViewSet):
+    permission_classes = [IsAuthenticated]
+    serializer_class = CourseSerializer
+
+    def get_queryset(self):
+        return CourseModel.objects.filter(owner=self.request.user)
