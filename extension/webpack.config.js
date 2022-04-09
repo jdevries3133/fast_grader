@@ -2,6 +2,7 @@ const path = require("path");
 const CopyPlugin = require("copy-webpack-plugin");
 const dotenv = require("dotenv");
 const replace = require("buffer-replace");
+const { gitDescribeSync } = require("git-describe");
 
 dotenv.config();
 
@@ -22,6 +23,23 @@ const oauthClientId =
       "568001308128-fq83v3nvmk7elfdcd937qail0k9fgtkt.apps.googleusercontent.com"
     : // prod client_id
       "850669494212-vnl448og3f97mnjsusupm3lftede1r34.apps.googleusercontent.com";
+
+/**
+ * For tagged commits, return the semantic version. For other commits, the
+ * distance from previous tag is the fourth parameter of the version, which
+ * is acceptable for Chrome Web Store versions.
+ *
+ * i.e:
+ * Tagged commit: 1.3.5
+ * Untagged commit: 1.3.5.18  (18 commits since 1.3.5)
+ */
+const getVersion = () => {
+  const git = gitDescribeSync();
+  if (git.distance === 0) {
+    return git.semver.version;
+  }
+  return `${git.semver.version}.${git.distance}`;
+};
 
 if (buildMode !== "beta" && buildMode !== "prod" && buildMode !== "dev") {
   throw new Error(`Invalid build mode in environment: ${buildMode}`);
@@ -92,6 +110,7 @@ module.exports = {
                 "script-src 'self' 'unsafe-eval'; object-src 'self'";
             }
             data["oauth2"]["client_id"] = oauthClientId;
+            data["version"] = getVersion();
 
             return Buffer.from(JSON.stringify(data));
           },
