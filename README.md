@@ -51,8 +51,7 @@ If you know the web, come
 
 This is a monorepo with a variety of fun inside:
 
-| Path        | Content                                                                                                                             |
-| ----------- | ----------------------------------------------------------------------------------------------------------------------------------- |
-| ./mailu     | Our config for [mailu](https://mailu.io), a docker-compose based fully-featured email service which we host at `mail.classfast.app` |
-| ./django    | The prototype Django application, which we are gradually eliminating                                                                |
-| ./extension | The browser extension which facilitates "manual" grade syncing in Google Classroom via DOM manipulation                             |
+| Path        | Content                                                                                                 |
+| ----------- | ------------------------------------------------------------------------------------------------------- |
+| ./django    | The Django application                                                                                  |
+| ./extension | The browser extension which facilitates "manual" grade syncing in Google Classroom via DOM manipulation |
