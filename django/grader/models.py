@@ -130,7 +130,6 @@ class AssignmentSubmission(models.Model):
 
     # grading information
     grade = models.IntegerField(null=True)
-    comment = models.TextField(blank=True)
 
     # submission content
     submission = models.TextField(default="no attachments found")

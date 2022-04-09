@@ -37,7 +37,6 @@ class AssignmentSubmissionSerializer(serializers.ModelSerializer):
             "submission",
             "student_name",
             "grade",
-            "comment",
         )
 
     def validate_submission(self, data):
