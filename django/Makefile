@@ -37,6 +37,11 @@ CONTAINER=$(DOCKER_ACCOUNT)/$(CONTAINER_NAME):$(TAG)
 all: setup test push deploy
 
 
+.PHONY: fmt
+fmt:
+	black .
+
+
 .PHONY: setup
 setup:
 	@# this attempts to pull the container of the last major version. Hopefully,
