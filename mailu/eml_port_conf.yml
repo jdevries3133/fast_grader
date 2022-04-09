@@ -1,0 +1,30 @@
+# this is supposed to be added to the nginx ingress config, but it's not
+# working... this partial is saved for later
+- containerPort: 25
+  hostPort: 25
+  name: tcp-25
+  protocol: TCP
+- containerPort: 110
+  hostPort: 110
+  name: tcp-110
+  protocol: TCP
+- containerPort: 143
+  hostPort: 143
+  name: tcp-143
+  protocol: TCP
+- containerPort: 465
+  hostPort: 465
+  name: tcp-465
+  protocol: TCP
+- containerPort: 587
+  hostPort: 587
+  name: tcp-587
+  protocol: TCP
+- containerPort: 993
+  hostPort: 993
+  name: tcp-993
+  protocol: TCP
+- containerPort: 995
+  hostPort: 995
+  name: tcp-995
+  protocol: TCP

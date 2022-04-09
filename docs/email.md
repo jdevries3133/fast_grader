@@ -36,3 +36,11 @@ all traffic
 │                   │
 └───────────────────┘
 ```
+
+## Cluster Setup
+
+When using an Nginx ingress, the ConfigMap for TCP traffic needs to be updated
+to listen on all the email ports. That process is described in [microk8s
+documentation here.](https://microk8s.io/docs/addon-ingress)
+Also see [specific nginx docs for exposing TCP/UDP services
+] (https://kubernetes.github.io/ingress-nginx/user-guide/exposing-tcp-udp-services/)

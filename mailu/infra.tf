@@ -55,6 +55,39 @@ resource "kubernetes_namespace" "mailu" {
   }
 }
 
+/* resource "kubernetes_ingress_v1" "mailu" { */
+/*   metadata { */
+/*     name      = "mailu-ingress" */
+/*     namespace = kubernetes_namespace.mailu.metadata.0.name */
+/*   } */
+
+/*   spec { */
+/*     ingress_class_name = "public" */
+
+/*     tls { */
+/*       hosts = ["mail.classfast.app", "mail1.classfast.app"] */
+/*     } */
+/*     rule { */
+/*       host = "mail.classfast.app" */
+/*       http { */
+/*         path { */
+/*           path      = "/" */
+/*           path_type = "Prefix" */
+/*           backend { */
+/*             service { */
+/*               name = "mailu-front" */
+/*               port { */
+/*                 number = 80 */
+/*               } */
+/*             } */
+/*           } */
+/*         } */
+/*       } */
+/*     } */
+
+/*   } */
+/* } */
+
 resource "helm_release" "mailu" {
   name       = "mailu"
   namespace  = kubernetes_namespace.mailu.metadata.0.name
