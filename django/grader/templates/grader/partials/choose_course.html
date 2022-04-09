@@ -27,9 +27,14 @@
   <br />
 
   <button
-    class="p-1 m-1 font-medium font-bold text-white bg-purple-500 rounded focus:ring-purple-600 hover:bg-purple-400">
-    Submit
+    class="p-1 m-1 font-medium font-bold text-white bg-purple-500 rounded focus:ring-purple-600 hover:bg-purple-400"
+    data-loading-class="!bg-gray-500"
+    >Submit
   </button>
+
+  <div class="inline htmx-indicator">
+    {% include 'core/loading.html' %}
+  </div>
 
 </form>
 

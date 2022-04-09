@@ -63,7 +63,9 @@
         <div
           hx-get="{% url 'choose_course' %}"
           hx-trigger="load"
-          hx-swap="outerHTML"></div>
+          hx-swap="outerHTML">
+          {% include 'core/loading.html' %}
+        </div>
 
         <a href="{% url 'flush_selections' %}">
           <button class="p-1 m-1 font-medium text-white bg-red-700 rounded shadow focus:ring-red-300 hover:bg-red-600">

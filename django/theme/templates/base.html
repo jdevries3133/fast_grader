@@ -35,11 +35,8 @@
 
 
     {#  htmx  #}
-    {% if debug %}
-      <script src="https://unpkg.com/htmx.org@1.6.0/dist/htmx.js"></script>
-    {% else %}
-      <script src="https://unpkg.com/htmx.org@1.6.0"></script>
-    {% endif %}
+    <script src="https://unpkg.com/htmx.org@1.7.0"></script>
+    <script src="https://unpkg.com/htmx.org@1.7.0/dist/ext/loading-states.js"></script>
     <script>
       // htmx init script for csrf
       document.addEventListener('DOMContentLoaded', () => {
@@ -55,7 +52,7 @@
     {% include 'fonts.html' %}
   </head>
 
-  <body class="bg-gray-100">
+  <body hx-ext="loading-states" class="bg-gray-100">
     {% block body %}
 
     {% include 'core/navigation.html' %}

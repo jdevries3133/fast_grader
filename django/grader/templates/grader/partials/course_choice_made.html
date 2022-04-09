@@ -22,7 +22,9 @@ we will immediately fetch the assignment choice partial.
 <form
   hx-get="{% url 'choose_assignment' %}"
   hx-trigger="load"
-  hx-swap="outerHTML" />
+  hx-swap="outerHTML">
+  {% include 'core/loading.html' %}
+</form>
 
 {% comment %}
 vi:filetype=htmldjango
