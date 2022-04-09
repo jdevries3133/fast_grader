@@ -79,6 +79,19 @@ class AssignmentSubmissionSerializer(serializers.ModelSerializer):
         return ret
 
 
+class ContentlessAssignmentSubmissionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AssignmentSubmission
+        fields = (
+            "pk",
+            "api_student_profile_id",
+            "api_student_submission_id",
+            "profile_photo_url",
+            "student_name",
+            "grade",
+        )
+
+
 class GradingSessionSerializer(serializers.ModelSerializer):
     class Meta:
         model = GradingSession
@@ -96,8 +109,11 @@ class GradingSessionSerializer(serializers.ModelSerializer):
 
 
 class DeepGradingSessionSerializer(GradingSessionSerializer):
-    """Nested serializer that includes full AssignmentSubmissions. If submission
-    content isn't fresh in the database, this can trigger a lot of API calls
-    and be extremely slow due to the behavior of AssignmentSubmissionSerializer."""
+    """Nested serializer that includes full AssignmentSubmissions. The key
+    use case is when you need to get all the grades for a given grading
+    session. The representation of each submission *does not* include the
+    submission content, because refreshing that content is extremely slow,
+    and should therefore always be fetched just one submission at a time.
+    """
 
-    submissions = AssignmentSubmissionSerializer(many=True)
+    submissions = ContentlessAssignmentSubmissionSerializer(many=True)

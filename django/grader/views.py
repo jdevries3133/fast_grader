@@ -424,7 +424,9 @@ class AssignmentSubmissionViewSet(ModelViewSet):
     serializer_class = AssignmentSubmissionSerializer
 
     def get_queryset(self):
-        return AssignmentSubmission.objects.filter(assignment__course__owner=self.request.user)
+        return AssignmentSubmission.objects.filter(
+            assignment__course__owner=self.request.user
+        )
 
 
 @login_required

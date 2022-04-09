@@ -46,11 +46,11 @@ urlpatterns = [
 ]
 
 router = routers.SimpleRouter()
+router.register(
+    r"assignment_submission", AssignmentSubmissionViewSet, "session_viewset"
+)
 router.register(r"session_viewset", GradingSessionViewSet, "session_viewset")
 router.register(
     r"deep_session", DeepAssignmentSubmissionViewSet, "deep_session_viewset"
-)
-router.register(
-    r"assignment_submission", AssignmentSubmissionViewSet, "session_viewset"
 )
 urlpatterns += router.urls

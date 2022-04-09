@@ -116,29 +116,33 @@ function parseRow(row: HTMLElement): {
  * 3. fill the input element with the value
  */
 async function inputGradeValue(gradeInput: HTMLElement, gradeValue: Number) {
-  const WAIT_TIME = 10;
+  console.debug(`putting grade ${gradeValue} into element`, gradeInput);
   // clicking the div causes the input to be injected
   gradeInput.click();
 
-  // look for the input element
+  // look for the input element to appear after clicking on the div
   let el: HTMLInputElement;
   while (!(el = gradeInput.querySelector("input"))) {
-    await wait(WAIT_TIME);
+    await wait(1);
   }
 
-  // for some reason, we need a bit more waiting here for things to work. Maybe
-  // we need to wait for the animation to finish? I do not know.
-  await wait(WAIT_TIME);
+  // it appears that there are two ticks involved in the animation. I assume
+  // that when the input first appears, it might be disabled or maybe it gets
+  // removed and re-added to the dom on the second animation tick. Either way,
+  // we need to wait here until the whole animation completes
+  await wait(100);
 
   // fill the input element with the value
   el.value = gradeValue.toString();
+  console.debug("entered value", el.value);
 
-  await wait(WAIT_TIME);
+  await wait(1);
 }
 
 async function syncAction(sessionData: GradingSessionDetailResponse) {
   const parentEl = await getParentTable();
   const rows = await getRows(parentEl);
+  await wait(200);
   for (const row of rows) {
     const { name, profilePhotoUrl, gradeInput } = parseRow(row);
 
@@ -156,8 +160,10 @@ async function syncAction(sessionData: GradingSessionDetailResponse) {
       });
       return;
     }
-    if (!matches.length) return;
+
+    if (!matches.length) continue;
     const match = matches[0];
+    if (typeof match.grade !== "number") continue;
 
     await inputGradeValue(gradeInput, match.grade);
   }
