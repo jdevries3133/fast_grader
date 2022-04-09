@@ -62,7 +62,6 @@ const eventRegistry: Array<{
   selector: string;
   handler: EventListener;
   event: keyof HTMLElementEventMap;
-  active?: boolean;
 }> = [
   {
     selector: ".syncSessionButton",
@@ -90,28 +89,19 @@ const eventRegistry: Array<{
     event: "click",
   },
 ];
-// initialize the eventRegistry for every item to be inactive
-eventRegistry.forEach((d, i) => (eventRegistry[i] = { ...d, active: false }));
 
 // update event listeners and eventRegistry on every htmx:afterSwap event
 document.body.addEventListener("htmx:afterSwap", () => {
-  eventRegistry.forEach(({ selector, handler, event, active }, index) => {
-    if (!active) {
-      // add event listener
-      const els = document.querySelectorAll(selector);
-      if (els.length !== 0) {
-        els.forEach((el: HTMLElement) => {
+  eventRegistry.forEach(({ selector, handler, event }) => {
+    // add event listener
+    const els = document.querySelectorAll(selector);
+    if (els.length !== 0) {
+      els.forEach((el: HTMLElement) => {
+        if (el.getAttribute("listener-bound") !== "true") {
           el.addEventListener(event, handler);
-          // update registry
-        });
-        eventRegistry[index].active = true;
-      }
-    } else if (
-      // if the element is gone, update the registry, so that we will not
-      // skip adding the event listener if the element comes back
-      !document.querySelector(selector)
-    ) {
-      eventRegistry[index].active = false;
+        }
+        el.setAttribute("listener-bound", "true");
+      });
     }
   });
 });
