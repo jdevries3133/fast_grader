@@ -19,7 +19,7 @@ import { focusTab } from "./util";
  */
 export function inBackgroundScript() {
   try {
-    return browser.extension.getBackgroundPage() === window;
+    return "ServiceWorkerGlobalScope" in global;
   } catch (e) {
     // getBackgroundPage() cannot be used in private windows and apparently
     // some other content script contexts, but it always works in the background
@@ -44,16 +44,16 @@ export function inBackgroundScript() {
  * checks localStorage for a token, or calls the login function to get one.
  */
 export async function fetchToken(): Promise<string> {
+  debugger;
   if (!inBackgroundScript()) {
     throw new Error("cannot call this method outside the background script");
   }
   try {
-    const result: { ["token"]: string } | undefined =
-      await browser.storage.sync.get("token");
+    const result = await chrome.storage.sync.get("token");
     let tok: string | undefined = result?.token;
     if (!tok) {
       tok = await login();
-      browser.storage.sync.set({ token: tok });
+      chrome.storage.sync.set({ token: tok });
     }
     return tok;
   } catch (e) {
@@ -66,9 +66,9 @@ export async function fetchToken(): Promise<string> {
  * Remove the localStorage token, which must be done, for example, in cases
  * where the token causes a 403 error.
  */
-async function clearToken(): Promise<null> {
+async function clearToken() {
   try {
-    return await browser.storage.sync.remove("token");
+    return chrome.storage.sync.remove("token");
   } catch (e) {
     logToBackend("failed to remove token", e, { associateUser: false });
   }
@@ -203,7 +203,7 @@ async function handleMessage(msg: RuntimeMsg, _: any) {
 // allows the content script to import from this module without registering
 // a duplicate listener in another part of the extension
 if (inBackgroundScript()) {
-  browser.runtime.onMessage.addListener(handleMessage);
+  chrome.runtime.onMessage.addListener(handleMessage);
 }
 
 export const exportedForTesting = {

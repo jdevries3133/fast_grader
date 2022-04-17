@@ -4,7 +4,11 @@ export async function applyPatch() {
    * Temporary workaround for secondary monitors on MacOS where redraws don't happen
    * @See https://bugs.chromium.org/p/chromium/issues/detail?id=971701
    */
-  const info = await browser.runtime.getPlatformInfo();
+  const info = await new Promise<chrome.runtime.PlatformInfo>((res) => {
+    chrome.runtime.getPlatformInfo((info) => {
+      res(info);
+    });
+  });
   if (info.os === "mac") {
     const fontFaceSheet = new CSSStyleSheet();
     fontFaceSheet.insertRule(`

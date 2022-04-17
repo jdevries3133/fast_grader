@@ -1,5 +1,6 @@
 import { GradingSessionDetailResponse } from "./api";
 import { wait } from "./util";
+import { tabMessage, runtimeMessage } from "./chromeWrappers";
 
 /**
  * Messages received from the background script
@@ -27,14 +28,6 @@ export type TabMsg = {
   kind: ContentMessageTypes;
   payload?: any;
 };
-
-function tabMessage(tabId: number, msg: TabMsg) {
-  return browser.tabs.sendMessage(tabId, msg);
-}
-
-async function runtimeMessage(msg: RuntimeMsg) {
-  return await browser.runtime.sendMessage(null, msg);
-}
 
 export async function getTokenMsg(): Promise<string> {
   return runtimeMessage({ kind: BackgroundMessageTypes.GET_TOKEN });

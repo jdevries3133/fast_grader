@@ -1,4 +1,3 @@
-import { gradingSessionDetail } from "./mockResponses";
 import { getMockTabQueryFunc } from "./testUtils";
 import { wait, wildTest, focusTab } from "./util";
 
@@ -57,7 +56,9 @@ test("wildTest", () => {
 describe("findTab", () => {
   afterAll(() => {
     // restore default mock implementation
-    browser.tabs.query.mockImplementation(getMockTabQueryFunc());
+    (
+      chrome.tabs.query as jest.MockedFunction<typeof chrome.tabs.query>
+    ).mockImplementation(getMockTabQueryFunc());
   });
   it("gets the correct tab for syncing", async () => {
     const tab = await focusTab(
@@ -71,6 +72,14 @@ describe("findTab", () => {
       id: 2,
       url: "https://classroom.google.com/c/MzgxNTMyMDA3ODU5/a/MzE5ODM3MTMwNjQ4/submissions/by-status/and-sort-first-name/all",
       windowId: 1,
+      index: 2,
+      pinned: false,
+      highlighted: true,
+      incognito: false,
+      selected: true,
+      discarded: false,
+      autoDiscardable: false,
+      groupId: 1,
     });
   });
   it("switches to the correct tab if the current one is wrong", async () => {
@@ -80,17 +89,27 @@ describe("findTab", () => {
       ],
       "https://classroom.google.com/c/MzgxNTMyMDA3ODU5/a/MzE5ODM3MTMwNjQ4/submissions/by-status/and-sort-first-name/all"
     );
-    expect(browser.tabs.update).toHaveBeenCalledWith(2, { active: true });
+    expect(chrome.tabs.update).toHaveBeenCalledWith(2, { active: true });
   });
 
   it("opens a new tab if there is not one already open", async () => {
-    browser.tabs.query.mockImplementation(
+    (
+      chrome.tabs.query as jest.MockedFunction<typeof chrome.tabs.query>
+    ).mockImplementation(
       getMockTabQueryFunc([
         {
           url: "https://facebook.com/",
           id: 1,
           windowId: 2,
           active: true,
+          index: 1,
+          pinned: false,
+          highlighted: true,
+          incognito: false,
+          selected: true,
+          discarded: false,
+          autoDiscardable: false,
+          groupId: 1,
         },
       ])
     );
@@ -100,7 +119,7 @@ describe("findTab", () => {
       ],
       "https://classroom.google.com/c/MzgxNTMyMDA3ODU5/a/MzE5ODM3MTMwNjQ4/submissions/by-status/and-sort-first-name/all"
     );
-    expect(browser.tabs.create).toHaveBeenCalledWith({
+    expect(chrome.tabs.create).toHaveBeenCalledWith({
       url: "https://classroom.google.com/c/MzgxNTMyMDA3ODU5/a/MzE5ODM3MTMwNjQ4/submissions/by-status/and-sort-first-name/all",
     });
   });

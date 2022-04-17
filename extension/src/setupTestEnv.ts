@@ -1,12 +1,8 @@
-//@ts-nocheck
-
 import "@testing-library/jest-dom";
-import "mockzilla-webextension";
-import "mockzilla";
 
 import { getMockTabQueryFunc } from "./testUtils";
 
-export const browserMocks = {
+export const chromeMocks = {
   runtime: {
     onMessage: {
       addListener: jest.fn(),
@@ -33,7 +29,7 @@ export const browserMocks = {
   },
 };
 
-global.browser = browserMocks;
+global.chrome = chromeMocks as any as typeof chrome;
 
 export const fetchMock = jest.fn();
 global.fetch = fetchMock;

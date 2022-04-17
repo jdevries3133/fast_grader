@@ -1,13 +1,12 @@
 {
-  "manifest_version": 2,
+  "manifest_version": 3,
   "name": "Grade Sync for Fast Grader",
-  "version": "0.0.4",
   "description": "Sync grades input via the fast grader tool with Google Classroom.",
   "icons": {
     "16": "icons/favicon-16x16.png",
     "32": "icons/favicon-32x32.png"
   },
-  "browser_action": {
+  "action": {
     "default_popup": "popup.html",
     "default_icon": "./icons/favicon-32x32.png"
   },
@@ -27,11 +26,9 @@
   },
   "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAjHaP274cLCq9Rmwl+4yfE2EBhevK5lAZXwhKyENipNTnNOwyfESY6AB+bGkq/+KZS7UBq1syLms3//kzJcM1e/r9BOiZ1sR54a5MSFRirVUME9GGt6WMjE93JTkDXfD/mqqcB8xN39G6WVjd3k6AfjbOl+laVBSNozf6UfQcmthtUWq0UgTvct1m8IqjYlsRymfj/LPf0B9KxPD2Pgi26qq5STFZqElUENkQs9tfQz9i055HJjU1qzeq/J40zXoGXaHGBHxVOlnp/Aj/vO/BRADEbvseLY/ND8jlSw+NJnx7N2zSvjZvU9eZxo06SYuOZrk9WUKENB2VDg3cb1qnlwIDAQAB",
   "background": {
-    "persistent": false,
-    "scripts": ["browser-polyfill.js", "background.bundle.js"]
+    "service_worker": "background.bundle.js"
   },
   "permissions": ["identity", "storage", "tabs"],
-  "content_security_policy": "script-src 'self' https://unpkg.com https://apis.google.com https://www.gstatic.com https://www.googleapis.com https://securetoken.googleapis.com; object-src 'self'",
   "content_scripts": [
     {
       "matches": ["*://classroom.google.com/*"],

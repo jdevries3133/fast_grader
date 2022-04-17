@@ -242,7 +242,7 @@ async function handleMessage(msg: TabMsg, _?: any) {
   }
 }
 
-browser.runtime.onMessage.addListener(handleMessage);
+chrome.runtime.onMessage.addListener(handleMessage);
 
 export const exportedForTesting = {
   getParentTable,

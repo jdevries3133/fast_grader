@@ -17,6 +17,11 @@ const website =
     ? "https://classfast.app"
     : "https://beta.classfast.app";
 
+const name =
+  buildMode === "prod"
+    ? "Grade Sync for Fast Grader"
+    : "Grade Sync for Fast Grader (Beta)";
+
 const oauthClientId =
   buildMode === "dev"
     ? // dev client_id
@@ -105,12 +110,9 @@ module.exports = {
           to: "manifest.json",
           transform(buf) {
             const data = JSON.parse(buf.toString("utf8"));
-            if (buildMode === "dev") {
-              data["content_security_policy"] =
-                "script-src 'self' 'unsafe-eval'; object-src 'self'";
-            }
             data["oauth2"]["client_id"] = oauthClientId;
             data["version"] = getVersion();
+            data["name"] = name;
 
             return Buffer.from(JSON.stringify(data));
           },

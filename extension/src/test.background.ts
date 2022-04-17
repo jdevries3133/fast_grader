@@ -33,15 +33,16 @@ jest.mock("./messaging", () => {
 
 jest.mock("./api");
 
-function setupTabs(tabResponse?: Tab) {
+function setupTabs(tabResponse?: chrome.tabs.Tab) {
   findTab.mockImplementation(async (_, __) => {
     return (
-      tabResponse || {
+      tabResponse ||
+      ({
         url: gradingSessionDetail.google_classroom_detail_view_url,
         active: false,
         windowId: 1,
         id: 2,
-      }
+      } as chrome.tabs.Tab)
     );
   });
 }
@@ -72,7 +73,9 @@ describe("syncRequestHandler", () => {
 
   afterEach(() => {
     backendRequest.mockClear();
-    browser.tabs.query.mockClear();
+    (
+      chrome.tabs.query as jest.MockedFunction<typeof chrome.tabs.query>
+    ).mockClear();
   });
 
   it("fetches pk from backend", async () => {
@@ -119,7 +122,9 @@ describe("performSync", () => {
 
   afterEach(() => {
     backendRequest.mockClear();
-    browser.tabs.query.mockClear();
+    (
+      chrome.tabs.query as jest.MockedFunction<typeof chrome.tabs.query>
+    ).mockClear();
   });
   it("does not initiate syncing before confirming initialization of the content script", async () => {
     const err = new Error("content script did not prepare");
