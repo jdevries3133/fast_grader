@@ -3,7 +3,7 @@ name: Browser Extension
 on:
   push:
     paths: [
-      "./extension/**",
+      "extension/**",
       ".github/workflows/extension.yml"
     ]
 
