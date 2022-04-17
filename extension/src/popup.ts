@@ -23,7 +23,7 @@ function syncRequestHandler(e: Event) {
 function haltSync() {}
 
 function openClassFast() {
-  browser.tabs.create({
+  chrome.tabs.create({
     url: BACKEND_BASE_URL,
   });
 }
@@ -33,7 +33,7 @@ function resumeGrading(e: Event) {
     return;
   }
   const pk = e.target.getAttribute("data-pk");
-  browser.tabs.create({
+  chrome.tabs.create({
     url: `${BACKEND_BASE_URL}/grader/${pk}/`,
   });
 }
@@ -43,7 +43,7 @@ function viewOnSite(e: Event) {
     return;
   }
   const pk = e.target.getAttribute("data-pk");
-  browser.tabs.create({
+  chrome.tabs.create({
     url: `${BACKEND_BASE_URL}/grader/session/${pk}/`,
   });
 }
@@ -107,7 +107,10 @@ document.body.addEventListener("htmx:afterSwap", () => {
 });
 
 let AUTH_TOKEN: string = "";
-getTokenMsg().then((tok) => (AUTH_TOKEN = tok));
+getTokenMsg()
+  .then((tok) => (AUTH_TOKEN = tok))
+  .catch((e) => console.error(e));
+
 document.body.addEventListener(
   "htmx:configRequest",
   (event: CustomEvent<HtmxEventDetail>) => {

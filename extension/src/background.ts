@@ -19,7 +19,7 @@ import { focusTab } from "./util";
  */
 export function inBackgroundScript() {
   try {
-    return browser.extension.getBackgroundPage() === window;
+    return "ServiceWorkerGlobalScope" in global;
   } catch (e) {
     // getBackgroundPage() cannot be used in private windows and apparently
     // some other content script contexts, but it always works in the background
@@ -48,12 +48,11 @@ export async function fetchToken(): Promise<string> {
     throw new Error("cannot call this method outside the background script");
   }
   try {
-    const result: { ["token"]: string } | undefined =
-      await browser.storage.sync.get("token");
+    const result = await chrome.storage.sync.get("token");
     let tok: string | undefined = result?.token;
     if (!tok) {
       tok = await login();
-      browser.storage.sync.set({ token: tok });
+      chrome.storage.sync.set({ token: tok });
     }
     return tok;
   } catch (e) {
@@ -66,9 +65,9 @@ export async function fetchToken(): Promise<string> {
  * Remove the localStorage token, which must be done, for example, in cases
  * where the token causes a 403 error.
  */
-async function clearToken(): Promise<null> {
+async function clearToken() {
   try {
-    return await browser.storage.sync.remove("token");
+    return chrome.storage.sync.remove("token");
   } catch (e) {
     logToBackend("failed to remove token", e, { associateUser: false });
   }
@@ -188,22 +187,32 @@ async function performSync(pk: string): Promise<boolean> {
   }
 }
 
-async function handleMessage(msg: RuntimeMsg, _: any) {
-  switch (msg.kind) {
-    case BackgroundMessageTypes.GET_TOKEN:
-      return fetchToken();
-    case BackgroundMessageTypes.CLEAR_TOKEN:
-      await clearToken();
-      return fetchToken();
-    case BackgroundMessageTypes.PERFORM_SYNC:
-      return performSync(msg.payload.pk);
-  }
+function handleMessage(
+  msg: RuntimeMsg,
+  _: any,
+  sendResponse: (response: any) => void
+) {
+  (async () => {
+    switch (msg.kind) {
+      case BackgroundMessageTypes.GET_TOKEN:
+        sendResponse(await fetchToken());
+        break;
+      case BackgroundMessageTypes.CLEAR_TOKEN:
+        await clearToken();
+        sendResponse(await fetchToken());
+        break;
+      case BackgroundMessageTypes.PERFORM_SYNC:
+        sendResponse(await performSync(msg.payload.pk));
+        break;
+    }
+  })();
+  return true;
 }
 
 // allows the content script to import from this module without registering
 // a duplicate listener in another part of the extension
 if (inBackgroundScript()) {
-  browser.runtime.onMessage.addListener(handleMessage);
+  chrome.runtime.onMessage.addListener(handleMessage);
 }
 
 export const exportedForTesting = {

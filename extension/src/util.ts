@@ -17,9 +17,8 @@ export function wildTest(wildcard: string, str: string): boolean {
  * The sync tab is the target google classroom tab with the content script in
  * it. This will create the tab if it does not already exist, and focus the
  * tab no matter what.
- *
  * ---
- * @param {urlPattern} string[] an array of strings that can contain wildcards,
+ * @param {string[]} urlPatterns an array of strings that can contain wildcards,
  * against which getSyncTab will filter. It follows the same rules as other
  * extension manifest match patterns:
  *
@@ -27,7 +26,7 @@ export function wildTest(wildcard: string, str: string): boolean {
  *  https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/Match_patterns
  *
  *
- * @param {concreteUrl} string the ideal target url. This will be searched against
+ * @param {string} concreteUrl the ideal target url. This will be searched against
  * too, but it will also be opened up if it does not already exist in any
  * tab or window.
  * ---
@@ -35,21 +34,21 @@ export function wildTest(wildcard: string, str: string): boolean {
 export async function focusTab(
   urlPatterns: string[],
   concreteUrl: string
-): Promise<Tab> {
+): Promise<chrome.tabs.Tab> {
   const searchPatterns = [...urlPatterns, concreteUrl];
 
   for (let i = 0; i < searchPatterns.length; i++) {
-    const matches = await browser.tabs.query({ url: searchPatterns[i] });
+    const matches = await chrome.tabs.query({ url: searchPatterns[i] });
     if (matches.length) {
       const tab = matches[0];
-      await browser.windows.update(tab.windowId, { focused: true });
-      await browser.tabs.update(tab.id, { active: true });
+      await chrome.windows.update(tab.windowId, { focused: true });
+      await chrome.tabs.update(tab.id, { active: true });
       return tab;
     }
   }
 
   // fallthrough means that we need to create a new tab
-  return await browser.tabs.create({
+  return await chrome.tabs.create({
     url: concreteUrl,
   });
 }

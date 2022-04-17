@@ -1,3 +1,4 @@
+import { runtimeMessage } from "./chromeWrappers";
 import {
   BackgroundMessageTypes,
   RuntimeMsg,
@@ -6,28 +7,16 @@ import {
   performSyncMsg,
 } from "./messaging";
 
-jest.mock("./messaging", () => {
-  const original = jest.requireActual("./messaging");
-  return {
-    ...original,
-    _pingContentScript: jest.fn(),
-  };
-});
+jest.mock("./chromeWrappers");
 
 describe("messaging methods", () => {
   test("getTokenMsg", async () => {
-    const expectedMsg: RuntimeMsg = {
-      kind: BackgroundMessageTypes.GET_TOKEN,
-    };
     await getTokenMsg();
-    expect(browser.runtime.sendMessage).toHaveBeenCalledWith(null, expectedMsg);
+    expect(runtimeMessage).toHaveBeenCalledWith({ kind: 0 });
   });
   test("getNewTokenMsg", async () => {
-    const expectedMsg: RuntimeMsg = {
-      kind: BackgroundMessageTypes.CLEAR_TOKEN,
-    };
     await getNewTokenMsg();
-    expect(browser.runtime.sendMessage).toHaveBeenCalledWith(null, expectedMsg);
+    expect(runtimeMessage).toHaveBeenCalledWith({ kind: 1 });
   });
   test("performSyncMsg", async () => {
     const expectedMsg: RuntimeMsg = {
@@ -35,6 +24,9 @@ describe("messaging methods", () => {
       payload: { pk: "23" },
     };
     await performSyncMsg(expectedMsg.payload.pk);
-    expect(browser.runtime.sendMessage).toHaveBeenCalledWith(null, expectedMsg);
+    expect(runtimeMessage).toHaveBeenCalledWith({
+      kind: 2,
+      payload: { pk: "23" },
+    });
   });
 });

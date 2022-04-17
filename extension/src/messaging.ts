@@ -1,5 +1,6 @@
 import { GradingSessionDetailResponse } from "./api";
 import { wait } from "./util";
+import { tabMessage, runtimeMessage } from "./chromeWrappers";
 
 /**
  * Messages received from the background script
@@ -27,14 +28,6 @@ export type TabMsg = {
   kind: ContentMessageTypes;
   payload?: any;
 };
-
-function tabMessage(tabId: number, msg: TabMsg) {
-  return browser.tabs.sendMessage(tabId, msg);
-}
-
-async function runtimeMessage(msg: RuntimeMsg) {
-  return await browser.runtime.sendMessage(null, msg);
-}
 
 export async function getTokenMsg(): Promise<string> {
   return runtimeMessage({ kind: BackgroundMessageTypes.GET_TOKEN });
@@ -66,7 +59,13 @@ async function _pingContentScript(tabId: number): Promise<boolean> {
   try {
     return await tabMessage(tabId, { kind: ContentMessageTypes.PING });
   } catch (e) {
-    console.log(e);
+    // we expect errors here, because we're polling until the content script
+    // gives a response
+    console.debug(
+      "expected error occured and was handled: ",
+      e,
+      chrome.runtime.lastError.message
+    );
     return false;
   }
 }
