@@ -59,7 +59,13 @@ async function _pingContentScript(tabId: number): Promise<boolean> {
   try {
     return await tabMessage(tabId, { kind: ContentMessageTypes.PING });
   } catch (e) {
-    console.log(e);
+    // we expect errors here, because we're polling until the content script
+    // gives a response
+    console.debug(
+      "expected error occured and was handled: ",
+      e,
+      chrome.runtime.lastError.message
+    );
     return false;
   }
 }

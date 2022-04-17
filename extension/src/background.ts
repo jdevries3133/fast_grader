@@ -44,7 +44,6 @@ export function inBackgroundScript() {
  * checks localStorage for a token, or calls the login function to get one.
  */
 export async function fetchToken(): Promise<string> {
-  debugger;
   if (!inBackgroundScript()) {
     throw new Error("cannot call this method outside the background script");
   }
@@ -188,16 +187,26 @@ async function performSync(pk: string): Promise<boolean> {
   }
 }
 
-async function handleMessage(msg: RuntimeMsg, _: any) {
-  switch (msg.kind) {
-    case BackgroundMessageTypes.GET_TOKEN:
-      return fetchToken();
-    case BackgroundMessageTypes.CLEAR_TOKEN:
-      await clearToken();
-      return fetchToken();
-    case BackgroundMessageTypes.PERFORM_SYNC:
-      return performSync(msg.payload.pk);
-  }
+function handleMessage(
+  msg: RuntimeMsg,
+  _: any,
+  sendResponse: (response: any) => void
+) {
+  (async () => {
+    switch (msg.kind) {
+      case BackgroundMessageTypes.GET_TOKEN:
+        sendResponse(await fetchToken());
+        break;
+      case BackgroundMessageTypes.CLEAR_TOKEN:
+        await clearToken();
+        sendResponse(await fetchToken());
+        break;
+      case BackgroundMessageTypes.PERFORM_SYNC:
+        sendResponse(await performSync(msg.payload.pk));
+        break;
+    }
+  })();
+  return true;
 }
 
 // allows the content script to import from this module without registering

@@ -11,13 +11,9 @@ export async function tabMessage(tabId: number, msg: TabMsg): Promise<any> {
 }
 
 export async function runtimeMessage(msg: RuntimeMsg): Promise<any> {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     chrome.runtime.sendMessage(chrome.runtime.id, msg, (response) => {
-      if (typeof response === "string") {
-        resolve(response);
-      } else {
-        reject();
-      }
+      resolve(response);
     });
   });
 }

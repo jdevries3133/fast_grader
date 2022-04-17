@@ -233,13 +233,22 @@ async function performSync(
   }
 }
 
-async function handleMessage(msg: TabMsg, _?: any) {
-  switch (msg.kind) {
-    case ContentMessageTypes.SYNC:
-      return performSync(msg.payload);
-    case ContentMessageTypes.PING:
-      return isReady();
-  }
+async function handleMessage(
+  msg: TabMsg,
+  _: any,
+  sendResponse: (response: any) => void
+) {
+  (async () => {
+    switch (msg.kind) {
+      case ContentMessageTypes.SYNC:
+        sendResponse(await performSync(msg.payload));
+        break;
+      case ContentMessageTypes.PING:
+        sendResponse(await isReady());
+        break;
+    }
+  })();
+  return true;
 }
 
 chrome.runtime.onMessage.addListener(handleMessage);
