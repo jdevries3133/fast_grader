@@ -1,3 +1,21 @@
+/**
+ *
+ * DEPLOY_TARGET is an environment variable as follows:
+ *
+ * Enum {
+ *   "beta";
+ *   "prod";
+ *   "dev";
+ * }
+ *
+ * Behavior that is customized based on build mode includes:
+ *
+ * - which base URL the extension points backend requests towards (`localhost:8000`,
+ *   `beta.classfast.app`, or `classfast.app`)
+ * - how the extension is titled in the manifest
+ * - which oauth client ID is used.
+ * - which public key is used
+ */
 const path = require("path");
 const CopyPlugin = require("copy-webpack-plugin");
 const dotenv = require("dotenv");
@@ -7,6 +25,11 @@ const { gitDescribeSync } = require("git-describe");
 dotenv.config();
 
 const buildMode = process.env.DEPLOY_TARGET;
+
+// validate build mode is `beta`, `prod`, or `dev`
+if (!["beta", "prod", "dev"].includes(buildMode)) {
+  throw new Error(`Invalid build mode: ${buildMode}`);
+}
 
 console.log("\033[96mBuilding in " + buildMode + " mode\033[0m");
 
@@ -29,6 +52,10 @@ const oauthClientId =
     : // prod client_id
       "850669494212-vnl448og3f97mnjsusupm3lftede1r34.apps.googleusercontent.com";
 
+const key =
+  buildMode === "prod"
+    ? "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAjHaP274cLCq9Rmwl+4yfE2EBhevK5lAZXwhKyENipNTnNOwyfESY6AB+bGkq/+KZS7UBq1syLms3//kzJcM1e/r9BOiZ1sR54a5MSFRirVUME9GGt6WMjE93JTkDXfD/mqqcB8xN39G6WVjd3k6AfjbOl+laVBSNozf6UfQcmthtUWq0UgTvct1m8IqjYlsRymfj/LPf0B9KxPD2Pgi26qq5STFZqElUENkQs9tfQz9i055HJjU1qzeq/J40zXoGXaHGBHxVOlnp/Aj/vO/BRADEbvseLY/ND8jlSw+NJnx7N2zSvjZvU9eZxo06SYuOZrk9WUKENB2VDg3cb1qnlwIDAQAB"
+    : "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAv6V/jgZu8Bb+fxV5Z7R0DpP5v5Ft4SBNTIumuaLz37ISyyACTqBHZvcSyJGRSBoDwb8bS2CZ6kE+pma12Ooin05diR+Q6I9BZYpvqNQsNAewKkAy85RJZr8eTknXm9KKEMZ7GuwxyFURzB3I7gWUyf85Zr2qh80jIHCFYeJB7a9YCXkc7q+5nkmz0Jz2KlF4qK/tGOk2WmZpjgxBHxySDrVvMop25vuHYl4b3TcqozTf1TeyO8W9pDIYnGXEwHxLoORvvMmNye/o8zBqI7K+ieXhkgYJTF7fCc14DZkRPprE0bK9e9b24c/9RkX8fHbmxdMe7F/NgZCD+I75zjobdQIDAQAB";
 /**
  * For tagged commits, return the semantic version. For other commits, the
  * distance from previous tag is the fourth parameter of the version, which
@@ -109,12 +136,14 @@ module.exports = {
           from: "./src/manifest.json",
           to: "manifest.json",
           transform(buf) {
-            const data = JSON.parse(buf.toString("utf8"));
-            data["oauth2"]["client_id"] = oauthClientId;
-            data["version"] = getVersion();
-            data["name"] = name;
+            const manifest = JSON.parse(buf.toString("utf8"));
 
-            return Buffer.from(JSON.stringify(data));
+            manifest["oauth2"]["client_id"] = oauthClientId;
+            manifest["version"] = getVersion();
+            manifest["name"] = name;
+            manifest["key"] = key;
+
+            return Buffer.from(JSON.stringify(manifest));
           },
         },
         {
