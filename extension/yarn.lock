@@ -828,11 +828,6 @@
   dependencies:
     "@types/jest" "*"
 
-"@types/webextension-polyfill@^0.8.3":
-  version "0.8.3"
-  resolved "https://registry.yarnpkg.com/@types/webextension-polyfill/-/webextension-polyfill-0.8.3.tgz#eb601b3fcf524f0ecf7d7579ccbd237928d0dda7"
-  integrity sha512-GN+Hjzy9mXjWoXKmaicTegv3FJ0WFZ3aYz77Wk8TMp1IY3vEzvzj1vnsa0ggV7vMI1i+PUxe4qqnIJKCzf9aTg==
-
 "@types/yargs-parser@*":
   version "21.0.0"
   resolved "https://registry.yarnpkg.com/@types/yargs-parser/-/yargs-parser-21.0.0.tgz#0c60e537fa790f5f9472ed2776c2b71ec117351b"
@@ -2453,11 +2448,6 @@ jest-message-util@^27.5.1:
     slash "^3.0.0"
     stack-utils "^2.0.3"
 
-jest-mock-proxy@^3.0.0:
-  version "3.0.0"
-  resolved "https://registry.yarnpkg.com/jest-mock-proxy/-/jest-mock-proxy-3.0.0.tgz#f80df2abe4230a9d0f1ccadf88b1226548894991"
-  integrity sha512-IwvZRoV4d115vMMLiFtiUd7B2rE3OfswPCzskFn1g4VI1h4fy+kQxuRP237uOZzfwPNCpQ1/F7Sike5JYBfvgQ==
-
 jest-mock@^27.5.1:
   version "27.5.1"
   resolved "https://registry.yarnpkg.com/jest-mock/-/jest-mock-27.5.1.tgz#19948336d49ef4d9c52021d34ac7b5f36ff967d6"
@@ -2907,16 +2897,6 @@ minimist@^1.1.1, minimist@^1.2.0, minimist@^1.2.5:
   version "1.2.5"
   resolved "https://registry.yarnpkg.com/minimist/-/minimist-1.2.5.tgz#67d66014b66a6a8aaa0c083c5fd58df4e4e97602"
   integrity sha512-FM9nNUYrRBAELZQT3xeZQ7fmMOBg6nWNmJKTcgsJeaLstP/UODVpGsr5OhXhhXg6f+qtJ8uiZ+PUxkDWcgIXLw==
-
-mockzilla-webextension@^0.13.0:
-  version "0.13.0"
-  resolved "https://registry.yarnpkg.com/mockzilla-webextension/-/mockzilla-webextension-0.13.0.tgz#89a0d627d86e8a912abc149ee903882da0ebb648"
-  integrity sha512-HDfabHLTdd6p2OiFEFB7ravSVEN0HllAjMeWUP7iUNXuCQEkIMro6BzxRL/Xtfe6fKRqNRykTQcX/H8RbAkv0A==
-
-mockzilla@^0.12.0:
-  version "0.12.0"
-  resolved "https://registry.yarnpkg.com/mockzilla/-/mockzilla-0.12.0.tgz#0916b16f955f1a5ef2df45cda0a9590428d80ae0"
-  integrity sha512-tbTdN9VDjy0wKl4w1nbwXzsaW7xJzFMr0Jgm/5RevN897Q4AIb1teBI2txbva41/H2uPo0fzbLgBd78tntfy4g==
 
 ms@2.1.2:
   version "2.1.2"
@@ -3778,11 +3758,6 @@ watchpack@^2.3.1:
   dependencies:
     glob-to-regexp "^0.4.1"
     graceful-fs "^4.1.2"
-
-webextension-polyfill@^0.9.0:
-  version "0.9.0"
-  resolved "https://registry.yarnpkg.com/webextension-polyfill/-/webextension-polyfill-0.9.0.tgz#de6c1941d0ef1b0858b20e9c7b46bbc042c5a960"
-  integrity sha512-LTtHb0yR49xa9irkstDxba4GATDAcDw3ncnFH9RImoFwDlW47U95ME5sn5IiQX2ghfaECaf6xyXM8yvClIBkkw==
 
 webidl-conversions@^5.0.0:
   version "5.0.0"
