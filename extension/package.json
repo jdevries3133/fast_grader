@@ -5,7 +5,7 @@
   "scripts": {
     "dist": "rm -rf dist && yarn build",
     "dev": "concurrently \"yarn dev:webpack\" \"yarn dev:tailwind\"",
-    "deploy": "yarn build && node upload.js",
+    "upload": "node upload.js",
     "build": "yarn build:tailwind && yarn build:webpack && zip extension.zip $(find dist)",
     "build:webpack": "webpack",
     "build:tailwind": "yarn tailwindcss -c ./tailwind.config.js -i ./src/styles.css -o ./dist/styles.css",

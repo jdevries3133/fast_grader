@@ -29,24 +29,39 @@ jobs:
         working-directory: ./extension
         run: yarn test
 
-      # commented out until the beta extension is approved, but this seems
-      # to work fine
-      # - name: Build and deploy to beta
+        # deployment steps for beta extension
+        # commented out while beta site awaits approval
+        # ---
+
+      # - name: Build beta extension
       #   working-directory: ./extension
+      #   env:
+      #     DEPLOY_TARGET: beta
+      #   run: yarn build
+
+      # - name: upload production extension to web store
       #   env:
       #     DEPLOY_TARGET: beta
       #     UPLOAD_CLIENT_ID: ${{ secrets.OAUTH_CLIENT_ID}}
       #     UPLOAD_CLIENT_SECRET: ${{ secrets.OAUTH_CLIENT_SECRET }}
       #     UPLOAD_REFRESH_TOKEN: ${{ secrets.OAUTH_REFRESH_TOKEN }}
-      #   run: yarn deploy
+      #   run: yarn upload
 
-        # only run this step for tagged commits
-      - name: Build and deploy to production
+        # deployment steps for production extension
+        # the following production steps (normally) only run on tagged commits
+        # ---
+      - name: Build production extension
         # if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
         working-directory: ./extension
+        env:
+          DEPLOY_TARGET: prod
+        run: yarn build
+
+      - name: upload production extension to web store
+        # if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
         env:
           DEPLOY_TARGET: prod
           UPLOAD_CLIENT_ID: ${{ secrets.OAUTH_CLIENT_ID}}
           UPLOAD_CLIENT_SECRET: ${{ secrets.OAUTH_CLIENT_SECRET }}
           UPLOAD_REFRESH_TOKEN: ${{ secrets.OAUTH_REFRESH_TOKEN }}
-        run: yarn deploy
+        run: yarn upload
