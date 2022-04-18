@@ -18,6 +18,7 @@ name: Documentation Website CI/CD
 on:
   push:
     branches: ['main']
+    tags: '**'
     paths: [
       "docs/**",
       "Dockerfile.documentation",
