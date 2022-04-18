@@ -18,7 +18,7 @@ import logging
 from django.core.exceptions import ValidationError
 from rest_framework import serializers
 
-from grader.services import NotGoogleDriveAssignment, update_submission
+from grader.services import update_submission
 
 from .models import GradingSession, AssignmentSubmission
 
@@ -27,6 +27,10 @@ logger = logging.getLogger(__name__)
 
 
 class AssignmentSubmissionSerializer(serializers.ModelSerializer):
+    """Warning: to_representation has an unusual side-effect of potentially
+    causing API calls due to self-updating behavior. Never use this serializer
+    in a `many` context."""
+
     class Meta:
         model = AssignmentSubmission
         fields = (
@@ -48,20 +52,10 @@ class AssignmentSubmissionSerializer(serializers.ModelSerializer):
         return data
 
     def to_representation(self, instance):
-        # TODO: this self-updating behavior should be in the model
         if instance:
-            try:
-                update_submission(submission=instance)
-            except NotGoogleDriveAssignment as e:
-                raise serializers.ValidationError(
-                    {
-                        "message": (
-                            "There are no google docs or slides attached "
-                            "to this assignment. Please try another assignment."
-                        )
-                    }
-                ) from e
-
+            # this is very slow. should this be in the serializer? should it be
+            # in this # method? not sure...
+            update_submission(submission=instance)
         ret = super().to_representation(instance)
 
         # when diff is requested by query param, render the diff
