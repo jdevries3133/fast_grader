@@ -11,7 +11,7 @@ on:
 jobs:
   ci-cd:
 
-    name: ci/cd pipeline for browser extnesion
+    name: ci/cd pipeline for browser extension
     runs-on: ubuntu-latest
     environment: Extension
     steps:
