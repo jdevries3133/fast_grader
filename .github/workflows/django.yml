@@ -14,7 +14,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-name: CI/CD for Django App
+name: Django App CI/CD
 
 on:
   push:
