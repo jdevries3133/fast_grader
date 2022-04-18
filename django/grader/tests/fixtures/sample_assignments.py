@@ -59,8 +59,8 @@ def sample_assignments():
             ],
         },
         {
-            'random': 'invalid data',
-            'that  will': 'cause key errors',
-            'materials': ['ok']
-        }
+            "random": "invalid data",
+            "that  will": "cause key errors",
+            "materials": ["ok"],
+        },
     ]
