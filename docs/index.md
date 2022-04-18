@@ -1,12 +1,5 @@
 # ⚡️ Grade Like Lightning 🌩
 
-Don't mind the failing tags, sirens, and red lights –– I'm working on the
-CI/CD pipeline now 🙃
-
-[![CI/CD for Django web application](https://github.com/jdevries3133/fast_grader/actions/workflows/django.yml/badge.svg)](https://github.com/jdevries3133/fast_grader/actions/workflows/django.yml)
-
-[![Node.js CI](https://github.com/jdevries3133/fast_grader/actions/workflows/extension.yml/badge.svg)](https://github.com/jdevries3133/fast_grader/actions/workflows/extension.yml)
-
 <img style="height: 200px" src="./django/fast_grader/static/brand/logo.webp" />
 
 **Grading in Online Assignments is not Fun**
