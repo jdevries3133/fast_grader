@@ -19,7 +19,10 @@ name: Django App CI/CD
 on:
   push:
     branches: ['main']
-    paths: "django/**"
+    paths: [
+      "django/**",
+      ".github/workflows/django.yml"
+    ]
 
 jobs:
   django-deploy:
