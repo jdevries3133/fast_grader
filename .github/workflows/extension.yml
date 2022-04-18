@@ -56,17 +56,17 @@ jobs:
       #   run: yarn upload
 
         # deployment steps for production extension
-        # the following production steps (normally) only run on tagged commits
+        # the following production steps only run on tagged commits
         # ---
       - name: Build production extension
-        # if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
+        if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
         working-directory: ./extension
         env:
           DEPLOY_TARGET: prod
         run: yarn build
 
       - name: upload production extension to web store
-        # if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags'
+        if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags'
         continue-on-error: true
         working-directory: ./extension
         env:
