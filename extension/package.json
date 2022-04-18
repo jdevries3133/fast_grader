@@ -3,7 +3,6 @@
   "version": "0.0.5",
   "description": "Browser extension to sync grades that were input on https://classfast.app/",
   "scripts": {
-    "dist": "rm -rf dist && yarn build",
     "dev": "concurrently \"yarn dev:webpack\" \"yarn dev:tailwind\"",
     "upload": "node upload.js",
     "build": "yarn build:tailwind && yarn build:webpack && zip extension.zip $(find dist)",

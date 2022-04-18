@@ -10,11 +10,10 @@ towards that directory.
 
 This project includes the following scripts:
 
-| `<cmd>`          | action                                                                               |
-| ---------------- | ------------------------------------------------------------------------------------ |
-| `dist`           | runs both `build` and `tailwind-build` to create a complete production-ready package |
-| `build`          | build project with webpack                                                           |
-| `dev`            | build project in dev mode with webpack.dev.js configuration and watch for changes    |
-| `tailwind-build` | build a `styles.css` file in JIT mode (performs PurgeCSS class elimination)          |
-| `tailwind-dev`   | build a `styles.css` file in dev mode and watch for changes                          |
-| `test`           | run unit test suite with jest                                                        |
+| `<cmd>`     | action                                                                            |
+| ----------- | --------------------------------------------------------------------------------- |
+| `upload`    | upload to chrome web store                                                        |
+| `build`     | build project with webpack                                                        |
+| `dev`       | build project in dev mode with webpack.dev.js configuration and watch for changes |
+| `test`      | run unit test suite with jest                                                     |
+| `typecheck` | check codebase for type errors                                                    |
