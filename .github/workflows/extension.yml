@@ -1,4 +1,19 @@
-name: Browser Extension
+# Copyright (C) 2021 John DeVries
+
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+name: CI/CD for Browser Extension
 
 on:
   push:
@@ -58,7 +73,7 @@ jobs:
         # deployment steps for production extension
         # the following production steps only run on tagged commits
         # ---
-      - name: Build production extension
+      - name: build production extension
         if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
         working-directory: ./extension
         env:

@@ -14,18 +14,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-# ---
-# This monolithic action does a bunch of things:
-#
-# - build the django app container
-# - run unit tests against the container
-# - push the container to docker hub
-# - deploy the development infrastructure to minikube
-# - run system integration tests against this ephemeral system
-# - deploy to staging with terraform
-
-
-name: CI/CD for Django web application
+name: CI/CD for Django App
 
 on:
   push:
@@ -35,7 +24,7 @@ on:
 jobs:
   django-deploy:
 
-    name: Test, push, deploy
+    name: test, push container, deploy to kubernetes
     runs-on: ubuntu-latest
     environment: Django Deployment
     steps:
@@ -43,13 +32,13 @@ jobs:
       with:
         fetch-depth: 0
 
-    - name: Login to Docker Hub
+    - name: login to docker hub
       uses: docker/login-action@v1
       with:
         username: jdevries3133
         password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-    - name: Test, push, and deploy via `make all`
+    - name: run `make all` to test, push container, and then deploy via terraform
       working-directory: ./django
       env:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
