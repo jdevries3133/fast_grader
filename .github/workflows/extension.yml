@@ -13,6 +13,7 @@ jobs:
 
     name: ci/cd pipeline for browser extnesion
     runs-on: ubuntu-latest
+    environment: Extension
     steps:
       - uses: actions/checkout@v2
         with:
