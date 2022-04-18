@@ -5,6 +5,7 @@
   "scripts": {
     "dist": "rm -rf dist && yarn build",
     "dev": "concurrently \"yarn dev:webpack\" \"yarn dev:tailwind\"",
+    "upload": "node upload.js",
     "build": "yarn build:tailwind && yarn build:webpack && zip extension.zip $(find dist)",
     "build:webpack": "webpack",
     "build:tailwind": "yarn tailwindcss -c ./tailwind.config.js -i ./src/styles.css -o ./dist/styles.css",
@@ -54,6 +55,7 @@
   },
   "dependencies": {
     "@babel/runtime": "^7.16.0",
+    "chrome-webstore-upload": "^1.0.0",
     "concurrently": "^7.0.0",
     "dotenv": "^16.0.0",
     "git-describe": "^4.1.0",

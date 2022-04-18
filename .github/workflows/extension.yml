@@ -9,19 +9,60 @@ on:
 
 
 jobs:
-  test-extension:
+  ci-cd:
 
-    name: Browser extension unit tests
+    name: ci/cd pipeline for browser extnesion
     runs-on: ubuntu-latest
+    environment: Extension
     steps:
       - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
       - name: setup node
         uses: actions/setup-node@v2
         with:
           node-version: 16.x
-      - name: Install dependencies
+      - name: install dependencies
         working-directory: ./extension
-        run: |
-          yarn install
-          yarn test
+        run: yarn install
+      - name: run unit tests
+        working-directory: ./extension
+        run: yarn test
 
+        # deployment steps for beta extension
+        # commented out while beta site awaits approval
+        # ---
+
+      # - name: Build beta extension
+      #   working-directory: ./extension
+      #   env:
+      #     DEPLOY_TARGET: beta
+      #   run: yarn build
+
+      # - name: upload production extension to web store
+      #   env:
+      #     DEPLOY_TARGET: beta
+      #     UPLOAD_CLIENT_ID: ${{ secrets.OAUTH_CLIENT_ID}}
+      #     UPLOAD_CLIENT_SECRET: ${{ secrets.OAUTH_CLIENT_SECRET }}
+      #     UPLOAD_REFRESH_TOKEN: ${{ secrets.OAUTH_REFRESH_TOKEN }}
+      #   run: yarn upload
+
+        # deployment steps for production extension
+        # the following production steps (normally) only run on tagged commits
+        # ---
+      - name: Build production extension
+        # if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
+        working-directory: ./extension
+        env:
+          DEPLOY_TARGET: prod
+        run: yarn build
+
+      - name: upload production extension to web store
+        # if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
+        working-directory: ./extension
+        env:
+          DEPLOY_TARGET: prod
+          UPLOAD_CLIENT_ID: ${{ secrets.OAUTH_CLIENT_ID}}
+          UPLOAD_CLIENT_SECRET: ${{ secrets.OAUTH_CLIENT_SECRET }}
+          UPLOAD_REFRESH_TOKEN: ${{ secrets.OAUTH_REFRESH_TOKEN }}
+        run: yarn upload
