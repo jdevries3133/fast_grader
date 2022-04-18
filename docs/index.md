@@ -13,15 +13,14 @@ CI/CD pipeline now 🙃
 
 Let's say you are grading a google docs/slides assignment. The grading page
 itself is a javascript behemoth that takes several seconds to load, then the
-embedded google document itself takes additional seconds to load! Then, you
-will sit around for even longer while the page glitches out as every image,
-video and animation moseys its way on into the page.
+embedded google document takes additional seconds to load! Then, you will sit
+around for even longer while the page glitches out as every image, video and
+animation moseys its way on into the page.
 
 To add insult to injury, Google Classroom has no keyboard shortcuts for
-advancing between assignments, entering the grading box, etc. It is a painful
-point-and-click slog that plagues teachers around the world. The problem
-is even worse if you are a music (me!), art, or other specialist teacher who
-services a **huge** student body.
+advancing between assignments, entering grades, etc. It is a painful
+point-and-click slog that plagues teachers around the world. The problem is
+even worse if you are a teacher with a large volume of students.
 
 ### When you give an assignment, _hundreds_ of students complete it.
 
@@ -49,9 +48,10 @@ If you know the web, come
 
 ## Software Components
 
-This is a monorepo with a variety of fun inside:
+This is a monorepo:
 
 | Path        | Content                                                                                                 |
 | ----------- | ------------------------------------------------------------------------------------------------------- |
 | ./django    | The Django application                                                                                  |
 | ./extension | The browser extension which facilitates "manual" grade syncing in Google Classroom via DOM manipulation |
+| ./docs      | Documentation website content                                                                           |
