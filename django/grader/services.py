@@ -337,16 +337,17 @@ def _update_teacher_template(
             id_=i.get("driveFile", {}).get("driveFile", {}).get("id"),
             name=i.get("driveFile", {}).get("driveFile", {}).get("title"),
         )
-        for i in assignment_data.get("materials", {})
+        for i in assignment_data.get("materials", {}) if i.get("driveFile", {}).get("driveFile", {}).get("id")
     ]
 
-    if not any(a.id_ for a in attachments):
-        raise NotGoogleDriveAssignment
+    if len(attachments) == 0:
+        logger.debug('attachments: %s', attachments)
+        raise ValueError('assignment does not contain any teacher attachments')
 
     template_content = concatenate_attachments(user=user, attachments=attachments)
 
     was_created = False
-    if template:
+    if template is not None:
         stringified = "\n".join(template_content.combine_content())
         if stringified != template.content:
             template.content = stringified

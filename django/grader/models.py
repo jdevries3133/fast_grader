@@ -123,9 +123,7 @@ class AssignmentSubmission(models.Model):
     # student information
     # this information is nullable, because it requires a separate request to
     # fetch, and this allows us to do that lazily.
-
-    # TODO: this should be default='unknown'
-    student_name = models.CharField(max_length=200, blank=True, default="")
+    student_name = models.CharField(max_length=200, blank=True, default="unknown")
     _profile_photo_url = models.CharField(max_length=200, blank=True, default="")
 
     # grading information
