@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}Fast Grader Help Page{% endblock %}
 
@@ -53,6 +54,21 @@
       where they actually put those answers.
     </p>
 
+  </details>
+
+  <details>
+    <summary class="cursor-pointer">
+      <h3 class="inline" id="assignment-filtering">Why do some of my assignments not appear in the dropdown?</h3>
+    </summary>
+    <p>
+      Only assignments that can be graded by this platform appear in the dropdown
+      menu for choosing assignments.
+      <img class="h-72" src={% static 'core/screenshots/assignment_picker.png' %} />
+      The only assignments that pass the filter are: (1) assignments that are
+      published, (2) assignments that contain a google drive file attachment,
+      and (3) have at least one drive file attachment set to make a copy
+      for each student.
+    </p>
   </details>
 
   <details>

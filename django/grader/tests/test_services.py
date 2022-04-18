@@ -22,15 +22,9 @@ from django.test import TestCase
 from django.contrib.auth.models import User
 from googleapiclient.errors import HttpError as GoogClientHttpError
 
-from grader.models import TeacherTemplate
 
-from ..services import (
-    concatenate_attachments,
-    DriveAttachment,
-    _update_teacher_template,
-    _update_teacher_template,
-    update_submission,
-)
+from .fixtures.sample_assignments import sample_assignments
+from ..services import concatenate_attachments, DriveAttachment, filter_assignments
 
 
 TEST_FIXTURES = Path(Path(__file__).parent, "fixtures")
@@ -40,7 +34,7 @@ class TestConcatenateAttachments(TestCase):
     """Test exception handling"""
 
     def setUp(self):
-        self.user = User.objects.create_user(  # type: ignore
+        self.user = User.objects.create_user(
             username="foo", email="test@test.com", password="bar"
         )
 
@@ -95,3 +89,28 @@ class TestConcatenateAttachments(TestCase):
         )
         self.assertEqual(len(mock_logger.error.mock_calls), 1)
         self.assertEqual(len(mock_logger.exception.mock_calls), 1)
+
+
+def test_filter_assignment_names(sample_assignments):
+    filtered = filter_assignments(assignments=sample_assignments)
+
+    assert len(filtered) == 2
+
+    for assignment in filtered:
+
+        assert assignment["state"] == "PUBLISHED"
+        # being a driveFile attachment type and having a share mode of student
+        # copy are the assignment types we want to filter down to
+
+        n_gradable = len(
+            [
+                m
+                for m in assignment["materials"]
+                if m.get("driveFile", {}).get("shareMode") == "STUDENT_COPY"
+            ]
+        )
+        assert n_gradable > 0
+
+    # double check that id #2 was removed, which is a google form-based
+    # assignment
+    assert 2 not in [a["id"] for a in filtered]

@@ -159,6 +159,31 @@ class AssignmentList:
     assignments: list[APIItem]
 
 
+def filter_assignments(*, assignments: list) -> list:
+    """We can only grade assignments with these properties:
+
+    1. A `driveFile` is attached as a material
+    2. At least one of these `driveFile`s have a `shareMode` of `STUDENT_COPY`
+    """
+
+    def _check_assignment(a) -> bool:
+        """Test if a single assignment meets the criteria."""
+        if "materials" not in a:
+            return False
+        for d in [m for m in a["materials"] if "driveFile" in m]:
+            if d["driveFile"]["shareMode"] == "STUDENT_COPY":
+
+                return True
+        return False
+
+    ret = []
+    for a in assignments:
+        if _check_assignment(a):
+            ret.append(a)
+
+    return ret
+
+
 def list_all_assignment_names(
     *, user: User, course: CourseResource, page_token: Union[str, None] = None
 ) -> AssignmentList:
@@ -173,6 +198,9 @@ def list_all_assignment_names(
         .execute()
     )
     data = response.get("courseWork")
+
+    # filter assignments
+    data = filter_assignments(assignments=data)
 
     # validate resonse
     if data is None:
