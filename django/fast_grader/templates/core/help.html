@@ -10,10 +10,29 @@
   <details>
     <summary class="cursor-pointer">
       <h3 class="inline">How do I get grades into Google Classroom?</h3>
+      {% if is_production %}
       <a class="no-underline" href="https://chrome.google.com/webstore/detail/grade-sync-for-fast-grade/abjpdpjdpbcnpflodcknkiebmnglgikp">
         <button class="block">Install Grade Sync Extension</button>
       </a>
+      {% endif %}
     </summary>
+    {% if not is_production %}
+    <h2>Important Note for Beta Users!</h2>
+    <p class="font-bold">
+      Currently, the beta build of the browser extension is undergoing the
+      Chrome Web Store review process, and is therefore unavailable. At this
+      time, it is impossiblbe to sync grades input on the beta site with
+      Google Classroom until the extension becomes available. If you install
+      the browser extension linked to above, it will only see grades entered
+      on the normall site (<a href="https://classfast.app/">classfast.app</a>),
+      not this site (the beta site).
+    </p>
+    <p>
+      The review process normally takes 4-6 weeks, and feel free to reach out to
+      <a class="link" href="mailto:support@classfast.app">support@classfast.app.</a>
+      with questions or for updates.
+    </p>
+    {% endif %}
     <p>
       When you finish a grading session, grades are only saved to our platform.
       To sync them with google classroom, use the
@@ -27,7 +46,7 @@
       This browser extension will open up Google Classroom in your browser, and
       input the grades for you. This tool is very new, free, and open source,
       so please take a second to double check the grades and kindly report any
-      bugs according to the directions below! Or, feel free to reach the
+      bugs (see bug reporting directions below)! Or, feel free to reach the
       developer directly at
         <a class="link" href="mailto:support@classfast.app">support@classfast.app.</a>
     </p>
@@ -61,13 +80,12 @@
       <h3 class="inline" id="assignment-filtering">Why do some of my assignments not appear in the dropdown?</h3>
     </summary>
     <p>
-      Only assignments that can be graded by this platform appear in the dropdown
-      menu for choosing assignments.
+      Only assignments that can be graded by this platform appear in the
+      dropdown menu for choosing assignments.
       <img class="h-72" src={% static 'core/screenshots/assignment_picker.png' %} />
       The only assignments that pass the filter are: (1) assignments that are
-      published, (2) assignments that contain a google drive file attachment,
-      and (3) have at least one drive file attachment set to make a copy
-      for each student.
+      published, (2) contain a google drive file attachment, and (3) have at
+      least one drive file attachment set to make a copy for each student.
     </p>
   </details>
 
@@ -76,68 +94,39 @@
       <h3 class="inline">What is in the feature roadmap?</h3>
     </summary>
     <p>
-      The website as you see it now should be seen as a prototype. Right now,
-      we are working on a redesign of the whole system, now that we have a good
-      understanding of the problem, and a better idea of how to solve it. We will
-      be requesting feedback from teachers throughout the process, so please
-      reach out and email me at
-      <a class="link" href="mailto:support@classfast.app">support@classfast.app!</a>
     </p>
     <h4>Coming Soon</h4>
     <ul class="list-disc">
       <li>
-        New brand, new frontend, improved user interface and user experiences
-      </li>
-      <li>
-        Development of a more robust backend and system testing pipeline to cut
-        down on bugs and broken deployments
-      </li>
-      <li>
         Improve differences view in grading tool to be more concise and
         informative
-      </li>
-      <li>
-        Optimize performance and page load time by predictively fetching data
-        for your grading session
       </li>
       <li>
         Commenting and a comment bank, including ability to save and manage
         comment banks through your account
       </li>
       <li>Queue up multiple assignments to grade at the same time, in a single session. Even across classrooms!</li>
-      <li>Support for Canvas, which is another Learning Mangement System (LMS)</li>
     </ul>
+    <p>
+      We need your help to learn which features are most important to you, so
+      please reach out and share your thoughts!
+    </p>
   </details>
 
   <details>
     <summary class="cursor-pointer">
-      <h3 class="inline">How do I report a bug?</h3>
+      <h3 class="inline">How do I report a bug or request a feature?</h3>
         <a class="no-underline bg-yellow-600" href="https://github.com/jdevries3133/fast_grader/issues/new">
-          <button class="block">Submit Bug Report</button>
+          <button class="block">Open GitHub Issue</button>
         </a>
     </summary>
   <p>
-    Bug reports are extremely appreciated! Click the button above to submit a
-    bug report on GitHub. Or, send me a personal email at
+    Engaging with the project on GitHub is the best way to either report a bug
+    or request a feature! Or, you can also email us at
     <a
       class="link"
       href="mailto:support@classfast.app">support@classfast.app</a>
   </p>
-  </details>
-  <details>
-    <summary class="cursor-pointer">
-      <h3 class="inline mt-4 mb-4">How do I request a new feature?</h3>
-      <a class="no-underline" href="https://github.com/jdevries3133/fast_grader/issues/new">
-        <button class="block bg-blue-200 focus:ring-blue-400 no-underline">Make a Feature Request</button>
-      </a>
-    </summary>
-    <p>
-      Use the same process as submitting a bug report! Open up an issue on the
-      GitHub repository, or 
-      <a
-        class="link"
-        href="mailto:support@classfast.app">send me an email!</a>
-    </p>
   </details>
 
 </div>
