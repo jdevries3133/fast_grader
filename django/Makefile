@@ -51,14 +51,20 @@ setup:
 
 .PHONY: test
 test:
+ifdef CI
 	@# the docker-compose and BuildKit integration is broken, so we need to
 	@# disable it for now. This also causes caching to become less effective,
 	@# so uncomment this override whenever the integration is fixed
 	COMPOSE_DOCKER_CLI_BUILD=0 \
 	TAG=$(TAG) \
 		docker-compose up -d
-
 	docker exec django_web_1 pytest
+else
+	@# outside CI, assume the system is already running. Also, attaching an
+	@# interactive terminal causes (1) pytest to give colored output, and (2)
+	@# pdb to pause at breakpoints
+	docker exec -it django_web_1 pytest
+endif
 
 
 .PHONY: push
