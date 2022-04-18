@@ -2,6 +2,7 @@ name: Deploy new documentation
 
 on:
   push:
+    branches: ['main']
     paths: [
       "docs/**",
       "Dockerfile.documentation",

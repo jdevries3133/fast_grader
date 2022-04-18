@@ -29,6 +29,7 @@ name: CI/CD for Django web application
 
 on:
   push:
+    branches: ['main']
     paths: "django/**"
 
 jobs:
