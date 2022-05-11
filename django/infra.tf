@@ -44,7 +44,7 @@ resource "random_password" "django_secret" {
 
 module "basic-deployment" {
   source  = "jdevries3133/basic-deployment/kubernetes"
-  version = "0.0.9"
+  version = "0.1.2"
 
   app_name  = terraform.workspace == "production" ? "fast-grader" : "fast-grader-beta"
   container = "jdevries3133/fast_grader_django:${data.external.git_describe.result.output}"
